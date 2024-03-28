@@ -1,5 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 
 public class UserGetDTO {
@@ -8,6 +11,11 @@ public class UserGetDTO {
   private String name;
   private String username;
   private UserStatus status;
+
+  private String password;
+  private String token;
+
+  private ArrayList<Long> friends;
 
   public Long getId() {
     return id;
@@ -39,5 +47,25 @@ public class UserGetDTO {
 
   public void setStatus(UserStatus status) {
     this.status = status;
+  }
+
+  public String getToken() {
+    return token;
+  }
+
+  public void setToken(String token) {
+    this.token = token;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public ArrayList<Long> getFriends() {
+    return friends;
   }
 }
