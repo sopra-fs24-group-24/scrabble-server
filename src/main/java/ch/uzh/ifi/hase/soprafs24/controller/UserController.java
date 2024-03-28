@@ -30,14 +30,21 @@ public class UserController {
   @GetMapping("/users")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserGetDTO> getAllUsers() {
+  public List<UserGetDTO> getAllUsers(@RequestParam(required=false) String token) 
+  {
+    userService.isTokenValid(token);
+
     // fetch all users in the internal representation
     List<User> users = userService.getUsers();
     List<UserGetDTO> userGetDTOs = new ArrayList<>();
 
     // convert each user to the API representation
-    for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+    for (User user : users) 
+    {
+        // strip critical information
+        user.setPassword("");
+        user.setToken("");
+        userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
     }
     return userGetDTOs;
   }
@@ -54,4 +61,27 @@ public class UserController {
     // convert internal representation of user back to API
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
   }
+
+  @RequestMapping("/users/{userId}")
+  @ResponseBody
+  public User getUser(@PathVariable("userId") Long userId,@RequestParam(required=false) String token) 
+  {
+    // Who is asking?
+    User tokenHolder=userService.isTokenValid(token);
+
+    // Are they asking for their own information?
+    if(tokenHolder.getId()==userId)
+    {
+        return userService.getUserParams(userId);
+    }
+    else // strip critical data:
+    {
+        User requestedUser=userService.getUserParams(userId);
+        requestedUser.setPassword("");
+        requestedUser.setToken("");
+        return requestedUser;
+    }
+        
+  }
+  
 }

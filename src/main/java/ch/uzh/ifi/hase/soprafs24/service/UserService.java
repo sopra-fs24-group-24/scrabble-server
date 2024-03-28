@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -41,7 +42,7 @@ public class UserService {
 
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
+    newUser.setStatus(UserStatus.ONLINE);
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -62,18 +63,41 @@ public class UserService {
    * @throws org.springframework.web.server.ResponseStatusException
    * @see User
    */
-  private void checkIfUserExists(User userToBeCreated) {
+  public User checkIfUserExists(User userToBeCreated) // TODO: private to public for testing and return type was void
+  {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
     User userByName = userRepository.findByName(userToBeCreated.getName());
 
     String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
     if (userByUsername != null && userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+      throw new ResponseStatusException(HttpStatus.CONFLICT,
           String.format(baseErrorMessage, "username and the name", "are"));
     } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
+      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     } else if (userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
+      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "name", "is"));
     }
+    return userToBeCreated;
+  }
+
+  public User isTokenValid(String token)
+  {
+    User foundUser=userRepository.findByToken(token);
+    String baseErrorMessage = "Invalid Token!";
+    if (foundUser== null) 
+    {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, String.format(baseErrorMessage));
+    }
+    return foundUser;
+}
+
+  public User getUserParams(Long userId)
+  {
+    Optional<User> user=userRepository.findById(userId);
+    if(user.isPresent())
+        return user.get();
+
+    String baseErrorMessage = "The %s provided can not be found!";
+    throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "User ID"));
   }
 }
