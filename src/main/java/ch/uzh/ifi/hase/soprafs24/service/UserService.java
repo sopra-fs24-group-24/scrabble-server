@@ -100,4 +100,17 @@ public class UserService {
     String baseErrorMessage = "The %s provided can not be found!";
     throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "User ID"));
   }
+
+  public User attemptUserLogin(String userName, String password)
+  {
+    User identifiedUser=userRepository.findByUsername(userName);
+
+    if(identifiedUser.getPassword().equals(password))
+    {
+        identifiedUser.setStatus(UserStatus.ONLINE);
+        return identifiedUser;
+    }
+    String baseErrorMessage = "The entered credentials are invalid!";
+    throw new ResponseStatusException(HttpStatus.FORBIDDEN, String.format(baseErrorMessage, "User ID"));
+  }
 }
