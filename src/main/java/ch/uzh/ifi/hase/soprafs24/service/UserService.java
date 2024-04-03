@@ -101,12 +101,14 @@ public class UserService {
   {
     User identifiedUser=userRepository.findByUsername(userName);
 
-    if(identifiedUser.getPassword().equals(password))
+    if(identifiedUser==null||(!identifiedUser.getPassword().equals(password)))
     {
-        identifiedUser.setStatus(UserStatus.ONLINE);
-        return identifiedUser;
+        String baseErrorMessage = "The entered credentials are invalid!";
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, String.format(baseErrorMessage, "User ID"));
     }
-    String baseErrorMessage = "The entered credentials are invalid!";
-    throw new ResponseStatusException(HttpStatus.FORBIDDEN, String.format(baseErrorMessage, "User ID"));
+
+    identifiedUser.setStatus(UserStatus.ONLINE);
+    return identifiedUser;
+
   }
 }
