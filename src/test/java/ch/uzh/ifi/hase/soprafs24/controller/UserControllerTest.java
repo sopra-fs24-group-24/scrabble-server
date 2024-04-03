@@ -141,6 +141,73 @@ public class UserControllerTest {
     .andExpect(status().isConflict());
   }
 
+  
+  @Test
+  public void loginUser_validInput() throws Exception {
+    // given
+    User user = new User();
+    user.setId(1L);
+    user.setPassword("1234");
+    user.setUsername("testUsername");
+    user.setToken("1");
+    user.setStatus(UserStatus.ONLINE);
+
+    UserPostDTO userPostDTO = new UserPostDTO();
+    userPostDTO.setPassword("1234");
+    userPostDTO.setUsername("testUsername");
+
+    given(userService.attemptUserLogin(user.getUsername(),user.getPassword())).willReturn(user);
+
+    // when/then -> do the request + validate the result
+    MockHttpServletRequestBuilder postRequest = post("/logins")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(userPostDTO));
+
+    // then
+    mockMvc.perform(postRequest)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+        .andExpect(jsonPath("$.name", is(user.getName())))
+        .andExpect(jsonPath("$.username", is(user.getUsername())))
+        .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
+  }
+
+  @Test
+  public void loginUser_invalidInput() throws Exception {
+    // given
+    User user = new User();
+    user.setId(1L);
+    user.setPassword("1234");
+    user.setUsername("testUsername");
+    user.setToken("1");
+    user.setStatus(UserStatus.ONLINE);
+
+    UserPostDTO userPostDTO = new UserPostDTO();
+    userPostDTO.setPassword("1234");
+    userPostDTO.setUsername("testUsername");
+    userPostDTO.setToken("1");
+
+    // given(userService.createUser(Mockito.any())).willReturn(user);
+    
+    ResponseStatusException e=new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+    given(userService.attemptUserLogin(user.getUsername(),user.getPassword())).willThrow(e);
+
+    // when/then -> do the request + validate the result
+    MockHttpServletRequestBuilder postRequest = post("/logins")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(userPostDTO));
+
+    // then
+    mockMvc.perform(postRequest)
+        .andExpect(status().isForbidden());
+        //.andExpect(jsonPath("$.id", is(user.getId().intValue())))
+        //.andExpect(jsonPath("$.name", is(user.getName())))
+        //.andExpect(jsonPath("$.username", is(user.getUsername())))
+        //.andExpect(jsonPath("$.status", is(user.getStatus().toString())));
+
+  }
+
   @Test
   public void getUser_validInputs() throws Exception 
   {
