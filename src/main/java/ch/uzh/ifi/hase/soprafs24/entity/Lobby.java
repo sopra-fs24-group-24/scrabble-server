@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -22,7 +23,8 @@ public class Lobby implements Serializable{
     private int LobbySize;
 
     @Column(nullable = false)
-    private ArrayList<Long> UsersInLobby;
+    @ElementCollection
+    private List<Long> UsersInLobby;
 
     @Column(nullable = false)
     private boolean GameStarted;
@@ -38,6 +40,8 @@ public class Lobby implements Serializable{
     }
 
     public int getNumberOfPlayers() { return NumberOfPlayers; }
+
+    public void setNumberOfPlayers(int NumberOfPlayers) { this.NumberOfPlayers = NumberOfPlayers; }
 
     public int getLobbySize() { return LobbySize; }
 
