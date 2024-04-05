@@ -11,14 +11,14 @@ public interface LobbyDTOMapper {
 
     LobbyDTOMapper INSTANCE = Mappers.getMapper(LobbyDTOMapper.class);
 
-    @Mapping(source = "LobbySize", target = "LobbySize")
-    @Mapping(source = "UsersInLobby", target = "UsersInLobby")
+    @Mapping(source = "lobbySize", target = "lobbySize")
+    @Mapping(source = "usersInLobby", target = "usersInLobby")
     Lobby convertLobbyPostDTOtoEntity(LobbyPostDTO lobbyPostDTO);
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "NumberOfPlayers", target = "NumberOfPlayers")
-    @Mapping(source = "LobbySize", target = "LobbySize")
-    @Mapping(source = "UsersInLobby", target = "UsersInLobby")
-    @Mapping(source = "GameStarted", target = "GameStarted")
+    @Mapping(source = "numberOfPlayers", target = "numberOfPlayers")
+    @Mapping(source = "lobbySize", target = "lobbySize")
+    @Mapping(source = "usersInLobby", target = "usersInLobby")
+    @Mapping(source = "gameStarted", target = "gameStarted")
     LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
 }
