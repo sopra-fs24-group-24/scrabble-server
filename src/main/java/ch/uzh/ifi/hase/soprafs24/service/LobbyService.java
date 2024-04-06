@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +27,14 @@ public class LobbyService {
         this.lobbyRepository = lobbyRepository;
     }
 
+    public List<Lobby> getLobbies() {
+        return this.lobbyRepository.findAll();
+    }
+
+    public Lobby getLobby(Long id) {
+        return checkIfLobbyExistsById(id);
+    }
+
     public Lobby createLobby(Lobby newLobby) {
         newLobby.setNumberOfPlayers(1);
         newLobby.setGameStarted(false);
@@ -35,7 +45,6 @@ public class LobbyService {
         log.debug("Created Information for Lobby: {}", newLobby);
         return newLobby;
     }
-
 
     /**
      * This is a helper method that will check whether the user,
@@ -48,7 +57,7 @@ public class LobbyService {
      * @see Lobby
      */
 
-     public Lobby checkIfUserAlreadyInLobby(Lobby lobbyToBeCreated) {
+     private Lobby checkIfUserAlreadyInLobby(Lobby lobbyToBeCreated) {
          Long UserId = lobbyToBeCreated.getUsersInLobby().get(0);
          Optional<Lobby> lobby = lobbyRepository.findLobbyByUserId(UserId);
          if (lobby.isPresent()){
@@ -57,4 +66,22 @@ public class LobbyService {
          }
          return lobbyToBeCreated;
      }
+
+    /**
+     * This is a helper method that will check whether the user,
+     * which wants to create/join a lobby, is already in a lobby
+     * or not. The method will do nothing if the user is not in
+     * a lobby yet and throw an error otherwise.
+     *
+     * @param id
+     * @throws org.springframework.web.server.ResponseStatusException
+     * @see Lobby
+     */
+
+     private Lobby checkIfLobbyExistsById(Long id) {
+         Optional<Lobby> foundLobby = lobbyRepository.findById(id);
+         return foundLobby.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                 String.format("Lobby with Lobby-ID %d does not exist!", id)));
+     }
+
 }

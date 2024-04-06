@@ -8,6 +8,9 @@ import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class LobbyController {
 
@@ -15,6 +18,26 @@ public class LobbyController {
 
     LobbyController(LobbyService lobbyService) {
         this.lobbyService = lobbyService;
+    }
+
+    @GetMapping("/lobbies")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<LobbyGetDTO> getAllLobbies() {
+        List<Lobby> lobbies = lobbyService.getLobbies();
+        List<LobbyGetDTO> lobbyGetDTOs = new ArrayList<>();
+        for (Lobby lobby : lobbies) {
+            lobbyGetDTOs.add(LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby));
+        }
+        return lobbyGetDTOs;
+    }
+
+    @GetMapping("/lobbies/{lobbyId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LobbyGetDTO getSpecificLobby(@PathVariable Long lobbyId) {
+        Lobby lobby = lobbyService.getLobby(lobbyId);
+        return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
     }
 
     @PostMapping("/lobbies")
