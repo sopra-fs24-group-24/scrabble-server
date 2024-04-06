@@ -38,12 +38,33 @@ public class LobbyService {
     public Lobby createLobby(Lobby newLobby) {
         newLobby.setNumberOfPlayers(1);
         newLobby.setGameStarted(false);
-        checkIfUserAlreadyInLobby(newLobby);
+        Long userId = newLobby.getUsersInLobby().get(0);
+        checkIfUserAlreadyInLobby(userId);
         newLobby = lobbyRepository.save(newLobby);
         lobbyRepository.flush();
 
         log.debug("Created Information for Lobby: {}", newLobby);
         return newLobby;
+    }
+
+    public Lobby addPlayertoLobby(Long lobbyId, Long userId) {
+        Lobby lobby = checkIfLobbyExistsById(lobbyId);
+        checkIfUserAlreadyInLobby(userId);
+        if (lobby.addPlayer(userId)) {
+            return lobby;
+        }
+        String errorMessage = "Lobby is already full!";
+        throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+    }
+
+    public void removePlayerFromLobby(Long lobbyId, Long userId) {
+        Lobby lobby = checkIfLobbyExistsById(lobbyId);
+        checkIfPlayerInLobby(lobby, userId);
+        lobby.removePlayer(userId);
+        if (lobby.getNumberOfPlayers() == 0) {
+            lobbyRepository.delete(lobby);
+            lobbyRepository.flush();
+        }
     }
 
     /**
@@ -52,26 +73,24 @@ public class LobbyService {
      * or not. The method will do nothing if the user is not in
      * a lobby yet and throw an error otherwise.
      *
-     * @param lobbyToBeCreated
+     * @param userId
      * @throws org.springframework.web.server.ResponseStatusException
      * @see Lobby
      */
 
-     private Lobby checkIfUserAlreadyInLobby(Lobby lobbyToBeCreated) {
-         Long UserId = lobbyToBeCreated.getUsersInLobby().get(0);
-         Optional<Lobby> lobby = lobbyRepository.findLobbyByUserId(UserId);
+     private Optional<Lobby> checkIfUserAlreadyInLobby(Long userId) {
+         Optional<Lobby> lobby = lobbyRepository.findLobbyByUserId(userId);
          if (lobby.isPresent()){
              String errorMessage = "User can only be in one Lobby";
              throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
          }
-         return lobbyToBeCreated;
+         return lobby;
      }
 
     /**
-     * This is a helper method that will check whether the user,
-     * which wants to create/join a lobby, is already in a lobby
-     * or not. The method will do nothing if the user is not in
-     * a lobby yet and throw an error otherwise.
+     * This is a helper method that will check whether a lobby
+     * with the specified ID exists or not. The method will return
+     * found lobby or else throw an error.
      *
      * @param id
      * @throws org.springframework.web.server.ResponseStatusException
@@ -83,5 +102,27 @@ public class LobbyService {
          return foundLobby.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                  String.format("Lobby with Lobby-ID %d does not exist!", id)));
      }
+
+    /**
+     * This is a helper method that will check whether the user,
+     * which wants to withdraw from a lobby, is indeed in the
+     * specified lobby. If the user is in the specified lobby,
+     * the truth value true is returned, otherwise an error
+     * message is shown.
+     *
+     * @param lobby
+     * @param userId
+     * @throws org.springframework.web.server.ResponseStatusException
+     * @see Lobby
+     */
+
+    private boolean checkIfPlayerInLobby(Lobby lobby, Long userId) {
+        List<Long> playersInLobby = lobby.getUsersInLobby();
+        if (playersInLobby.contains(userId)) {
+            return true;
+        }
+        String errorMessage = "User not found in specified Lobby";
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
+    }
 
 }

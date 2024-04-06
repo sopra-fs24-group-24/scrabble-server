@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class LobbyController {
@@ -51,5 +52,21 @@ public class LobbyController {
         Lobby createdLobby = lobbyService.createLobby(userInput);
         // convert internal representation of user back to API
         return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(createdLobby);
+    }
+
+    @PutMapping("/lobbies/{lobbyId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LobbyGetDTO joinLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) {
+        Long userId = requestBody.get("userId");
+        Lobby joinedLobby = lobbyService.addPlayertoLobby(lobbyId, userId);
+        return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
+    }
+
+    @PutMapping("/lobbies/withdrawal/{lobbyId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void withdrawFromLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) {
+        Long userId = requestBody.get("userId");
+        lobbyService.removePlayerFromLobby(lobbyId, userId);
     }
 }

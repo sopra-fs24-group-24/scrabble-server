@@ -66,13 +66,7 @@ public class Lobby implements Serializable{
     }
 
     public boolean addPlayer(Long UserId) {
-        if (this.numberOfPlayers == 0){
-            this.usersInLobby = new ArrayList<>();
-            this.usersInLobby.add(UserId);
-            this.numberOfPlayers += 1;
-            return true;
-        }
-        else if (this.numberOfPlayers > 0 && this.numberOfPlayers < this.lobbySize){
+        if (this.numberOfPlayers > 0 && this.numberOfPlayers < this.lobbySize){
             this.numberOfPlayers += 1;
             this.usersInLobby.add(UserId);
             return true;
@@ -80,15 +74,10 @@ public class Lobby implements Serializable{
         return false;
     }
 
-    public boolean removePlayer(Long UserId){
-        int index = this.usersInLobby.indexOf(UserId);
-
-        if (this.numberOfPlayers == 0 || index == -1){
-            return false;
-        }
-        else if (index != -1) {
+    public boolean removePlayer(Long UserId) {
+        if (this.numberOfPlayers >= 1) {
             this.numberOfPlayers -= 1;
-            this.usersInLobby.remove(index);
+            this.usersInLobby.remove(UserId);
             return true;
         }
         return false;
