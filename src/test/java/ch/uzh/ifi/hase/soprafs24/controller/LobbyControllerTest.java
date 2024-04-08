@@ -46,7 +46,8 @@ public class LobbyControllerTest {
         given(lobbyService.getLobbies()).willReturn(allLobbies);
 
         // when
-        MockHttpServletRequestBuilder getRequest = get("/lobbies").contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder getRequest = get("/lobbies")
+                .contentType(MediaType.APPLICATION_JSON);
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isOk())
@@ -59,5 +60,32 @@ public class LobbyControllerTest {
                 .andExpect(jsonPath("$[0].gameStarted", is(lobby.getGameStarted())));
     }
 
+    @Test
+    public void getLobby_validInput() throws Exception {
+        // given
+        Lobby lobby = new Lobby();
+        lobby.setId(2L);
+        lobby.setLobbySize(4);
+        lobby.setNumberOfPlayers(2);
+        lobby.setGameStarted(false);
+        List<Long> players = new ArrayList<Long>();
+        players.add((long) 1);
+        players.add((long) 3);
+        lobby.setUsersInLobby(players);
 
+        given(lobbyService.getLobby(2L)).willReturn(lobby);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}", 2L)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        // then
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
+                .andExpect(jsonPath("$.numberOfPlayers", is(lobby.getNumberOfPlayers())))
+                .andExpect(jsonPath("$.lobbySize", is(lobby.getLobbySize())))
+                .andExpect(jsonPath("$.usersInLobby", containsInAnyOrder(lobby.getUsersInLobby().get(1).intValue(), lobby.getUsersInLobby().get(0).intValue())))
+                .andExpect(jsonPath("$.usersInLobby").value(hasSize(2)))
+                .andExpect(jsonPath("$.gameStarted", is(lobby.getGameStarted())));
+    }
 }
