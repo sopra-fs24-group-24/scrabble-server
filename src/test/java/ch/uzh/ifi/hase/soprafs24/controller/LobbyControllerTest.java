@@ -16,14 +16,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LobbyController.class)
@@ -170,6 +167,83 @@ public class LobbyControllerTest {
 
         // then
         mockMvc.perform(postRequest).andExpect(status().isConflict())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    public void addPlayerToLobby_validInputs_thenPlayerAddedToLobby() throws Exception {
+        // given
+        Lobby lobby = new Lobby();
+        Long lobbyId = 6L;
+        lobby.setId(lobbyId);
+        lobby.setLobbySize(3);
+        lobby.setNumberOfPlayers(2);
+        lobby.setGameStarted(false);
+        List<Long> players = new ArrayList<Long>();
+        players.add(7L);
+        players.add(10L);
+        lobby.setUsersInLobby(players);
+
+        // add new player to Lobby
+        Map<String, Long> userId = new HashMap<>();
+        userId.put("userId", 10L);
+
+        given(lobbyService.addPlayertoLobby(lobbyId, 10L)).willReturn(lobby);
+
+        // when
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", lobbyId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userId));
+
+        // then
+        mockMvc.perform(putRequest).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
+                .andExpect(jsonPath("$.numberOfPlayers", is(lobby.getNumberOfPlayers())))
+                .andExpect(jsonPath("$.lobbySize", is(lobby.getLobbySize())))
+                .andExpect(jsonPath("$.usersInLobby", containsInAnyOrder(lobby.getUsersInLobby().get(0).intValue(), lobby.getUsersInLobby().get(1).intValue())))
+                .andExpect(jsonPath("$.usersInLobby").value(hasSize(2)))
+                .andExpect(jsonPath("$.gameStarted", is(lobby.getGameStarted())));
+
+
+    }
+
+    @Test
+    public void addPlayerToLobby_whenNonExistentLobby_thenThrowError() throws Exception {
+        // given
+        Long lobbyId = 22L;
+        Map<String, Long> userId = new HashMap<>();
+        userId.put("userId", 10L);
+
+
+        given(lobbyService.addPlayertoLobby(lobbyId, 10L)).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // when
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", lobbyId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userId));
+
+        // then
+        mockMvc.perform(putRequest).andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    public void addPlayerToLobby_whenUserAlreadyInLobby_thenThrowError() throws Exception {
+        // given
+        Long lobbyId = 30L;
+        Map<String, Long> userId = new HashMap<>();
+        userId.put("userId", 12L);
+
+
+        given(lobbyService.addPlayertoLobby(lobbyId, 12L)).willThrow(new ResponseStatusException(HttpStatus.CONFLICT));
+
+        // when
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", lobbyId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userId));
+
+        // then
+        mockMvc.perform(putRequest).andExpect(status().isConflict())
                 .andExpect(content().string(""));
     }
 
