@@ -6,9 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +19,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LobbyController.class)
 public class LobbyControllerTest {
@@ -61,7 +62,7 @@ public class LobbyControllerTest {
     }
 
     @Test
-    public void getLobby_validInput() throws Exception {
+    public void getLobby_whenRequestExistentLobby_thenReturnLobby() throws Exception {
         // given
         Lobby lobby = new Lobby();
         lobby.setId(2L);
@@ -87,5 +88,21 @@ public class LobbyControllerTest {
                 .andExpect(jsonPath("$.usersInLobby", containsInAnyOrder(lobby.getUsersInLobby().get(1).intValue(), lobby.getUsersInLobby().get(0).intValue())))
                 .andExpect(jsonPath("$.usersInLobby").value(hasSize(2)))
                 .andExpect(jsonPath("$.gameStarted", is(lobby.getGameStarted())));
+    }
+
+    @Test
+    public void getLobby_whenRequestNonExistentLobby_thenThrowError() throws Exception {
+        // given
+        long lobbyId = 5;
+
+        given(lobbyService.getLobby(lobbyId)).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}", lobbyId)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        // then
+        mockMvc.perform(getRequest).andExpect(status().isNotFound())
+                .andExpect(content().string(""));
     }
 }
