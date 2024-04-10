@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,5 +27,16 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
+
+
+    public Game getGameParams(Long gameId)
+    {
+      Optional<Game> game=gameRepository.findById(gameId);
+      if(game.isPresent())
+          return game.get();
+  
+      String baseErrorMessage = "The %s provided can not be found!";
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "Game ID"));
+    }
 
 }
