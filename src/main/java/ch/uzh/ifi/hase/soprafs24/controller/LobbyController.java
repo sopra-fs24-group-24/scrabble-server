@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,18 @@ public class LobbyController {
         Lobby joinedLobby = lobbyService.addPlayertoLobby(lobbyId, userId);
         return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
     }
+
+    @DeleteMapping("/lobbies/{lobbyId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void deleteLobby(@PathVariable("lobbyId") Long lobbyId,@RequestParam(required=false) String token) 
+    {
+        // TODO: Need to check token first
+        Lobby toKill=lobbyService.checkIfLobbyExistsById(lobbyId); // raises 404 if not
+        toKill=null;
+    }
+
+    
 
     @PutMapping("/lobbies/withdrawal/{lobbyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
