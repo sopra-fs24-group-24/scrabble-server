@@ -97,7 +97,7 @@ public class LobbyService {
      * @see Lobby
      */
 
-     private Lobby checkIfLobbyExistsById(Long id) {
+    public Lobby checkIfLobbyExistsById(Long id) {
          Optional<Lobby> foundLobby = lobbyRepository.findById(id);
          return foundLobby.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                  String.format("Lobby with Lobby-ID %d does not exist!", id)));
