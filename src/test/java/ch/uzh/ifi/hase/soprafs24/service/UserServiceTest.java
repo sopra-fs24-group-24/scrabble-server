@@ -11,6 +11,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
@@ -82,4 +84,75 @@ public class UserServiceTest {
     assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
   }
 
+  @Test
+  public void updateUser_invalidId_throwsException() {
+    userService.createUser(testUser);
+
+    User updatedUser = new User();
+    updatedUser.setUsername("newUsername");
+
+    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+    assertThrows(ResponseStatusException.class, () -> userService.updateUser(updatedUser, 2L));
+  }
+
+  @Test
+  public void updateUser_invalidToken_throwsException() {
+    userService.createUser(testUser);
+
+    User updatedUser = new User();
+    updatedUser.setUsername("newUsername");
+    updatedUser.setToken("invalidToken");
+
+    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(testUser));
+
+    assertThrows(ResponseStatusException.class, () -> userService.updateUser(updatedUser, 1L));
+  }
+
+  @Test
+  public void updateUser_emptyUsername_throwsException() {
+    User createdUser = userService.createUser(testUser);
+
+    User updatedUser = new User();
+    updatedUser.setUsername("");
+    updatedUser.setToken(createdUser.getToken());
+
+    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(testUser));
+
+    assertThrows(ResponseStatusException.class, () -> userService.updateUser(updatedUser, 1L));
+  }
+
+  @Test
+  public void updateUser_duplicateUsername_throwsException() {
+    User createdUser = userService.createUser(testUser);
+
+    User updatedUser = new User();
+    updatedUser.setUsername("newUsername");
+    updatedUser.setToken(createdUser.getToken());
+
+    User secondUser = new User();
+    secondUser.setUsername("newUsername");
+    secondUser.setId(2L);
+
+    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(testUser));
+    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(secondUser);
+
+    assertThrows(ResponseStatusException.class, () -> userService.updateUser(updatedUser, 1L));
+  }
+
+  @Test
+  public void updateUser_validInput_success() {
+    User createdUser = userService.createUser(testUser);
+
+    User updatedUser = new User();
+    updatedUser.setUsername("newUsername");
+    updatedUser.setToken(createdUser.getToken());
+
+    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(testUser));
+    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(null);
+
+    userService.updateUser(updatedUser, 1l);
+
+    assertEquals(updatedUser.getUsername(), createdUser.getUsername());
+  }
 }

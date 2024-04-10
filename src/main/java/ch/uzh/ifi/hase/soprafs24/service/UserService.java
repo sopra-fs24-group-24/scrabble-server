@@ -53,6 +53,25 @@ public class UserService {
     return newUser;
   }
 
+  public void updateUser(User user, Long id) {
+      Optional<User> userById = userRepository.findById(id);
+      User userByUsername = userRepository.findByUsername(user.getUsername());
+
+      if (userById.isEmpty()) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The user with id: %s doesn't exist!", id));
+      } else if (!userById.get().getToken().equals(user.getToken())) {
+          throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be authenticated. Therefore the user could not be updated!");
+      }
+
+      if (user.getUsername().isEmpty()) {
+          throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "The username is empty. Therefore, the user could not be updated!");
+      } else if (userByUsername != null && !userByUsername.getId().equals(id)) {
+          throw new ResponseStatusException(HttpStatus.CONFLICT, "The username is not unique. Therefore, the user could not be updated!");
+      }
+
+      userById.get().setUsername(user.getUsername());
+  }
+
   /**
    * This is a helper method that will check the uniqueness criteria of the
    * username and the name
