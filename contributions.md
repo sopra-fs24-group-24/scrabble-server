@@ -67,3 +67,25 @@ completed on Saturday 06.04.2024
 completed on Saturday 06.04.2024
 
 - Implemented the client side undo functionality for the undo button
+
+## Michael Kevin Barry
+
+### *Week 0 and 1*
+
+**Create function to authenticate user #82**: </br>
+
+**Implement register and login page with username and password input fields and commit button #30**: </br>
+
+**Create function to persist user in database #81**: </br>
+
+**Implement routing to main page after succesful login/registration #29**: </br>
+
+**Create REST POST endpoint for registered users to log in  #85**: </br>
+
+**Create user schema #57**: </br>
+
+**Create REST GET endpoints to get user information #61**: </br>
+
+**Create REST POST endpoints to register user #80**: </br>
+
+**Multiple bug fixes**: </br>
