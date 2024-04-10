@@ -1,5 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.constant;
 
-public enum GameMode {
-    CLASSIC
+public enum Multiplier {
+    TW,TL,DW,DL
 }

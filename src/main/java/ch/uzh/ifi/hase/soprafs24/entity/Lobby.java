@@ -28,7 +28,7 @@ public class Lobby implements Serializable{
 
     @Column(nullable = false)
     private boolean gameStarted;
-
+    @OneToOne
     private Game gameOfLobby;
 
     public Long getId() {
