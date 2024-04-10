@@ -43,7 +43,8 @@ public class User implements Serializable {
   private String password;
 
   @Column(nullable = true)
-  private ArrayList<Long> friends;
+  @ElementCollection
+  private List<Long> friends = new ArrayList<Long>();
 
   public Long getId() {
     return id;
@@ -95,7 +96,7 @@ public class User implements Serializable {
     this.password = password;
   }
 
-  public ArrayList<Long> getFriends()
+  public List<Long> getFriends()
   {
     return friends;
   }

@@ -105,5 +105,20 @@ public class UserController {
     // convert internal representation of user back to API
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedinUser);
   }
-  
+
+  @GetMapping("/friends/{userId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<UserGetDTO> getFriends(@PathVariable("userId") Long userId, @RequestParam String token) {
+    List<User> friends = userService.getFriends(userId, token);
+    List<UserGetDTO> userGetDTOs = new ArrayList<>();
+
+    for (User user : friends) {
+        user.setPassword("");
+        user.setToken("");
+        userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+    }
+
+    return userGetDTOs;
+  }
 }

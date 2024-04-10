@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,6 +44,7 @@ public class UserService {
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
+
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -70,6 +72,28 @@ public class UserService {
       }
 
       userById.get().setUsername(user.getUsername());
+  }
+
+  public List<User> getFriends(Long id, String token) {
+    authenticateUser(id, token);
+    List<Long> friendIds = userRepository.findById(id).get().getFriends();
+    List<User> friends = new ArrayList<>();
+
+    for (Long friendId : friendIds) {
+      friends.add(userRepository.findById(friendId).get());
+    }
+
+    return friends;
+  }
+
+  private void authenticateUser(Long id, String token) {
+    Optional<User> userById = userRepository.findById(id);
+
+    if (userById.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The user with id: %s doesn't exist!", id));
+    } else if (!userById.get().getToken().equals(token)) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User could not be authenticated!");
+    }
   }
 
   /**
