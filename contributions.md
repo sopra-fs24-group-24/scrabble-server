@@ -89,3 +89,19 @@ completed on Saturday 06.04.2024
 **Create REST POST endpoints to register user #80**: </br>
 
 **Multiple bug fixes**: </br>
+
+## Florian Lanz
+
+### *Week 1*
+
+**Create REST PUT endpoint to update user information [(issue #62)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/62)** </br>
+
+**Implement profile page with user information and edit button [(issue #20)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/20)** </br>
+
+**Create functionality to replace user information fields with input fields and replace edit button with save and abort button [(issue #18)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/18)** </br>
+
+**Create REST GET endpoint to get the friendslist of the user [(issue #72)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/72)** </br>
+
+**Create Post REST endpoint to log out a user [(issue #86)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/86)** </br>
+
+**Create a logout button [(issue #32)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/32)** </br>
