@@ -155,4 +155,19 @@ public class UserServiceTest {
 
     assertEquals(updatedUser.getUsername(), createdUser.getUsername());
   }
+
+  @Test
+  public void logoutUser_validInput_success() {
+    User createdUser = userService.createUser(testUser);
+
+    User user = new User();
+    user.setId(1L);
+    user.setToken(createdUser.getToken());
+
+    Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(testUser));
+
+    userService.logoutUser(user);
+
+    assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
+  }
 }

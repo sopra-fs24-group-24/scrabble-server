@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LogoutPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
@@ -42,4 +43,8 @@ public interface DTOMapper {
   @Mapping(source = "username", target="username")
   @Mapping(source = "token", target = "token")
   User convertUserPutDTOToEntity(UserPutDTO userPutDTO);
+
+  @Mapping(source = "id", target = "id")
+  @Mapping(source = "token", target = "token")
+  User convertLogoutPostDTOToEntity(LogoutPostDTO logoutPostDTO);
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +85,12 @@ public class UserService {
     }
 
     return friends;
+  }
+
+  public void logoutUser(User user) {
+    authenticateUser(user.getId(), user.getToken());
+
+    userRepository.findById(user.getId()).get().setStatus(UserStatus.OFFLINE);
   }
 
   private void authenticateUser(Long id, String token) {

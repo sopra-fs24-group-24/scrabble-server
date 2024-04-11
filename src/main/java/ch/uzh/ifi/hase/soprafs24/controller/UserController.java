@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LogoutPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
@@ -104,6 +105,15 @@ public class UserController {
 
     // convert internal representation of user back to API
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedinUser);
+  }
+
+  @PostMapping("/logout")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public void logoutUser(@RequestBody LogoutPostDTO logoutPostDTO) {
+      User userInput = DTOMapper.INSTANCE.convertLogoutPostDTOToEntity(logoutPostDTO);
+
+      userService.logoutUser(userInput);
   }
 
   @GetMapping("/friends/{userId}")

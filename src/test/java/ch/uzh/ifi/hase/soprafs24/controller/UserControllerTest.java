@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LogoutPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -27,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -241,6 +243,38 @@ public class UserControllerTest {
         //.andExpect(jsonPath("$.username", is(user.getUsername())))
         //.andExpect(jsonPath("$.status", is(user.getStatus().toString())));
 
+  }
+
+  @Test
+  public void logoutUser_validInput() throws Exception {
+    LogoutPostDTO logoutPostDTO = new LogoutPostDTO();
+    logoutPostDTO.setToken("testToken");
+    logoutPostDTO.setId(1L);
+
+    MockHttpServletRequestBuilder postRequest = post("/logout")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(logoutPostDTO));
+
+    mockMvc.perform(postRequest)
+            .andExpect(status().isNoContent());
+  }
+
+  @Test
+  public void logoutUser_invalidInput() throws Exception {
+      LogoutPostDTO logoutPostDTO = new LogoutPostDTO();
+      logoutPostDTO.setToken("testToken");
+      logoutPostDTO.setId(1L);
+
+      ResponseStatusException response = new ResponseStatusException(HttpStatus.NOT_FOUND, "The user with id: 1 doesn't exist!");
+
+      doThrow(response).when(userService).logoutUser(isA(User.class));
+
+      MockHttpServletRequestBuilder postRequest = post("/logout")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(asJsonString(logoutPostDTO));
+
+      mockMvc.perform(postRequest)
+              .andExpect(status().isNotFound());
   }
 
   @Test
