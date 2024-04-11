@@ -72,21 +72,21 @@ completed on Saturday 06.04.2024
 
 ### *Week 0 and 1*
 
-**Create function to authenticate user #82**: </br>
+**Create function to authenticate user [(issue #82)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/82)**: </br>
 
-**Implement register and login page with username and password input fields and commit button #30**: </br>
+**Implement register and login page with username and password input fields and commit button [(issue #30)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/30)**: </br>
 
-**Create function to persist user in database #81**: </br>
+**Create function to persist user in database [(issue #81)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/#81)**: </br>
 
-**Implement routing to main page after succesful login/registration #29**: </br>
+**Implement routing to main page after succesful login/registration [(issue #29)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/29)**: </br>
 
-**Create REST POST endpoint for registered users to log in  #85**: </br>
+**Create REST POST endpoint for registered users to log in  [(issue #85)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/85)**: </br>
 
-**Create user schema #57**: </br>
+**Create user schema [(issue #57)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/57)**: </br>
 
-**Create REST GET endpoints to get user information #61**: </br>
+**Create REST GET endpoints to get user information [(issue #61)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/61)**: </br>
 
-**Create REST POST endpoints to register user #80**: </br>
+**Create REST POST endpoints to register user [(issue #80)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/80)**: </br>
 
 **Multiple bug fixes**: </br>
 
