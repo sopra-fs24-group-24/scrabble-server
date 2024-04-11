@@ -262,4 +262,46 @@ public class LobbyControllerTest {
                     String.format("The request body could not be created.%s", e.toString()));
         }
     }
+
+    @Test
+    public void deleteExistingLobby() throws Exception 
+    {
+        Lobby lobby=new Lobby();
+        lobby.setId(1L);
+        lobby.setNumberOfPlayers(1);
+        lobby.setLobbySize(1);
+
+        given(lobbyService.checkIfLobbyExistsById(1L)).willReturn(lobby);
+
+        // when
+        MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/{lobbyId}", lobby.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(lobby));
+
+        // then
+        mockMvc.perform(deleteRequest).andExpect(status().isOk())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    public void deleteNonExistantLobby() throws Exception 
+    {
+        Lobby lobby=new Lobby();
+        lobby.setId(1L);
+        lobby.setNumberOfPlayers(1);
+        lobby.setLobbySize(1);
+
+        ResponseStatusException e=new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+        given(lobbyService.checkIfLobbyExistsById(1L)).willThrow(e);
+
+        // when
+        MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/{lobbyId}", lobby.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(lobby));
+
+        // then
+        mockMvc.perform(deleteRequest).andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+    }
 }
