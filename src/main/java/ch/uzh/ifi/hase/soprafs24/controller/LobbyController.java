@@ -5,9 +5,11 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
+import ch.uzh.ifi.hase.soprafs24.service.UserService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +20,13 @@ public class LobbyController {
 
     private final LobbyService lobbyService;
 
-    LobbyController(LobbyService lobbyService) {
+    @Autowired
+    private final UserService userService;
+
+    LobbyController(LobbyService lobbyService, UserService userService) 
+    {
         this.lobbyService = lobbyService;
+        this.userService=userService;
     }
 
     @GetMapping("/lobbies")
@@ -69,7 +76,7 @@ public class LobbyController {
     @ResponseBody
     public void deleteLobby(@PathVariable("lobbyId") Long lobbyId,@RequestParam(required=false) String token) 
     {
-        // TODO: Need to check token first
+        userService.isTokenValid(token);
         Lobby toKill=lobbyService.checkIfLobbyExistsById(lobbyId); // raises 404 if not
         toKill=null;
     }
