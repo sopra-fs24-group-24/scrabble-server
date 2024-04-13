@@ -27,6 +27,20 @@ public class Game implements Serializable{
     @OneToOne
     private Playfield playfield;
 
+    @OneToMany
+    private List<Hand> hands;
+
+    @OneToMany
+    private List<Score> scores;
+
+    public void setScores(List<Score> scores) {
+        this.scores = scores;
+    }
+
+    public List<Score> getScores() {
+        return scores;
+    }
+
     public Bag getBag() {
         return bag;
     }
@@ -49,6 +63,14 @@ public class Game implements Serializable{
 
     public void setMode(GameMode mode) {
         this.mode = mode;
+    }
+
+    public List<Hand> getHands() {
+        return hands;
+    }
+
+    public void setHands(List<Hand> hands) {
+        this.hands = hands;
     }
 
     public Long getCurrentPlayer() {

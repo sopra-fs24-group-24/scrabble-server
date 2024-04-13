@@ -41,14 +41,14 @@ completed on Monday, 08.04.2024
 
 ### *Week 1*
 
-**Create Schema for Game [(issue 21)](https://github.com/orgs/sopra-fs24-group-24/projects/2/views/1?pane=issue&itemId=57329485)**: </br>
+**Create Schema for Game [(issue 21)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/21)**: </br>
 completed on Wednesday, 10.04.2024
 
 - Created entity Game, Bag, Cell, Playfield and Tile
 - Created files GameController, GameRepository and GameService
 - Created Enum Multiplier for Cells and GameMode for Game
 
-**Create GamePage [(issue scrabble-client 1)](https://github.com/orgs/sopra-fs24-group-24/projects/2/views/1?pane=issue&itemId=57329485)**: </br>
+**Create GamePage [(issue 1)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/1)**: </br>
 completed on Saturday 06.04.2024
 
 - Created Game view
@@ -56,14 +56,14 @@ completed on Saturday 06.04.2024
 - Created the Board
 - Created Buttons for saving, clearing the board, swapping, leaving the game and opening the dictionary
 
-**Create GamePage [(issue scrabble-client 2)](https://github.com/orgs/sopra-fs24-group-24/projects/2/views/1?pane=issue&itemId=57329485)**: </br>
+**Create GamePage [(issue 2)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/2)**: </br>
 completed on Saturday 06.04.2024
 
 - Created Cell Component and Draggable Component
 - Implemented dragging and dropping for the Board and Hand
 - Created Styling for Cell and Draggable
 
-**Create GamePage [(issue scrabble-client 3)](https://github.com/orgs/sopra-fs24-group-24/projects/2/views/1?pane=issue&itemId=57329485)**: </br>
+**Create GamePage [(issue 3)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/3)**: </br>
 completed on Saturday 06.04.2024
 
 - Implemented the client side undo functionality for the undo button

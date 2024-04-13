@@ -1,8 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,8 +29,19 @@ public class Lobby implements Serializable{
 
     @Column(nullable = false)
     private boolean gameStarted;
+
     @OneToOne
     private Game gameOfLobby;
+
+
+    public void setGameOfLobby(Game gameOfLobby) {
+        this.gameOfLobby = gameOfLobby;
+    }
+
+    public Game getGameOfLobby() {
+        return gameOfLobby;
+    }
+
 
     public Long getId() {
         return id;
@@ -61,7 +73,7 @@ public class Lobby implements Serializable{
             return false;
         }
         this.gameStarted = true;
-        this.gameOfLobby = new Game();
+        setGameOfLobby(new Game());
         return true;
     }
 

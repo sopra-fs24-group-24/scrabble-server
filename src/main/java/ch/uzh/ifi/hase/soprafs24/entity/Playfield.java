@@ -2,8 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Array;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -16,7 +14,7 @@ public class Playfield implements Serializable{
     private Long id;
 
     @OneToMany
-    private List<Cell> board;
+    private List<Tile> boardtiles;
 
     public Long getId() {
         return id;
@@ -27,4 +25,11 @@ public class Playfield implements Serializable{
     }
 
 
+    public void setBoardtiles(List<Tile> boardtiles) {
+        this.boardtiles = boardtiles;
+    }
+
+    public List<Tile> getBoardtiles() {
+        return boardtiles;
+    }
 }

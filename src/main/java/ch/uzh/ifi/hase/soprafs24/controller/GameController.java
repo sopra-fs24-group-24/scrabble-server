@@ -29,7 +29,8 @@ public class GameController
         this.userService=userService;
     }
 
-    @RequestMapping("/games/{gameId}")
+    @GetMapping("/games/{gameId}")
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public Game getGame(@PathVariable("gameId") Long gameId,@RequestParam(required=false) String token) 
     {

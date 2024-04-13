@@ -1,9 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-
-import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
-import ch.uzh.ifi.hase.soprafs24.entity.Bag;
+import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Playfield;
+import ch.uzh.ifi.hase.soprafs24.entity.Score;
 
 import java.util.List;
 
@@ -12,11 +11,27 @@ public class GameGetDTO {
 
     private Long currentPlayer;
 
-    private GameMode mode;
+    private List<Hand> hands;
 
-    private Bag bag;
+    private List<Score> scores;
 
     private Playfield playfield;
+
+    public void setHands(List<Hand> hands) {
+        this.hands = hands;
+    }
+
+    public List<Hand> getHands() {
+        return hands;
+    }
+
+    public List<Score> getScores() {
+        return scores;
+    }
+
+    public void setScores(List<Score> scores) {
+        this.scores = scores;
+    }
 
     public Playfield getPlayfield() {
         return playfield;
@@ -26,21 +41,6 @@ public class GameGetDTO {
         this.playfield = playfield;
     }
 
-    public Bag getBag() {
-        return bag;
-    }
-
-    public void setBag(Bag bag) {
-        this.bag = bag;
-    }
-
-    public GameMode getMode() {
-        return mode;
-    }
-
-    public void setMode(GameMode mode) {
-        this.mode = mode;
-    }
 
     public Long getId() {
         return id;
