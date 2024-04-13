@@ -67,7 +67,6 @@ public class GameControllerTest {
     
     GameGetDTO gameGetDTO = new GameGetDTO();
     gameGetDTO.setId(1L);
-    gameGetDTO.setMode(GameMode.CLASSIC);
     gameGetDTO.setCurrentPlayer(0L);
     
     given(gameService.getGameParams(Mockito.any())).willReturn(game);
@@ -101,7 +100,6 @@ mockMvc.perform(getRequest)
      
      GameGetDTO gameGetDTO = new GameGetDTO();
      gameGetDTO.setId(1L);
-     gameGetDTO.setMode(GameMode.CLASSIC);
      gameGetDTO.setCurrentPlayer(0L);
      
      ResponseStatusException e=new ResponseStatusException(HttpStatus.NOT_FOUND);
