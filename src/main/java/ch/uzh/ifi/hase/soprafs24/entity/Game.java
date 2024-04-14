@@ -15,23 +15,34 @@ public class Game implements Serializable{
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private Long currentPlayer;
 
-    @Column(nullable = false)
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<User> players;
+
+    @Column
     private GameMode mode;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Bag bag;
 
-    @OneToOne
-    private Playfield playfield;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Tile> playfield;
 
-    @OneToMany
+    @OneToMany(cascade= CascadeType.ALL)
     private List<Hand> hands;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Score> scores;
+
+    public void setPlayers(List<User> players) {
+        this.players = players;
+    }
+
+    public List<User> getPlayers() {
+        return players;
+    }
 
     public void setScores(List<Score> scores) {
         this.scores = scores;
@@ -49,12 +60,12 @@ public class Game implements Serializable{
         this.bag = bag;
     }
 
-    public Playfield getPlayfield() {
-        return playfield;
+    public void setPlayfield(List<Tile> playfield) {
+        this.playfield = playfield;
     }
 
-    public void setPlayfield(Playfield playfield) {
-        this.playfield = playfield;
+    public List<Tile> getPlayfield() {
+        return playfield;
     }
 
     public GameMode getMode() {

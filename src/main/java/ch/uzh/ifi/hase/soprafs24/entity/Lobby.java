@@ -30,7 +30,7 @@ public class Lobby implements Serializable{
     @Column(nullable = false)
     private boolean gameStarted;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Game gameOfLobby;
 
 

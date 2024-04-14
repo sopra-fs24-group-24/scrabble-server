@@ -16,9 +16,7 @@ import java.util.Map;
 @RestController
 public class GameController 
 {
-  
 
-    @Autowired
     private final GameService gameService;
     @Autowired
     private final UserService userService;

@@ -15,7 +15,7 @@ public class Hand implements Serializable{
 
     @Column
     private Long handuserid;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Tile> handtiles;
 
     public void setHanduserid(Long handuserid) {

@@ -13,7 +13,7 @@ public class Bag implements Serializable{
     @GeneratedValue
     private Long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Tile> tiles;
 
     public Long getId() {

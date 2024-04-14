@@ -39,4 +39,5 @@ public class GameService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "Game ID"));
     }
 
+
 }

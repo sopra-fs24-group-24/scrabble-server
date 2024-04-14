@@ -42,7 +42,6 @@ public class LobbyService {
         checkIfUserAlreadyInLobby(userId);
         newLobby = lobbyRepository.save(newLobby);
         lobbyRepository.flush();
-
         log.debug("Created Information for Lobby: {}", newLobby);
         return newLobby;
     }

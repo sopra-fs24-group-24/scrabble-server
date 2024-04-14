@@ -1,8 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Hand;
-import ch.uzh.ifi.hase.soprafs24.entity.Playfield;
 import ch.uzh.ifi.hase.soprafs24.entity.Score;
+import ch.uzh.ifi.hase.soprafs24.entity.Tile;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 
 import java.util.List;
 
@@ -15,7 +16,16 @@ public class GameGetDTO {
 
     private List<Score> scores;
 
-    private Playfield playfield;
+    private List<Tile> playfield;
+
+    private List<User> players;
+
+    public void setPlayers(List<User> players) {
+    }
+
+    public List<User> getPlayers() {
+        return players;
+    }
 
     public void setHands(List<Hand> hands) {
         this.hands = hands;
@@ -33,14 +43,13 @@ public class GameGetDTO {
         this.scores = scores;
     }
 
-    public Playfield getPlayfield() {
-        return playfield;
-    }
-
-    public void setPlayfield(Playfield playfield) {
+    public void setPlayfield(List<Tile> playfield) {
         this.playfield = playfield;
     }
 
+    public List<Tile> getPlayfield() {
+        return playfield;
+    }
 
     public Long getId() {
         return id;
