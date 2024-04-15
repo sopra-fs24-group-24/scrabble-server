@@ -26,7 +26,7 @@ public class LobbyController {
     LobbyController(LobbyService lobbyService, UserService userService) 
     {
         this.lobbyService = lobbyService;
-        this.userService=userService;
+        this.userService = userService;
     }
 
     @GetMapping("/lobbies")
