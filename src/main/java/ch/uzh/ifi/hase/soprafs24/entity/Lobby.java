@@ -76,7 +76,7 @@ public class Lobby implements Serializable{
 
     public void setUsersInLobby(List<Long> usersInLobby) { this.usersInLobby = usersInLobby; }
 
-    public boolean startGame() {
+    private boolean startGame() {
         //Check if lobby already started a Game
         if (this.gameStarted){
             return false;
@@ -87,9 +87,16 @@ public class Lobby implements Serializable{
     }
 
     public boolean addPlayer(Long UserId) {
-        if (this.numberOfPlayers > 0 && this.numberOfPlayers < this.lobbySize){
+        if (this.numberOfPlayers > 0 && this.numberOfPlayers < this.lobbySize - 1){
             this.numberOfPlayers += 1;
             this.usersInLobby.add(UserId);
+            return true;
+        }
+        // if lobby is full, the method startGame() is called
+        else if (this.numberOfPlayers > 0 && this.numberOfPlayers == this.lobbySize - 1) {
+            this.numberOfPlayers += 1;
+            this.usersInLobby.add(UserId);
+            startGame();
             return true;
         }
         return false;

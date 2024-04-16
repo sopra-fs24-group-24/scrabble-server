@@ -47,7 +47,7 @@ public class LobbyServiceIntegrationTest {
         assertEquals(testLobby.getId(), createdLobby.getId());
         assertEquals(testLobby.getUsersInLobby(), createdLobby.getUsersInLobby());
         assertEquals(testLobby.getLobbySize(), createdLobby.getLobbySize());
-        assertEquals(createdLobby.getNumberOfPlayers(), 1);
+        assertEquals(1, createdLobby.getNumberOfPlayers());
         assertFalse(createdLobby.getGameStarted());
     }
 
@@ -88,15 +88,39 @@ public class LobbyServiceIntegrationTest {
         Lobby updatedLobby = lobbyService.addPlayertoLobby(createdLobby.getId(), 2L);
 
         // then
-        assertEquals(createdLobby.getId(), updatedLobby.getId());
-        assertEquals(createdLobby.getLobbySize(), updatedLobby.getLobbySize());
-        assertEquals(updatedLobby.getNumberOfPlayers(), 2);
+        assertEquals(3, updatedLobby.getLobbySize());
+        assertEquals(2, updatedLobby.getNumberOfPlayers());
         List<Long> expectedPlayers = new ArrayList<>();
         expectedPlayers.add(1L);
         expectedPlayers.add(2L);
-        assertArrayEquals(updatedLobby.getUsersInLobby().toArray(), expectedPlayers.toArray());
-        assertEquals(createdLobby.getGameStarted(), updatedLobby.getGameStarted());
+        assertArrayEquals(expectedPlayers.toArray(), updatedLobby.getUsersInLobby().toArray());
+        assertFalse(updatedLobby.getGameStarted());
     }
+
+    @Test
+    public void addPlayerToLobby_validInputs_lobbyFull_thenGameIsStarted() {
+        // given
+        Lobby testLobby = new Lobby();
+        List<Long> players = new ArrayList<Long>();
+        players.add(1L);
+        testLobby.setUsersInLobby(players);
+        testLobby.setLobbySize(2);
+
+        Lobby createdLobby = lobbyService.createLobby(testLobby);
+
+        // when
+        Lobby updatedLobby = lobbyService.addPlayertoLobby(createdLobby.getId(), 2L);
+
+        // then
+        assertEquals(2, updatedLobby.getLobbySize());
+        assertEquals(2, updatedLobby.getNumberOfPlayers());
+        List<Long> expectedPlayers = new ArrayList<>();
+        expectedPlayers.add(1L);
+        expectedPlayers.add(2L);
+        assertArrayEquals(expectedPlayers.toArray(), updatedLobby.getUsersInLobby().toArray());
+        assertTrue(updatedLobby.getGameStarted());
+    }
+
 
     @Test
     public void addPlayerToLobby_NonExistentLobby_throwsException() {

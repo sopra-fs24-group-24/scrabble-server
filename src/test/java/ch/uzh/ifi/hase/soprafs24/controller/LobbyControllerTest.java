@@ -180,13 +180,13 @@ public class LobbyControllerTest {
         Lobby lobby = new Lobby();
         Long lobbyId = 6L;
         lobby.setId(lobbyId);
-        lobby.setLobbySize(3);
+        lobby.setLobbySize(4);
         lobby.setNumberOfPlayers(2);
-        lobby.setGameStarted(false);
         List<Long> players = new ArrayList<Long>();
         players.add(7L);
         players.add(10L);
         lobby.setUsersInLobby(players);
+        lobby.setGameStarted(false);
 
         // add new player to Lobby
         Map<String, Long> userId = new HashMap<>();
