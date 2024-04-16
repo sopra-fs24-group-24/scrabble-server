@@ -1,11 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
-
-import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs24.controller.LobbyController;
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,23 +24,17 @@ import java.util.UUID;
  */
 @Service
 @Transactional
-public class UserService {
+public class UserService 
+{
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-  private final Logger log = LoggerFactory.getLogger(UserService.class);
+    @Autowired
+    private final UserRepository userRepository;
 
-  //import lobbyservice to automatically create Lobby when user registers and there are none
-  private final LobbyService lobbyService;
-
-  private final UserRepository userRepository;
-
-  @Autowired
-  public UserService(@Qualifier("userRepository") UserRepository userRepository,
-                     //delete this after M3
-                     LobbyService lobbyService) {
-    this.userRepository = userRepository;
-    //delete this after M3
-    this.lobbyService = lobbyService;
-  }
+    public UserService(@Qualifier("userRepository") UserRepository userRepository)
+    {
+        this.userRepository = userRepository;
+    }
 
   public List<User> getUsers() {
     return this.userRepository.findAll();
@@ -63,25 +50,6 @@ public class UserService {
     newUser = userRepository.save(newUser);
     userRepository.flush();
     log.debug("Created Information for User: {}", newUser);
-    //create Lobby if there are no existing lobbies (delete after M3)
-      // Check if there are any existing lobbies
-      List<Lobby> lobbies = lobbyService.getLobbies();
-      if (lobbies.isEmpty()) {
-          // If no lobby exists, create a new lobby
-          Lobby lobby = new Lobby();
-          List <Long> usersInLobby = new ArrayList<>();
-          usersInLobby.add(newUser.getId());
-          lobby.setUsersInLobby(usersInLobby);
-          lobby.setLobbySize(2);
-          lobby.setMode(GameMode.CLASSIC);
-          lobby =lobbyService.createLobby(lobby);
-          newUser.setLobbyid(lobby.getId());
-      }
-      else {
-          Long lobbyid = lobbies.get(0).getId();
-          Lobby lobby = lobbyService.addPlayertoLobby(lobbyid, newUser.getId());
-          newUser.setLobbyid(lobby.getId());
-      }
     return newUser;
   }
 
@@ -187,26 +155,6 @@ public class UserService {
     }
 
     identifiedUser.setStatus(UserStatus.ONLINE);
-      //create Lobby if there are no existing lobbies (delete after M3)
-      // Check if there are any existing lobbies
-      List<Lobby> lobbies = lobbyService.getLobbies();
-      if (lobbies.isEmpty()) {
-          // If no lobby exists, create a new lobby
-          Lobby lobby = new Lobby();
-          List <Long> usersInLobby = new ArrayList<>();
-          usersInLobby.add(identifiedUser.getId());
-          lobby.setUsersInLobby(usersInLobby);
-          lobby.setLobbySize(2);
-          lobby.setMode(GameMode.CLASSIC);
-          lobby =lobbyService.createLobby(lobby);
-          identifiedUser.setLobbyid(lobby.getId());
-      }
-      else {
-          Long lobbyid = lobbies.get(0).getId();
-          Lobby lobby = lobbyService.addPlayertoLobby(lobbyid, identifiedUser.getId());
-          identifiedUser.setLobbyid(lobby.getId());
-      }
     return identifiedUser;
-
   }
 }
