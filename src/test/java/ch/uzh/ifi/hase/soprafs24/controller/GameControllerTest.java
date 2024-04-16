@@ -8,9 +8,11 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.LogoutPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -53,6 +55,9 @@ public class GameControllerTest {
 
   @MockBean
   private GameService gameService;
+
+  @MockBean
+  private UserService userService;
 
   @Test
   public void getGame_validInputs() throws Exception 

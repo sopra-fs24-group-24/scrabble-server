@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -20,4 +21,9 @@ public interface GameDTOMapper {
     @Mapping(source= "players", target="players")
     @Mapping(source = "mode", target = "mode")
     GameGetDTO convertEntityToGameGetDTO(Game game);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "currentPlayer", target = "currentPlayer")
+    @Mapping(source = "playfield", target = "playfield")
+    Game convertGamePostDTOToEntity(GamePostDTO gamePostDTO);
 }
