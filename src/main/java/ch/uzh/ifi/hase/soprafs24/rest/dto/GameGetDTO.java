@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Score;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
@@ -18,7 +19,17 @@ public class GameGetDTO {
 
     private List<Tile> playfield;
 
+    private GameMode mode;
+
     private List<User> players;
+
+    public void setMode(GameMode mode) {
+        this.mode = mode;
+    }
+
+    public GameMode getMode() {
+        return mode;
+    }
 
     public void setPlayers(List<User> players) {
     }

@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,16 @@ public class LobbyPostDTO {
     private int lobbySize;
 
     private List<Long> usersInLobby;
+
+    private GameMode mode;
+
+    public void setMode(GameMode mode) {
+        this.mode = mode;
+    }
+
+    public GameMode getMode() {
+        return mode;
+    }
 
     public int getLobbySize() { return lobbySize; }
 

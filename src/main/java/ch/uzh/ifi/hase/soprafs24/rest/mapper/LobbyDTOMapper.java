@@ -13,6 +13,7 @@ public interface LobbyDTOMapper {
 
     @Mapping(source = "lobbySize", target = "lobbySize")
     @Mapping(source = "usersInLobby", target = "usersInLobby")
+    @Mapping(source = "mode", target = "mode")
     Lobby convertLobbyPostDTOtoEntity(LobbyPostDTO lobbyPostDTO);
 
     @Mapping(source = "id", target = "id")
@@ -20,5 +21,6 @@ public interface LobbyDTOMapper {
     @Mapping(source = "lobbySize", target = "lobbySize")
     @Mapping(source = "usersInLobby", target = "usersInLobby")
     @Mapping(source = "gameStarted", target = "gameStarted")
+    @Mapping(source = "mode", target ="mode")
     LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
 }

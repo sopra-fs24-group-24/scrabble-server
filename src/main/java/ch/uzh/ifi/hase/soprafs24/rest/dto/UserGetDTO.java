@@ -17,7 +17,17 @@ public class UserGetDTO {
 
   private ArrayList<Long> friends;
 
-  public Long getId() {
+  private Long lobbyid;
+
+    public void setLobbyid(Long lobbyid) {
+        this.lobbyid = lobbyid;
+    }
+
+    public Long getLobbyid() {
+        return lobbyid;
+    }
+
+    public Long getId() {
     return id;
   }
 

@@ -19,6 +19,7 @@ public interface GameDTOMapper {
     @Mapping(source = "scores", target = "scores")
     @Mapping(source = "hands", target = "hands")
     @Mapping(source= "players", target="players")
+    @Mapping(source = "mode", target = "mode")
     GameGetDTO convertEntityToGameGetDTO(Game game);
 
     @Mapping(source = "id", target = "id")
