@@ -19,6 +19,12 @@ public class Tile implements Serializable{
     @Column(nullable=false)
     private int value;
 
+    Tile(char letter, int value)
+    {
+        this.setLetter(letter);
+        this.setValue(value);
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -41,5 +47,10 @@ public class Tile implements Serializable{
 
     public void setValue(int value) {
         this.value = value;
+    }
+
+    public String toString()
+    {
+        return this.id+":"+ this.getLetter()+" "+this.getValue();
     }
 }
