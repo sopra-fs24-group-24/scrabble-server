@@ -45,7 +45,12 @@ public class GameService {
         Game foundGame = checkIfGameExists(game);
         List<Tile> updatedPlayfield = game.getPlayfield();
         List<Tile> persistedPlayfield = foundGame.getPlayfield();
+
         validMove(updatedPlayfield, persistedPlayfield);
+
+        // update playfield and save it in database
+        foundGame.setPlayfield(updatedPlayfield);
+        gameRepository.flush();
     }
 
     public void validMove(List<Tile> updatedPlayfield, List<Tile> persistedPlayfield) {
