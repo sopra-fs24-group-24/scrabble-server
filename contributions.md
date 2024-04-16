@@ -90,6 +90,10 @@ completed on Saturday 06.04.2024
 
 **Multiple bug fixes**: </br>
 
+**Make sure validity of token can be verified by all controllers [(issue #89)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/89)**: </br>
+
+**Initialise game [(issue #90)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/90)**: </br>
+
 ## Florian Lanz
 
 ### *Week 1*
