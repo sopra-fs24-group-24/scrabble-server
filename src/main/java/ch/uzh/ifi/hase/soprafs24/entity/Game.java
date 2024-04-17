@@ -106,6 +106,14 @@ public class Game implements Serializable{
 
     public void initialiseGame()
     {
+        // Initialise playfield:
+        List<Tile> playfield = new ArrayList<Tile>();
+
+        for(int i=0;i<225;i++)
+            playfield.add(null);
+
+        this.playfield=playfield;
+
         bag.Initialise();
 
         // Initialise the hands (give them 7 tiles each)
