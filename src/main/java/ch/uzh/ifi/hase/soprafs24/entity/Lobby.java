@@ -29,6 +29,9 @@ public class Lobby implements Serializable{
     @ElementCollection
     private List<Long> usersInLobby;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<User> players;
+
     @Column(nullable = false)
     private boolean gameStarted;
 
@@ -76,6 +79,10 @@ public class Lobby implements Serializable{
 
     public void setUsersInLobby(List<Long> usersInLobby) { this.usersInLobby = usersInLobby; }
 
+    public List<User> getPlayers() { return players; }
+
+    public void setPlayers(List<User> players) { this.players = players; }
+
     private boolean startGame() {
         //Check if lobby already started a Game
         if (this.gameStarted){
@@ -86,16 +93,22 @@ public class Lobby implements Serializable{
         return true;
     }
 
-    public boolean addPlayer(Long UserId) {
+    public boolean addPlayer(User user, Lobby lobby) {
         if (this.numberOfPlayers > 0 && this.numberOfPlayers < this.lobbySize - 1){
             this.numberOfPlayers += 1;
-            this.usersInLobby.add(UserId);
+            this.usersInLobby.add(user.getId());
+            List<User> players = lobby.getPlayers();
+            players.add(user);
+            lobby.setPlayers(players);
             return true;
         }
         // if lobby is full, the method startGame() is called
         else if (this.numberOfPlayers > 0 && this.numberOfPlayers == this.lobbySize - 1) {
             this.numberOfPlayers += 1;
-            this.usersInLobby.add(UserId);
+            this.usersInLobby.add(user.getId());
+            List<User> players = lobby.getPlayers();
+            players.add(user);
+            lobby.setPlayers(players);
             startGame();
             return true;
         }

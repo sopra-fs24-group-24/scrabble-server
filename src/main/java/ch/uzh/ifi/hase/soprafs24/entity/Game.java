@@ -35,7 +35,7 @@ public class Game implements Serializable{
     private List<Tile> playfield;
 
     @OneToMany(cascade= CascadeType.ALL)
-    private ArrayList<Hand> hands;
+    private List<Hand> hands;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Score> scores;
@@ -80,11 +80,11 @@ public class Game implements Serializable{
         this.mode = mode;
     }
 
-    public ArrayList<Hand> getHands() {
+    public List<Hand> getHands() {
         return hands;
     }
 
-    public void setHands(ArrayList<Hand> hands) {
+    public void setHands(List<Hand> hands) {
         this.hands = hands;
     }
 
@@ -109,7 +109,7 @@ public class Game implements Serializable{
         bag.Initialise();
 
         // Initialise the hands (give them 7 tiles each)
-        ArrayList<Hand> allHands=getHands();
+        List<Hand> allHands=getHands();
 
         // Give each hand 7 tiles:
         for(int i=0;i<allHands.size();i++)
