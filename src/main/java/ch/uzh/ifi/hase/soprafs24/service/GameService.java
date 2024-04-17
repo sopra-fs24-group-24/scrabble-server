@@ -30,15 +30,6 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
-    //TODO: This function isn't actually functional and should be updated accordingly
-    public Game createGame(List<User> players) {
-        Game newGame = new Game();
-        newGame.initialiseGame();
-        newGame = gameRepository.save(newGame);
-        gameRepository.flush();
-        return newGame;
-    }
-
     public Game getGameParams(Long gameId)
     {
       Optional<Game> game=gameRepository.findById(gameId);
