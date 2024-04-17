@@ -22,5 +22,6 @@ public interface LobbyDTOMapper {
     @Mapping(source = "usersInLobby", target = "usersInLobby")
     @Mapping(source = "gameStarted", target = "gameStarted")
     @Mapping(source = "mode", target ="mode")
+    @Mapping(source = "players", target = "players")
     LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
 }
