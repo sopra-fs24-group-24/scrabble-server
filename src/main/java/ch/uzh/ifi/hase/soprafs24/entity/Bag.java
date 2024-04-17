@@ -57,9 +57,9 @@ public class Bag implements Serializable{
         }
     }
 
-    public void Initialise()
+    public Bag()
     {
-         // Make list of tiles for bag
+        // Make list of tiles for bag
 
         HashMap<String, Integer> tileCounts = new HashMap<String, Integer>();
 

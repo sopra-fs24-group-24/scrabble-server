@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -64,4 +65,34 @@ public class GameController
         User user = userService.isTokenValid(token);
         gameService.skipTurn(user, gameId);
     }
+
+    // TODO: temporary endpoint for testing purposes: Delete when not needed anymore
+    @PostMapping("/quiek")
+    @ResponseStatus(HttpStatus.OK)
+    public Game startGame() 
+    {
+         
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("Anna");
+        user.setPassword("1234");
+        userService.createUser(user);
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("Bert");
+        user2.setPassword("1234");
+        userService.createUser(user2);
+
+        Game game= new Game();
+
+        List<User> players=new ArrayList<User>();
+        players.add(user);
+        players.add(user2);
+
+        game.initialiseGame(players);
+
+        return game;
+    }
+
 }

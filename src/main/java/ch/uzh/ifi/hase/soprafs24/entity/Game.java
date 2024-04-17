@@ -5,7 +5,6 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
-import java.util.List;
 
 
 @Entity
@@ -102,8 +101,10 @@ public class Game implements Serializable{
         return id;
     }
 
-    public void initialiseGame()
+    public void initialiseGame(List<User> players)
     {
+        this.players=players;
+
         // Initialise playfield:
         List<Tile> playfield = new ArrayList<Tile>();
 
@@ -112,19 +113,29 @@ public class Game implements Serializable{
 
         this.playfield=playfield;
 
-        bag.Initialise();
+        this.bag=new Bag();
 
         // Initialise the hands (give them 7 tiles each)
-        List<Hand> allHands=getHands();
+        List<Hand> allHands = new ArrayList<Hand>();
+        List<Score> allScores = new ArrayList<Score>();
 
-        // Give each hand 7 tiles:
-        for(int i=0;i<allHands.size();i++)
+        for(int i=0;i<this.getPlayers().size();i++)
         {
-            allHands.get(i).setHandtiles(bag.getSomeTiles(7));
+            Hand temp_hand=new Hand();
+            temp_hand.setHanduserid(this.getPlayers().get(i).getId());
+            temp_hand.setHandtiles(bag.getSomeTiles(7));
+            allHands.add(temp_hand);
+
+            Score temp_score=new Score();
+            temp_score.setScoreUserId(this.getPlayers().get(i).getId());
+            temp_score.setScore(0);
+            allScores.add(temp_score);
         }
 
+        this.setHands(allHands);
+        this.setScores(allScores);
+
         // Randomly choose the starting player
-        List<User> players=this.getPlayers();
         this.setCurrentPlayer(players.get(randomInt(0, players.size()-1)).getId());
     }
 
