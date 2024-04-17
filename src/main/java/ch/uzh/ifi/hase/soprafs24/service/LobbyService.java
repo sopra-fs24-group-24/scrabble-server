@@ -1,7 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +26,13 @@ public class LobbyService {
     @Autowired
     private final LobbyRepository lobbyRepository;
 
-    public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
+    @Autowired
+    private final UserRepository userRepository;
+
+    public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                        @Qualifier("userRepository") UserRepository userRepository) {
         this.lobbyRepository = lobbyRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Lobby> getLobbies() {
@@ -36,20 +44,31 @@ public class LobbyService {
     }
 
     public Lobby createLobby(Lobby newLobby) {
-        newLobby.setNumberOfPlayers(1);
-        newLobby.setGameStarted(false);
-        Long userId = newLobby.getUsersInLobby().get(0);
-        checkIfUserAlreadyInLobby(userId);
-        newLobby = lobbyRepository.save(newLobby);
-        lobbyRepository.flush();
-        log.debug("Created Information for Lobby: {}", newLobby);
-        return newLobby;
+        //if there is no lobby, create one... if there already is a lobby, add player to lobby
+        //after M3 delete if/else statement
+        if (getLobbies().isEmpty()){
+            Long userId = newLobby.getUsersInLobby().get(0);
+            User foundUser = checkIfPlayerExists(userId);
+            checkIfUserAlreadyInLobby(userId);
+            newLobby.setNumberOfPlayers(1);
+            newLobby.setGameStarted(false);
+            List<User> players = new ArrayList<>();
+            players.add(foundUser);
+            newLobby.setPlayers(players);
+            newLobby = lobbyRepository.save(newLobby);
+            lobbyRepository.flush();
+            log.debug("Created Information for Lobby: {}", newLobby);
+            return newLobby;
+        }
+        Lobby lobby = getLobbies().get(0);
+        return addPlayertoLobby(lobby.getId(), newLobby.getUsersInLobby().get(0));
     }
 
     public Lobby addPlayertoLobby(Long lobbyId, Long userId) {
+        User foundUser = checkIfPlayerExists(userId);
         Lobby lobby = checkIfLobbyExistsById(lobbyId);
         checkIfUserAlreadyInLobby(userId);
-        if (lobby.addPlayer(userId)) {
+        if (lobby.addPlayer(foundUser, lobby)) {
             return lobby;
         }
         String errorMessage = "Lobby is already full!";
@@ -122,6 +141,23 @@ public class LobbyService {
         }
         String errorMessage = "User not found in specified Lobby";
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
+    }
+
+    /**
+     * This is a helper method that will check whether the user,
+     * which wants to withdraw from a lobby, is indeed in the
+     * specified lobby. If the user is in the specified lobby,
+     * the truth value true is returned, otherwise an error
+     * message is shown.
+     *
+     * @param userId
+     * @throws org.springframework.web.server.ResponseStatusException
+     * @see ch.uzh.ifi.hase.soprafs24.entity.User
+     */
+
+    private User checkIfPlayerExists(Long userId) {
+        return userRepository.findById(userId).orElseThrow();
+
     }
 
 }

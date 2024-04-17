@@ -36,6 +36,8 @@ public class Bag implements Serializable{
         this.tiles = tiles;
     }
 
+    private void addTile(Tile tile) { tiles.add(tile); }
+
     public int tilesleft(){
         return this.tiles.size();
     }
@@ -47,6 +49,12 @@ public class Bag implements Serializable{
         tiles=tiles.subList(0,tiles.size()-numberOfTiles);
 
         return tilesToReturn;
+    }
+
+    public void putTilesInBag(List<Tile> tilesToBeExchanged) {
+        for (Tile tile : tilesToBeExchanged) {
+            addTile(tile);
+        }
     }
 
     public void Initialise()

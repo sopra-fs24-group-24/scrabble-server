@@ -1,7 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Bag;
+import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +27,13 @@ public class GameService {
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
     private final GameRepository gameRepository;
+    private final HandRepository handRepository;
 
     @Autowired
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository) {
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
+                       @Qualifier("handRepository") HandRepository handRepository) {
         this.gameRepository = gameRepository;
+        this.handRepository = handRepository;
     }
 
 
@@ -39,6 +46,22 @@ public class GameService {
   
       String baseErrorMessage = "The %s provided can not be found!";
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "Game ID"));
+    }
+
+    public void skipTurn(User user, Long gameId) {
+        authenticateUserForMove(user, gameId);
+        makeNextPlayerToCurrentPlayer(gameId);
+    }
+
+    public void makeNextPlayerToCurrentPlayer(Long gameId) {
+        Optional<Game> game = gameRepository.findById(gameId);
+
+        if (game.isPresent()) {
+            User nextPlayer = game.get().getNextPlayer();
+            game.get().setCurrentPlayer(nextPlayer.getId());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The game with id %s does not exist!", gameId));
+        }
     }
 
     public void placeTilesOnBoard(Game game) {
@@ -228,6 +251,66 @@ public class GameService {
 
         }
 
+    }
+
+    public List<Tile> swapTiles(Long gameId, Long userId, Long handId, List<Tile> tilesToBeExchanged) {
+        Hand foundhand = handRepository.findById(handId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                String.format("Hand with ID %d not found!", handId)));
+        Game foundGame = gameRepository.findById(gameId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                String.format("Game with ID %d not found!", gameId)));
+
+        // check if userId of found hand equals the indicated userId
+        if (!Objects.equals(foundhand.getHanduserid(), userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Not correct hand!");
+        }
+
+        // check if there is a valid number of tiles to be exchanged
+        if (tilesToBeExchanged.isEmpty() || tilesToBeExchanged.size() > 7) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You can swap 1-7 tiles");
+        }
+
+        // check if tiles to be exchanged is a sublist of the actual hand
+        for (Tile tile : tilesToBeExchanged) {
+            if (foundhand.getHandtiles().contains(tile)) {
+                continue;
+            }
+            else {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        String.format("Tile %c not found in hand!", tile.getLetter()));
+            }
+        }
+
+        Bag bag = foundGame.getBag();
+
+        // check if enough tiles are in bag
+        if (bag.tilesleft() < tilesToBeExchanged.size()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Not enough tiles in bag!");
+        }
+
+        // get tiles from bag
+        List<Tile> tilesToAddToHand = bag.getSomeTiles(tilesToBeExchanged.size());
+        // put tiles to be exchanged in bag
+        bag.putTilesInBag(tilesToBeExchanged);
+        // remove tiles from hand
+        foundhand.removeTilesFromHand(tilesToBeExchanged);
+        // add new tiles to hand
+        foundhand.putTilesInHand(tilesToAddToHand);
+        // return new hand
+        return foundhand.getHandtiles();
+    }
+
+
+    public void authenticateUserForMove(User userInput, Long gameId) {
+        Optional<Game> game = gameRepository.findById(gameId);
+
+        if (game.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The game does not exist!");
+        } else if (!game.get().getCurrentPlayer().equals(userInput.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "It's not your turn!");
+        }
     }
 
     /**

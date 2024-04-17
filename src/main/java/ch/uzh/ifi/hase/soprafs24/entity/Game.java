@@ -4,11 +4,9 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
+
 
 @Entity
 @Table(name="Game")
@@ -35,7 +33,7 @@ public class Game implements Serializable{
     private List<Tile> playfield;
 
     @OneToMany(cascade= CascadeType.ALL)
-    private ArrayList<Hand> hands;
+    private List<Hand> hands;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Score> scores;
@@ -80,11 +78,11 @@ public class Game implements Serializable{
         this.mode = mode;
     }
 
-    public ArrayList<Hand> getHands() {
+    public List<Hand> getHands() {
         return hands;
     }
 
-    public void setHands(ArrayList<Hand> hands) {
+    public void setHands(List<Hand> hands) {
         this.hands = hands;
     }
 
@@ -117,7 +115,7 @@ public class Game implements Serializable{
         bag.Initialise();
 
         // Initialise the hands (give them 7 tiles each)
-        ArrayList<Hand> allHands=getHands();
+        List<Hand> allHands=getHands();
 
         // Give each hand 7 tiles:
         for(int i=0;i<allHands.size();i++)
@@ -128,6 +126,14 @@ public class Game implements Serializable{
         // Randomly choose the starting player
         List<User> players=this.getPlayers();
         this.setCurrentPlayer(players.get(randomInt(0, players.size()-1)).getId());
+    }
+
+    public User getNextPlayer() {
+        Optional<User> currentPlayer = getPlayers().stream().filter(player -> player.getId().equals(getCurrentPlayer())).findFirst();
+
+        int currentIndex = getPlayers().indexOf(currentPlayer.get());
+
+        return getPlayers().get((currentIndex + 1) % getPlayers().size());
     }
 
     private static int randomInt(int min, int max)

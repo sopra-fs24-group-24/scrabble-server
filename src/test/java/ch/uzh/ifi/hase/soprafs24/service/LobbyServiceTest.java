@@ -1,7 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,14 +23,25 @@ public class LobbyServiceTest {
     @Mock
     private LobbyRepository lobbyRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private LobbyService lobbyService;
 
+    @InjectMocks
+    private UserService userService;
+
     private Lobby testLobby;
+    private User testUser;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+
+        testUser = new User();
+        testUser.setUsername("fabio");
+        testUser.setPassword("1");
 
         // given
         testLobby = new Lobby();
@@ -47,6 +60,7 @@ public class LobbyServiceTest {
     @Test
     public void createLobby_validInputs_success() {
         // when
+        User createdUser = userService.createUser(testUser);
         Lobby createdLobby = lobbyService.createLobby(testLobby);
 
         // then
