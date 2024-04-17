@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.dictionary.Dictionary;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
@@ -9,18 +10,30 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 
 public class GameServiceTest {
 
     @Mock
     private GameRepository gameRepository;
+
+    @Mock
+    private Dictionary dictionary;
+
+    @Mock
+    private HttpResponse<String> mockResponse;
 
     @InjectMocks
     private GameService gameService;
@@ -103,5 +116,53 @@ public class GameServiceTest {
         Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
 
         assertDoesNotThrow(() -> gameService.authenticateUserForMove(user, 1L));
+    }
+
+    @Test
+    public void validateWord_isValid() {
+        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        Mockito.when(mockResponse.statusCode()).thenReturn(200);
+
+        assertTrue(gameService.validateWord("testWord"));
+    }
+
+    @Test
+    public void validateWord_isInvalid() {
+        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+
+        assertFalse(gameService.validateWord("testWord"));
+    }
+
+    @Test
+    public void validateWord_throwsException() {
+        ResponseStatusException response = new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        doThrow(response).when(dictionary).getScrabbleScore(Mockito.any());
+        assertThrows(ResponseStatusException.class, () -> gameService.validateWord("testWord"));
+    }
+
+    @Test
+    public void getScrabbleScore_wordIsValid() {
+        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        Mockito.when(mockResponse.statusCode()).thenReturn(200);
+        Mockito.when(mockResponse.body()).thenReturn("{" + '"' + "value" + '"' + ":8}");
+
+        assertEquals(8, gameService.getScrabbleScore("testWord"));
+    }
+
+    @Test
+    public void getScrabbleScore_wordIsInvalid() {
+        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+
+        assertEquals(0, gameService.getScrabbleScore("testWord"));
+    }
+
+    @Test
+    public void getScrabbleScore_throwsException() {
+        ResponseStatusException response = new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        doThrow(response).when(dictionary).getScrabbleScore(Mockito.any());
+
+        assertThrows(ResponseStatusException.class, () -> gameService.getScrabbleScore("testWord"));
     }
 }
