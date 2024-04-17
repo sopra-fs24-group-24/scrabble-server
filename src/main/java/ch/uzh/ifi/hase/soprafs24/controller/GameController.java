@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -42,5 +43,12 @@ public class GameController
     public void placeWordOnPlayfield(@PathVariable Long gameId, @RequestBody GamePostDTO gamePostDTO) {
         Game updatedGame = GameDTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
         gameService.placeTilesOnBoard(updatedGame);
+    }
+
+    @PostMapping("moves/skip/{gameId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void skipTurn(@PathVariable Long gameId, @RequestParam String token) {
+        User user = userService.isTokenValid(token);
+        gameService.skipTurn(user, gameId);
     }
 }

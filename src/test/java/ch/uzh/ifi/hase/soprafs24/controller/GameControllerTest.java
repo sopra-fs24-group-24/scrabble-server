@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -109,6 +110,37 @@ mockMvc.perform(getRequest)
  mockMvc.perform(getRequest)
  .andExpect(status().isNotFound());
   }
+
+  @Test
+  public void skipMove_invalidInput() throws Exception {
+      User user = new User();
+      user.setId(1L);
+
+      ResponseStatusException response = new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+      given(userService.isTokenValid(Mockito.any())).willReturn(user);
+      doThrow(response).when(gameService).skipTurn(Mockito.any(), Mockito.any());
+
+      MockHttpServletRequestBuilder postRequest = post("/moves/skip/1?token=1")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(postRequest)
+              .andExpect(status().isNotFound());
+  }
+
+    @Test
+    public void skipMove_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+
+        given(userService.isTokenValid(Mockito.any())).willReturn(user);
+
+        MockHttpServletRequestBuilder postRequest = post("/moves/skip/1?token=1")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(postRequest)
+                .andExpect(status().isOk());
+    }
 
   /**
    * Helper Method to convert userPostDTO into a JSON string such that the input

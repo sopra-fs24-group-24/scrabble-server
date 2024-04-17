@@ -15,8 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
 
@@ -49,6 +48,14 @@ public class GameServiceTest {
     }
 
     @Test
+    public void skipTurn_2Players_success() {
+        User user = testGame.getPlayers().get(0);
+        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        gameService.skipTurn(user, 1L);
+        assertEquals(2L, testGame.getCurrentPlayer());
+    }
+
+    @Test
     public void nextPlayer_2Players_success() {
         Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
         gameService.makeNextPlayerToCurrentPlayer(1L);
@@ -71,5 +78,30 @@ public class GameServiceTest {
     public void nextPlayer_wrongId_fail() {
         Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class ,() -> gameService.makeNextPlayerToCurrentPlayer(2L));
+    }
+
+    @Test
+    public void authenticatePlayer_invalidGameId_fail() {
+        User user = testGame.getPlayers().get(0);
+
+        Mockito.when(gameRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(ResponseStatusException.class ,() -> gameService.authenticateUserForMove(user, 2L));
+    }
+
+    @Test
+    public void authenticatePlayer_invalidUserId_fail() {
+        User user = testGame.getPlayers().get(1);
+
+        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        assertThrows(ResponseStatusException.class ,() -> gameService.authenticateUserForMove(user, 1L));
+    }
+
+    @Test
+    public void authenticatePlayer_success() {
+        User user = testGame.getPlayers().get(0);
+
+        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+
+        assertDoesNotThrow(() -> gameService.authenticateUserForMove(user, 1L));
     }
 }

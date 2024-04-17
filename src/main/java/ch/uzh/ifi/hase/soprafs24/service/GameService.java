@@ -40,6 +40,11 @@ public class GameService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "Game ID"));
     }
 
+    public void skipTurn(User user, Long gameId) {
+        authenticateUserForMove(user, gameId);
+        makeNextPlayerToCurrentPlayer(gameId);
+    }
+
     public void makeNextPlayerToCurrentPlayer(Long gameId) {
         Optional<Game> game = gameRepository.findById(gameId);
 
@@ -240,6 +245,16 @@ public class GameService {
 
     }
 
+    public void authenticateUserForMove(User userInput, Long gameId) {
+        Optional<Game> game = gameRepository.findById(gameId);
+
+        if (game.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The game does not exist!");
+        } else if (!game.get().getCurrentPlayer().equals(userInput.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "It's not your turn!");
+        }
+    }
+
     /**
      * This is a helper method that will check whether a game
      * with the specified ID exists or not. The method will return
@@ -249,7 +264,6 @@ public class GameService {
      * @throws org.springframework.web.server.ResponseStatusException
      * @see Game
      */
-
     private Game checkIfGameExists(Game game) {
         return gameRepository.findById(game.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indicated Game not found!"));
