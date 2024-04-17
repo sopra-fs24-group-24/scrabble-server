@@ -135,3 +135,13 @@ completed on Saturday 06.04.2024
 **Create Post REST endpoint to log out a user [(issue #86)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/86)** </br>
 
 **Create a logout button [(issue #32)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/32)** </br>
+
+### *Week 2*
+
+**Implement skip turn button in game screen [(issue #23)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/23)** </br>
+
+**Create functionality to validate word with API [(issue #32)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/32)** </br>
+
+**Create functionality to assign a new player as the current player [(issue #66)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/66)** </br>
+
+**Create REST POST endpoint to skip turn [(issue #67)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/67)** </br>
