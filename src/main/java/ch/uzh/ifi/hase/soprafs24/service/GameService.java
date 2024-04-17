@@ -1,11 +1,15 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.dictionary.Dictionary;
+import ch.uzh.ifi.hase.soprafs24.dictionary.WordnikClient;
 import ch.uzh.ifi.hase.soprafs24.entity.Bag;
 import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import java.util.*;
 
 @Service
@@ -28,12 +34,15 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final HandRepository handRepository;
+    private final Dictionary dictionary;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
-                       @Qualifier("handRepository") HandRepository handRepository) {
+                       @Qualifier("handRepository") HandRepository handRepository,
+                       @Qualifier("dictionary") Dictionary dictionary) {
         this.gameRepository = gameRepository;
         this.handRepository = handRepository;
+        this.dictionary = dictionary;
     }
 
 
@@ -83,6 +92,22 @@ public class GameService {
         // update playfield and save it in database
         foundGame.setPlayfield(updatedPlayfield);
         gameRepository.flush();
+    }
+
+    public boolean validateWord(String word) {
+        HttpResponse<String> response = dictionary.getScrabbleScore(word);
+
+        return response.statusCode() == 200;
+    }
+
+    public int getScrabbleScore(String word) {
+        HttpResponse<String> response = dictionary.getScrabbleScore(word);
+
+        if (response.statusCode() == HttpStatus.OK.value()) {
+            return getJSON(response).get("value").asInt();
+        } else {
+            return 0;
+        }
     }
 
     public void validMove(List<Tile> updatedPlayfield, List<Tile> persistedPlayfield) {
@@ -311,7 +336,6 @@ public class GameService {
         return foundhand.getHandtiles();
     }
 
-
     public void authenticateUserForMove(User userInput, Long gameId) {
         Optional<Game> game = gameRepository.findById(gameId);
 
@@ -319,6 +343,15 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The game does not exist!");
         } else if (!game.get().getCurrentPlayer().equals(userInput.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "It's not your turn!");
+        }
+    }
+
+    private JsonNode getJSON(HttpResponse<String> response) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readTree(response.body());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Response body could not be parsed!");
         }
     }
 
