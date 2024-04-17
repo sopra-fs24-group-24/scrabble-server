@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -9,6 +10,8 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -42,5 +45,15 @@ public class GameController
     public void placeWordOnPlayfield(@PathVariable Long gameId, @RequestBody GamePostDTO gamePostDTO) {
         Game updatedGame = GameDTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
         gameService.placeTilesOnBoard(updatedGame);
+    }
+
+    @PostMapping("moves/swaps/{gameId}/{userId}/{handId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<Tile> swapTilesOfPlayer(@PathVariable Long gameId, @PathVariable Long userId,
+                                        @PathVariable Long handId, @RequestBody List<Tile> inputTiles) {
+        // returns new hand (exchanged tiles + remaining tiles)
+        return gameService.swapTiles(gameId, userId, handId, inputTiles);
+
     }
 }

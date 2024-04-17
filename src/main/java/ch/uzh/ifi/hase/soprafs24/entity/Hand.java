@@ -41,4 +41,25 @@ public class Hand implements Serializable{
     public List<Tile> getHandtiles() {
         return handtiles;
     }
+
+    private void removeTile(Tile tile) {
+        handtiles.remove(tile);
+    }
+
+    private void addTile(Tile tile) {
+        handtiles.add(tile);
+    }
+
+
+    public void putTilesInHand(List<Tile> tiles) {
+        for (Tile tile : tiles) {
+            addTile(tile);
+        }
+    }
+
+    public void removeTilesFromHand(List<Tile> tiles) {
+        for (Tile tile : tiles) {
+            removeTile(tile);
+        }
+    }
 }

@@ -19,7 +19,7 @@ public class Tile implements Serializable{
     @Column(nullable=false)
     private int value;
 
-    Tile(char letter, int value)
+    public Tile(char letter, int value)
     {
         this.setLetter(letter);
         this.setValue(value);
