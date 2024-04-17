@@ -2,7 +2,7 @@
 
 ## Fabio Luca Rippstein
 
-### *Week 1*
+### *Week 1 (28.03.24 - 10.04.24)*
 
 **Create Schema for Lobby [(issue 41)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/41)**: </br>
 completed on Monday, 08.04.2024
@@ -36,6 +36,32 @@ completed on Monday, 08.04.2024
 - Implemented PUT endpoint in file LobbyController
 - Implemented corresponding tests in file LobbyControllerTest
 - Implemented tests for function addPlayerToLobby() in files LobbyServiceIntegrationTest & LobbyServiceTest
+
+### *Week 2 (11.04.24 - 17.04.24)*
+
+**Create REST POST endpoint to swap tiles [(issue 56)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/56)**:</br>
+completed on Wednesday, 17.04.2024
+
+- Implemented REST POST endpoint for swapping tiles in file GameController
+- Created 3 tests for POST endpoint in file GameControllerTest
+
+**Implement functionality to check if lobby is full and ready to start [(issue 49)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/49)**:</br>
+completed on Tuesday, 16.04.2024
+
+- Implemented check if lobby is full in method addPlayer() in entity Lobby
+- Implemented tests in files LobbyServiceTest and LobbyServiceIntegrationTest
+
+**Implement persistence of played tiles [(issue 24)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/24)**:</br>
+completed on Wednesday, 17.04.2024
+
+- Implemented functionality to save and update oldPlayfield and currentPlayfield
+
+**Implement REST POST to send played tiles (issue 27)** (in Progress - not completed yet)
+
+**Implement functionality to validate move (issue 28)** (in Progress - not completed yet)
+
+**Create functionality to swap tiles from player's hand and bag (issue 54)** (in Progress - not completed yet)
+
 
 ## Luca Stephan Christl
 

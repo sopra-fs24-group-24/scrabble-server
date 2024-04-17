@@ -31,6 +31,13 @@ public class Game implements Serializable{
     @OneToMany(cascade = CascadeType.ALL)
     private List<Tile> playfield;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Tile> oldPlayfield;
+
+    @Column(nullable = false)
+    private boolean wordContested;
+
+
     @OneToMany(cascade= CascadeType.ALL)
     private List<Hand> hands;
 
@@ -68,6 +75,18 @@ public class Game implements Serializable{
     public List<Tile> getPlayfield() {
         return playfield;
     }
+
+    public void setOldPlayfield(List<Tile> oldPlayfield) {
+        this.oldPlayfield = oldPlayfield;
+    }
+
+    public List<Tile> getOldPlayfield() {
+        return oldPlayfield;
+    }
+
+    public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
+
+    public boolean getWordContested() { return wordContested; }
 
     public GameMode getMode() {
         return mode;

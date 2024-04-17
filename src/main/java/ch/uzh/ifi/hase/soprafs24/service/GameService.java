@@ -66,6 +66,15 @@ public class GameService {
 
     public void placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game);
+
+        // if in the last round the word was not contested, then the variable oldPlayfield is updated by
+        // assigning the current Playfield to the variable oldPlayfield
+        // if the word was contested, then the word-validation-method will handle the storing of the playfields
+        if (!foundGame.getWordContested()) {
+            List<Tile> newPlayfield = foundGame.getPlayfield();
+            foundGame.setOldPlayfield(newPlayfield);
+        }
+
         List<Tile> updatedPlayfield = game.getPlayfield();
         List<Tile> persistedPlayfield = foundGame.getPlayfield();
 
