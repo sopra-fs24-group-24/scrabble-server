@@ -115,10 +115,13 @@ public class Lobby implements Serializable{
         return false;
     }
 
-    public boolean removePlayer(Long UserId) {
+    public boolean removePlayer(User user) {
         if (this.numberOfPlayers >= 1) {
             this.numberOfPlayers -= 1;
-            this.usersInLobby.remove(UserId);
+            this.usersInLobby.remove(user.getId());
+            List<User> players = this.players;
+            players.remove(user);
+            this.players = players;
             return true;
         }
         return false;

@@ -76,9 +76,10 @@ public class LobbyService {
     }
 
     public void removePlayerFromLobby(Long lobbyId, Long userId) {
+        User foundUser = checkIfPlayerExists(userId);
         Lobby lobby = checkIfLobbyExistsById(lobbyId);
         checkIfPlayerInLobby(lobby, userId);
-        lobby.removePlayer(userId);
+        lobby.removePlayer(foundUser);
         if (lobby.getNumberOfPlayers() == 0) {
             lobbyRepository.delete(lobby);
             lobbyRepository.flush();
