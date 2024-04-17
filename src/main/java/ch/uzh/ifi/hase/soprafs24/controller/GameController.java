@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -55,5 +56,12 @@ public class GameController
         // returns new hand (exchanged tiles + remaining tiles)
         return gameService.swapTiles(gameId, userId, handId, inputTiles);
 
+    }
+
+    @PostMapping("moves/skip/{gameId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void skipTurn(@PathVariable Long gameId, @RequestParam String token) {
+        User user = userService.isTokenValid(token);
+        gameService.skipTurn(user, gameId);
     }
 }
