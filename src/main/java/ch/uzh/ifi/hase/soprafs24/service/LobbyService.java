@@ -44,18 +44,24 @@ public class LobbyService {
     }
 
     public Lobby createLobby(Lobby newLobby) {
-        Long userId = newLobby.getUsersInLobby().get(0);
-        User foundUser = checkIfPlayerExists(userId);
-        checkIfUserAlreadyInLobby(userId);
-        newLobby.setNumberOfPlayers(1);
-        newLobby.setGameStarted(false);
-        List<User> players = new ArrayList<>();
-        players.add(foundUser);
-        newLobby.setPlayers(players);
-        newLobby = lobbyRepository.save(newLobby);
-        lobbyRepository.flush();
-        log.debug("Created Information for Lobby: {}", newLobby);
-        return newLobby;
+        //if there is no lobby, create one... if there already is a lobby, add player to lobby
+        //after M3 delete if/else statement
+        if (getLobbies().isEmpty()){
+            Long userId = newLobby.getUsersInLobby().get(0);
+            User foundUser = checkIfPlayerExists(userId);
+            checkIfUserAlreadyInLobby(userId);
+            newLobby.setNumberOfPlayers(1);
+            newLobby.setGameStarted(false);
+            List<User> players = new ArrayList<>();
+            players.add(foundUser);
+            newLobby.setPlayers(players);
+            newLobby = lobbyRepository.save(newLobby);
+            lobbyRepository.flush();
+            log.debug("Created Information for Lobby: {}", newLobby);
+            return newLobby;
+        }
+        Lobby lobby = getLobbies().get(0);
+        return addPlayertoLobby(lobby.getId(), newLobby.getUsersInLobby().get(0));
     }
 
     public Lobby addPlayertoLobby(Long lobbyId, Long userId) {

@@ -27,7 +27,6 @@ public class User implements Serializable {
   @GeneratedValue
   private Long id;
 
-  @Column Long lobbyid;
   @Column(nullable = true)
   private String name;
 
@@ -46,14 +45,6 @@ public class User implements Serializable {
   @Column(nullable = true)
   @ElementCollection
   private List<Long> friends = new ArrayList<Long>();
-
-    public void setLobbyid(Long lobbyid) {
-        this.lobbyid = lobbyid;
-    }
-
-    public Long getLobbyid() {
-        return lobbyid;
-    }
 
     public Long getId() {
     return id;
