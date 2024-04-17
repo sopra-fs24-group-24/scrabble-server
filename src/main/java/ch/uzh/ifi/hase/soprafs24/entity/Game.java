@@ -4,11 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name="Game")
@@ -120,6 +116,14 @@ public class Game implements Serializable{
         // Randomly choose the starting player
         List<User> players=this.getPlayers();
         this.setCurrentPlayer(players.get(randomInt(0, players.size()-1)).getId());
+    }
+
+    public User getNextPlayer() {
+        Optional<User> currentPlayer = getPlayers().stream().filter(player -> player.getId().equals(getCurrentPlayer())).findFirst();
+
+        int currentIndex = getPlayers().indexOf(currentPlayer.get());
+
+        return getPlayers().get((currentIndex + 1) % getPlayers().size());
     }
 
     private static int randomInt(int min, int max)

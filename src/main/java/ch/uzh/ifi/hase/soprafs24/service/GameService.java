@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,14 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
-
+    //TODO: This function isn't actually functional and should be updated accordingly
+    public Game createGame(List<User> players) {
+        Game newGame = new Game();
+        newGame.initialiseGame();
+        newGame = gameRepository.save(newGame);
+        gameRepository.flush();
+        return newGame;
+    }
 
     public Game getGameParams(Long gameId)
     {
@@ -39,6 +47,17 @@ public class GameService {
   
       String baseErrorMessage = "The %s provided can not be found!";
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "Game ID"));
+    }
+
+    public void makeNextPlayerToCurrentPlayer(Long gameId) {
+        Optional<Game> game = gameRepository.findById(gameId);
+
+        if (game.isPresent()) {
+            User nextPlayer = game.get().getNextPlayer();
+            game.get().setCurrentPlayer(nextPlayer.getId());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The game with id %s does not exist!", gameId));
+        }
     }
 
     public void placeTilesOnBoard(Game game) {
