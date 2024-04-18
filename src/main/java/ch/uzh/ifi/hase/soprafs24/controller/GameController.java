@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
@@ -69,9 +70,12 @@ public class GameController
     // TODO: temporary endpoint for testing purposes: Delete when not needed anymore
     @PostMapping("/quiek")
     @ResponseStatus(HttpStatus.OK)
-    public Game startGame() 
+    public Lobby startGame() 
     {
-         
+        Lobby lobby=new Lobby();
+        lobby.setId(1L);
+        lobby.setNumberOfPlayers(2);
+
         User user = new User();
         user.setId(1L);
         user.setUsername("Anna");
@@ -89,10 +93,13 @@ public class GameController
         List<User> players=new ArrayList<User>();
         players.add(user);
         players.add(user2);
+        lobby.setPlayers(players);
 
-        game.initialiseGame(players);
+        game.initialiseGame(lobby.getPlayers());
 
-        return game;
+        lobby.setGameOfLobby(game);
+
+        return lobby;
     }
 
 }
