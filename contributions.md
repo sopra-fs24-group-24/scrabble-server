@@ -100,11 +100,11 @@ completed on Saturday 06.04.2024
 
 **Create function to authenticate user [(issue #82)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/82)**: </br>
 
-**Implement register and login page with username and password input fields and commit button [(issue #30)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/30)**: </br>
+**Implement register and login page with username and password input fields and commit button [(issue #30)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/30)**: </br>
 
-**Create function to persist user in database [(issue #81)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/#81)**: </br>
+**Create function to persist user in database [(issue #81)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/81)**: </br>
 
-**Implement routing to main page after succesful login/registration [(issue #29)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/29)**: </br>
+**Implement routing to main page after succesful login/registration [(issue #29)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/29)**: </br>
 
 **Create REST POST endpoint for registered users to log in  [(issue #85)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/85)**: </br>
 
