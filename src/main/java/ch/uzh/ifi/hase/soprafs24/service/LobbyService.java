@@ -27,12 +27,16 @@ public class LobbyService {
     private final LobbyRepository lobbyRepository;
 
     @Autowired
+    private final UserService userService;
+
+    @Autowired
     private final UserRepository userRepository;
 
     public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
                         @Qualifier("userRepository") UserRepository userRepository) {
         this.lobbyRepository = lobbyRepository;
         this.userRepository = userRepository;
+        this.userService = new UserService(userRepository);
     }
 
     public List<Lobby> getLobbies() {
@@ -157,7 +161,7 @@ public class LobbyService {
      */
 
     private User checkIfPlayerExists(Long userId) {
-        return userRepository.findById(userId).orElseThrow();
+        return userService.getUser(userId);
 
     }
 

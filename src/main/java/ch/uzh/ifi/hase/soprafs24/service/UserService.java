@@ -40,6 +40,8 @@ public class UserService
     return this.userRepository.findAll();
   }
 
+  public User getUser(Long userId) { return this.userRepository.findById(userId).orElseThrow(); }
+
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
