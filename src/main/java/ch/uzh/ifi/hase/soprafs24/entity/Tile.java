@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name="Tile")
@@ -23,6 +24,32 @@ public class Tile implements Serializable{
     {
         this.setLetter(letter);
         this.setValue(value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this){
+            return true;
+        }
+        if (o == null){
+            return false;
+        }
+        if (getClass() != o.getClass()){
+            return false;
+        }
+        Tile other = (Tile) o;
+        if (this.letter != other.letter){
+            return false;
+        }
+        if (this.value != other.value){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(letter, value);
     }
 
     public void setId(Long id) {

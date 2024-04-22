@@ -45,9 +45,9 @@ public class GameController
     @PostMapping("moves/words/{gameId}")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public void placeWordOnPlayfield(@PathVariable Long gameId, @RequestBody GamePostDTO gamePostDTO) {
+    public List<Tile> placeWordOnPlayfield(@PathVariable Long gameId, @RequestBody GamePostDTO gamePostDTO) {
         Game updatedGame = GameDTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
-        gameService.placeTilesOnBoard(updatedGame);
+        return gameService.placeTilesOnBoard(updatedGame);
     }
 
     @PostMapping("moves/swaps/{gameId}/{userId}/{handId}")

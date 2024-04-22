@@ -73,8 +73,9 @@ public class GameService {
         }
     }
 
-    public void placeTilesOnBoard(Game game) {
+    public List<Tile> placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game);
+        checkIfBoardValid(game.getPlayfield());
 
         // if in the last round the word was not contested, then the variable oldPlayfield is updated by
         // assigning the current Playfield to the variable oldPlayfield
@@ -87,11 +88,15 @@ public class GameService {
         List<Tile> updatedPlayfield = game.getPlayfield();
         List<Tile> persistedPlayfield = foundGame.getPlayfield();
 
+        // check if move is valid
         validMove(updatedPlayfield, persistedPlayfield);
 
         // update playfield and save it in database
         foundGame.setPlayfield(updatedPlayfield);
         gameRepository.flush();
+        foundGame.setWordContested(false);
+
+        return foundGame.getPlayfield();
     }
 
     public boolean validateWord(String word) {
@@ -113,9 +118,13 @@ public class GameService {
     public void validMove(List<Tile> updatedPlayfield, List<Tile> persistedPlayfield) {
         // save the indices of the new tiles in a list
         List<Integer> updatedIndices = new ArrayList<Integer>();
+
         // search for the new tiles and add them to the list
-        for (int index = 0; index < 255; index++) {
-            if (updatedPlayfield.get(index) != persistedPlayfield.get(index)) {
+        for (int index = 0; index < 225; index++) {
+            if (updatedPlayfield.get(index) == null && persistedPlayfield.get(index) == null) {
+                continue;
+            }
+            if (!updatedPlayfield.get(index).equals(persistedPlayfield.get(index))) {
                 updatedIndices.add(index);
             }
         }
@@ -163,36 +172,99 @@ public class GameService {
             int lastElement = updatedIndices.get(sizeOfUpdatedIndices - 1);
 
             // check whether word is placed vertically or horizontally
-            // word is placed horizontally
+            // word is placed horizontally, since first and last tile are on the same row
             if (firstElement / 15 == lastElement / 15) {
 
-                // check if all newly placed tiles are on the same row and connected with each other or with an existing tile
-                for (int j = 1; j < sizeOfUpdatedIndices; j++) {
-                    int index = firstElement + j;
+                // check if all newly placed tiles are on the same row and directly connected with an existing tile
+                int step = 1;
+                while (updatedPlayfield.get(firstElement+step) != null) {
+                    int index = firstElement + step;
                     if (updatedIndices.contains(index) && persistedPlayfield.get(index) == null) {
-                        continue;
+                        step++;
                     }
                     else if (persistedPlayfield.get(index) instanceof Tile && !updatedIndices.contains(index)) {
                         newWordConnectedToExistingTile = true;
+                        step++;
                     }
                     else {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                                "You either have to place a word vertically or horizontally");
+                                "You cannot overwrite an existing tile");
                     }
                 }
 
-                // check if an existing tile is placed in front of the word
-                // check if leftmost letter in word is not placed in first column
-                if (firstElement % 15 != 0) {
-                    if (persistedPlayfield.get(firstElement - 1) instanceof Tile) {
-                        newWordConnectedToExistingTile = true;
+                // check if there are further placed tiles which are not connected to an existing tile or a placed tile
+                final int surplus = step;
+                if (updatedIndices.stream().anyMatch(num -> num > firstElement+surplus)) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "You have to place connected tiles");
+                }
+
+                // check for already existing tiles at top/below the horizontal word
+                // compute row on which first tile is located
+                int row = firstElement / 15;
+
+                // if word is located on row 0, only check for neighbor tiles on row 1
+                if (row == 0) {
+                    if (firstElement != 0) {
+                        if (persistedPlayfield.get(firstElement-1) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    if (lastElement != 14) {
+                        if (persistedPlayfield.get(firstElement+1) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    for (int j = 0; j < sizeOfUpdatedIndices; j++) {
+                        if (persistedPlayfield.get(firstElement + j + 15) != null) {
+                            newWordConnectedToExistingTile = true;
+                            break;
+                        }
                     }
                 }
-                // check if an existing tile is placed after the word
-                // check if rightmost letter in word is not placed in last column
-                if ((lastElement + 1) % 15 != 0) {
-                    if (persistedPlayfield.get(firstElement + 1) instanceof Tile) {
-                        newWordConnectedToExistingTile = true;
+                // if word is located on row 14, only check for neighbor tiles on row 13
+                else if (row == 14) {
+                    if (firstElement != 210) {
+                        if (persistedPlayfield.get(firstElement-1) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    if (lastElement != 224) {
+                        if (persistedPlayfield.get(firstElement+1) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    for (int j = 0; j < sizeOfUpdatedIndices; j++) {
+                        if (persistedPlayfield.get(firstElement + j - 15) != null) {
+                            newWordConnectedToExistingTile = true;
+                            break;
+                        }
+                    }
+
+                }
+                // if word is located on row 2-13, check for neighbor tiles at top and below the word
+                else {
+                    if (firstElement % 15 != 0) {
+                        if (persistedPlayfield.get(firstElement-1) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    if ((lastElement+1) % 15 != 0) {
+                        if (persistedPlayfield.get(firstElement+1) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    for (int j = 0; j < sizeOfUpdatedIndices; j++) {
+                        if (persistedPlayfield.get(firstElement + j - 15) != null || persistedPlayfield.get(firstElement + j + 15) != null) {
+                            newWordConnectedToExistingTile = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -200,33 +272,94 @@ public class GameService {
             // word is placed vertically
             else {
                 // check if all newly placed tiles are on the same column and connected with each other
-                for (int j = 1; j < sizeOfUpdatedIndices; j++) {
-                    int index = firstElement + 15 * j;
+                int step = 1;
+                while (updatedPlayfield.get(firstElement + step*15) != null) {
+                    int index = firstElement + 15 * step;
                     if (updatedIndices.contains(index) && persistedPlayfield.get(index) == null) {
-                        continue;
+                        step++;
                     }
                     else if (persistedPlayfield.get(index) instanceof Tile && !updatedIndices.contains(index)) {
                         newWordConnectedToExistingTile = true;
+                        step++;
                     }
                     else {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                                "You either have to place a word vertically or horizontally");
+                                "You cannot overwrite an existing tile");
                     }
                 }
 
-                // check if an existing tile is placed above the word
-                // check if uppermost letter in word is not placed in first row
-                if (firstElement / 15 != 0) {
-                    if (persistedPlayfield.get(firstElement - 15) instanceof Tile) {
-                        newWordConnectedToExistingTile = true;
-                    }
+                // check if there are further placed tiles which are not connected to an existing tile or a placed tile
+                final int surplus = step*15;
+                if (updatedIndices.stream().anyMatch(num -> num > firstElement+surplus)) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "You have to place horizontally or vertically connected tiles");
                 }
 
-                // check if an existing tile is placed below the word
-                // check if lowest letter in word is not placed in last row
-                if (firstElement / 15 != 14) {
-                    if (persistedPlayfield.get(firstElement + 15) instanceof Tile) {
-                        newWordConnectedToExistingTile = true;
+                // check for already existing tiles to the right/left of the vertical word
+                // compute column on which first tile is located
+                int column = firstElement % 15;
+
+                // if word is located on column 0, only check for neighbor tiles to the right of placed word
+                if (column == 0) {
+                    if (firstElement != 0) {
+                        if (persistedPlayfield.get(firstElement-15) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    if (lastElement != 210) {
+                        if (persistedPlayfield.get(firstElement+15) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    for (int j = 0; j < sizeOfUpdatedIndices; j++) {
+                        if (persistedPlayfield.get(firstElement + j*15 + 1) != null) {
+                            newWordConnectedToExistingTile = true;
+                            break;
+                        }
+                    }
+                }
+                // if word is located on row 14, only check for neighbor tiles on row 13
+                else if (column == 14) {
+                    if (firstElement != 14) {
+                        if (persistedPlayfield.get(firstElement-15) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    if (lastElement != 224) {
+                        if (persistedPlayfield.get(firstElement+15) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    for (int j = 0; j < sizeOfUpdatedIndices; j++) {
+                        if (persistedPlayfield.get(firstElement + j*15 - 1) != null) {
+                            newWordConnectedToExistingTile = true;
+                            break;
+                        }
+                    }
+                }
+                // if word is located on column 2-13, check for neighbor tiles to the right/left of placed word
+                else {
+                    if (firstElement > 14) {
+                        if (persistedPlayfield.get(firstElement-15) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    if (lastElement < 210) {
+                        if (persistedPlayfield.get(firstElement+15) != null){
+                            newWordConnectedToExistingTile = true;
+                        }
+                    }
+
+                    for (int j = 0; j < sizeOfUpdatedIndices; j++) {
+                        if (persistedPlayfield.get(firstElement + j*15 - 1) != null || persistedPlayfield.get(firstElement + j*15 + 1) != null) {
+                            newWordConnectedToExistingTile = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -244,6 +377,12 @@ public class GameService {
             boolean newWordConnectedToExistingTile = false;
             int element = updatedIndices.get(0);
 
+            // check if new tile is overwriting an existing tile
+            if (persistedPlayfield.get(element) != null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You cannot overwrite an existing tile");
+            }
+
             // calculate row and column of element
             int row = element / 15;
             int column = element % 15;
@@ -252,7 +391,8 @@ public class GameService {
             List<Integer> neighborCells = new ArrayList<Integer>();
 
             // add valid neighbor cells to array
-            for (int j = 0; j < 3; j++) {
+            for (int j = 0; j < 2; j++) {
+                // check if there is a valid neighbor at top/below the specified cell
                 if (j % 2 == 0) {
                     if (row - 1 >= 0){
                         neighborCells.add(element - 15);
@@ -261,6 +401,7 @@ public class GameService {
                         neighborCells.add(element + 15);
                     }
                 }
+                // check if there is a valid neighbor to the left/right of the specified cell
                 else {
                     if (column - 1 >= 0){
                         neighborCells.add(element - 1);
@@ -278,6 +419,7 @@ public class GameService {
                 }
             }
 
+            // if no valid neighbor cell contains an existing tile, throw error
             if (!newWordConnectedToExistingTile) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                         "Your placed word needs to be connected with an existing tile");
