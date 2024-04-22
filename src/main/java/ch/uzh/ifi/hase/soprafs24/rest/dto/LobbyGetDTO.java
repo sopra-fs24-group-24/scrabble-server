@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 
 import java.util.ArrayList;
@@ -18,9 +19,19 @@ public class LobbyGetDTO {
 
     private boolean gameStarted;
 
+    private GameGetDTO gameOfLobby;
+
     private GameMode mode;
 
     private List<User> players;
+
+    public void setGameOfLobby(GameGetDTO gameOfLobby) {
+        this.gameOfLobby = gameOfLobby;
+    }
+
+    public GameGetDTO getGameOfLobby() {
+        return gameOfLobby;
+    }
 
     public void setPlayers(List<User> players) {
         this.players = players;

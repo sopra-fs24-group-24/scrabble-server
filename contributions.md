@@ -82,17 +82,39 @@ completed on Saturday 06.04.2024
 - Created the Board
 - Created Buttons for saving, clearing the board, swapping, leaving the game and opening the dictionary
 
-**Create GamePage [(issue 2)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/2)**: </br>
+**Create Drag and Drop [(issue 2)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/2)**: </br>
 completed on Saturday 06.04.2024
 
 - Created Cell Component and Draggable Component
 - Implemented dragging and dropping for the Board and Hand
 - Created Styling for Cell and Draggable
 
-**Create GamePage [(issue 3)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/3)**: </br>
+**Create Undo [(issue 3)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/3)**: </br>
 completed on Saturday 06.04.2024
 
 - Implemented the client side undo functionality for the undo button
+
+### *Week 2*
+
+**Create LobbyPage[(issue 13)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/13)**: </br>
+completed on Wednesday 17.04.2024
+
+- created LobbyPage
+- created styling for LobbyPage
+- implemented regular updates via getrequests
+- implemented users automatically joining a lobby for M3
+
+**Create Gameobject in Frontend [(issue 37)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/37)**: </br>
+completed on Monday 15.04.2024
+
+- created Gameobject in frontend
+
+**Implement functionality to regularly update Gameobject [(issue 38)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/38)**: </br>
+in Progress
+
+-implemented regular updates for gameobject
+
+-created necessary states and assign everything
 
 ## Michael Kevin Barry
 

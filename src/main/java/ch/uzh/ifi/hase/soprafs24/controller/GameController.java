@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -34,12 +35,12 @@ public class GameController
     @GetMapping("/games/{gameId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Game getGame(@PathVariable("gameId") Long gameId,@RequestParam(required=false) String token) 
+    public GameGetDTO getGame(@PathVariable("gameId") Long gameId, @RequestParam(required=false) String token)
     {
         userService.isTokenValid(token);
         
-        Game requestedGame=gameService.getGameParams(gameId);
-        return requestedGame;
+        GameGetDTO gameGetDTO = GameDTOMapper.INSTANCE.convertEntityToGameGetDTO(gameService.getGameParams(gameId));
+        return gameGetDTO;
     }
 
     @PostMapping("moves/words/{gameId}")

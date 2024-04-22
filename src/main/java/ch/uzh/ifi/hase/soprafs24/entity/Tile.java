@@ -20,10 +20,23 @@ public class Tile implements Serializable{
     @Column(nullable=false)
     private int value;
 
-    public Tile(char letter, int value)
-    {
-        this.setLetter(letter);
-        this.setValue(value);
+    @Column(nullable = true)
+    private int boardidx;
+    public Tile(char letter, int value){
+        this.letter = letter;
+        this.value = value;
+    }
+
+    public Tile() {
+
+    }
+
+    public void setBoardidx(int boardidx) {
+        this.boardidx = boardidx;
+    }
+
+    public int getBoardidx() {
+        return boardidx;
     }
 
     @Override
