@@ -35,6 +35,8 @@ public class GameService {
     private final GameRepository gameRepository;
     private final HandRepository handRepository;
     private final Dictionary dictionary;
+    private final Bag bag;
+
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
@@ -43,6 +45,7 @@ public class GameService {
         this.gameRepository = gameRepository;
         this.handRepository = handRepository;
         this.dictionary = dictionary;
+        this.bag = new Bag();
     }
 
 

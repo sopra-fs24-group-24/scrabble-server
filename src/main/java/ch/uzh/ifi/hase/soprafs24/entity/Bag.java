@@ -42,16 +42,16 @@ public class Bag implements Serializable{
         return this.tiles.size();
     }
 
-    public List<Tile> getSomeTiles(int numberOfTiles)
+    public synchronized List<Tile> getSomeTiles(int numberOfTiles)
     {
-        List<Tile> tilesToReturn=tiles.subList(tiles.size()-numberOfTiles, tiles.size());
+        List<Tile> tilesToReturn = new ArrayList<>(tiles.subList(tiles.size()-numberOfTiles, tiles.size()));
 
-        tiles=tiles.subList(0,tiles.size()-numberOfTiles);
+        tiles = new ArrayList<>(tiles.subList(0,tiles.size()-numberOfTiles));
 
         return tilesToReturn;
     }
 
-    public void putTilesInBag(List<Tile> tilesToBeExchanged) {
+    public synchronized void putTilesInBag(List<Tile> tilesToBeExchanged) {
         for (Tile tile : tilesToBeExchanged) {
             addTile(tile);
         }
