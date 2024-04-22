@@ -73,7 +73,16 @@ public class Game implements Serializable{
     }
 
     public List<Tile> getPlayfield() {
-        return playfield;
+        List<Tile> filledfield = new ArrayList<>();
+        for (int i = 0; i< 225;i++){
+            filledfield.add(null);
+        }
+        for (int i = 0; i<this.playfield.size(); i++){
+            if (this.playfield.get(i)!= null){
+                filledfield.set(this.playfield.get(i).getBoardidx(), this.playfield.get(i));
+            }
+        }
+        return filledfield;
     }
 
     public void setOldPlayfield(List<Tile> oldPlayfield) {
@@ -122,17 +131,18 @@ public class Game implements Serializable{
 
     public void initialiseGame(List<User> players)
     {
-        this.players=players;
+        setPlayers(players);
 
         // Initialise playfield:
         List<Tile> playfield = new ArrayList<Tile>();
 
-        for(int i=0;i<225;i++)
+        for(int i=0;i<225;i++) {
             playfield.add(null);
-
-        this.playfield=playfield;
-
-        this.bag=new Bag();
+        }
+        setPlayfield(playfield);
+        Bag bag =new Bag();
+        bag.initialisebag();
+        setBag(bag);
 
         // Initialise the hands (give them 7 tiles each)
         List<Hand> allHands = new ArrayList<Hand>();
@@ -151,8 +161,8 @@ public class Game implements Serializable{
             allScores.add(temp_score);
         }
 
-        this.setHands(allHands);
-        this.setScores(allScores);
+        setHands(allHands);
+        setScores(allScores);
 
         // Randomly choose the starting player
         this.setCurrentPlayer(players.get(randomInt(0, players.size()-1)).getId());

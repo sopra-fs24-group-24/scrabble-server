@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -89,7 +90,9 @@ public class Lobby implements Serializable{
             return false;
         }
         this.gameStarted = true;
-        setGameOfLobby(new Game());
+        Game game =new Game();
+        game.initialiseGame(new ArrayList<>(this.players));
+        setGameOfLobby(game);
         return true;
     }
 

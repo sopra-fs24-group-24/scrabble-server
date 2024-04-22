@@ -5,7 +5,9 @@ import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Score;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import org.springframework.lang.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameGetDTO {
@@ -23,6 +25,14 @@ public class GameGetDTO {
 
     private List<User> players;
 
+    public void setPlayfield(List<Tile> playfield) {
+        this.playfield = playfield;
+    }
+
+    public List<Tile> getPlayfield() {
+        return playfield;
+    }
+
     public void setMode(GameMode mode) {
         this.mode = mode;
     }
@@ -32,6 +42,7 @@ public class GameGetDTO {
     }
 
     public void setPlayers(List<User> players) {
+        this.players = players;
     }
 
     public List<User> getPlayers() {
@@ -54,13 +65,6 @@ public class GameGetDTO {
         this.scores = scores;
     }
 
-    public void setPlayfield(List<Tile> playfield) {
-        this.playfield = playfield;
-    }
-
-    public List<Tile> getPlayfield() {
-        return playfield;
-    }
 
     public Long getId() {
         return id;

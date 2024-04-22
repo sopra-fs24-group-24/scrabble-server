@@ -57,7 +57,7 @@ public class Bag implements Serializable{
         }
     }
 
-    public Bag()
+    public void initialisebag()
     {
         // Make list of tiles for bag
 
@@ -139,7 +139,10 @@ public class Bag implements Serializable{
 
             for (int i=0;i<count;i++)
             {
-                tempTiles.add(new Tile(key.charAt(0),tileValues.get(key)));
+                Tile tile = new Tile();
+                tile.setLetter(key.charAt(0));
+                tile.setValue(tileValues.get(key));
+                tempTiles.add(tile);
             }
         }
 
