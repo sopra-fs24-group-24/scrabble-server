@@ -1,11 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,24 +23,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
-import static org.hamcrest.Matchers.hasSize;
 import java.util.ArrayList;
 import java.util.List;
 
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * UserControllerTest
- * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
- * request without actually sending them over the network.
- * This tests if the UserController works.
- */
 @WebMvcTest(GameController.class)
 public class GameControllerTest {
 
@@ -119,6 +111,144 @@ mockMvc.perform(getRequest)
  mockMvc.perform(getRequest)
  .andExpect(status().isNotFound());
   }
+
+  @Test
+  public void placeTilesOnPlayfield_validInput_thenUpdatedPlayfieldIsReturned() throws Exception {
+      // given
+      // sent data
+      GamePostDTO gamePostDTO = new GamePostDTO();
+      gamePostDTO.setId(1L);
+      gamePostDTO.setCurrentPlayer(1L);
+
+      List<Tile> sentPlayfield = new ArrayList<>();
+      for (int i = 0; i < 225; i++){
+          sentPlayfield.add(null);
+      }
+
+      Tile tile1 = new Tile('C', 4);
+      Tile tile2 = new Tile('A', 3);
+      Tile tile3 = new Tile('T', 6);
+      Tile tile4 = new Tile('E', 1);
+      Tile tile5 = new Tile('A', 3);
+
+      sentPlayfield.set(112, tile1);
+      sentPlayfield.set(127, tile2);
+      sentPlayfield.set(142, tile3);
+      sentPlayfield.set(143, tile4);
+      sentPlayfield.set(144, tile5);
+      gamePostDTO.setPlayfield(sentPlayfield);
+
+      // returned data
+      List<Tile> returnedPlayfield = new ArrayList<>();
+      for (int i = 0; i < 225; i++){
+          returnedPlayfield.add(null);
+      }
+
+      Tile tile6 = new Tile('C', 4);
+      Tile tile7 = new Tile('A', 3);
+      Tile tile8 = new Tile('T', 6);
+      Tile tile9 = new Tile('E', 1);
+      Tile tile10 = new Tile('A', 3);
+
+      returnedPlayfield.set(112, tile6);
+      returnedPlayfield.set(127, tile7);
+      returnedPlayfield.set(142, tile8);
+      returnedPlayfield.set(143, tile9);
+      returnedPlayfield.set(144, tile10);
+
+      given(gameService.placeTilesOnBoard(Mockito.any())).willReturn(returnedPlayfield);
+
+      // convert returnedPlayfield to a JSON string
+      String jsonReturnedPlayfield  = new ObjectMapper().writeValueAsString(returnedPlayfield);
+
+      // when
+      MockHttpServletRequestBuilder postRequest = post("/moves/words/{gameId}", 1)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(asJsonString(gamePostDTO));
+
+      // then
+      mockMvc.perform(postRequest).andExpect(status().isCreated())
+              .andExpect(content().json(jsonReturnedPlayfield));
+  }
+
+  @Test
+  public void placeTilesOnPlayfield_invalidInputs_thenThrowError() throws Exception {
+      // given
+      // sent data
+      GamePostDTO gamePostDTO = new GamePostDTO();
+      gamePostDTO.setId(1L);
+      gamePostDTO.setCurrentPlayer(1L);
+
+      List<Tile> sentPlayfield = new ArrayList<>();
+      for (int i = 0; i < 225; i++){
+          sentPlayfield.add(null);
+      }
+
+      Tile tile1 = new Tile('C', 4);
+      Tile tile2 = new Tile('A', 3);
+      Tile tile3 = new Tile('T', 6);
+      Tile tile4 = new Tile('E', 1);
+      Tile tile5 = new Tile('A', 3);
+
+      sentPlayfield.set(112, tile1);
+      sentPlayfield.set(127, tile2);
+      sentPlayfield.set(142, tile3);
+      sentPlayfield.set(143, tile4);
+      sentPlayfield.set(145, tile5);
+      gamePostDTO.setPlayfield(sentPlayfield);
+
+      given(gameService.placeTilesOnBoard(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.FORBIDDEN));
+
+      // when
+      MockHttpServletRequestBuilder postRequest = post("/moves/words/{gameId}", 1)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(asJsonString(gamePostDTO));
+
+      // then
+      mockMvc.perform(postRequest).andExpect(status().isForbidden())
+              .andExpect(content().string(""));
+  }
+
+  @Test
+  public void placeTilesOnPlayfield_gameNotFound_thenThrowError() throws Exception {
+      // given
+      // sent data
+      GamePostDTO gamePostDTO = new GamePostDTO();
+      gamePostDTO.setId(1L);
+      gamePostDTO.setCurrentPlayer(1L);
+
+      List<Tile> sentPlayfield = new ArrayList<>();
+      for (int i = 0; i < 225; i++){
+          sentPlayfield.add(null);
+      }
+
+      Tile tile1 = new Tile('C', 4);
+      Tile tile2 = new Tile('A', 3);
+      Tile tile3 = new Tile('T', 6);
+      Tile tile4 = new Tile('E', 1);
+      Tile tile5 = new Tile('A', 3);
+
+      sentPlayfield.set(112, tile1);
+      sentPlayfield.set(127, tile2);
+      sentPlayfield.set(142, tile3);
+      sentPlayfield.set(143, tile4);
+      sentPlayfield.set(145, tile5);
+      gamePostDTO.setPlayfield(sentPlayfield);
+
+      given(gameService.placeTilesOnBoard(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+      // when
+      MockHttpServletRequestBuilder postRequest = post("/moves/words/{gameId}", 2)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(asJsonString(gamePostDTO));
+
+      // then
+      mockMvc.perform(postRequest).andExpect(status().isNotFound())
+              .andExpect(content().string(""));
+
+  }
+
+
 
   @Test
   public void swapTiles_validInput_thenNewHandIsReturned() throws Exception {
