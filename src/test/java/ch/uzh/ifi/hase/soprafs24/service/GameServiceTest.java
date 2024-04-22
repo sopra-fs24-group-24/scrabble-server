@@ -182,17 +182,10 @@ public class GameServiceTest {
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        userPlayfield.set(112, tile1);
-        userPlayfield.set(127, tile2);
-        userPlayfield.set(142, tile3);
+        char[] lettersUser = {'C', 'A', 'T'};
+        int[] valuesUser = {4, 3, 5};
+        int[] boardIndicesUser = {112, 127, 142};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -200,17 +193,10 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-
-        expectedPlayfield.set(112, tile4);
-        expectedPlayfield.set(127, tile5);
-        expectedPlayfield.set(142, tile6);
+        char[] lettersExpected = {'C', 'A', 'T'};
+        int[] valuesExpected = {4, 3, 5};
+        int[] boardIndicesExpected = {112, 127, 142};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
     }
@@ -222,38 +208,18 @@ public class GameServiceTest {
 
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(127, tile2);
-        generatedPlayfield.set(142, tile3);
-
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 127, 142};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('E', 2);
-        Tile tile8 = new Tile('A', 3);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(127, tile5);
-        userPlayfield.set(142, tile6);
-        userPlayfield.set(143, tile7);
-        userPlayfield.set(144, tile8);
-
+        char[] lettersUser = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesUser = {4, 3, 5, 2, 3};
+        int[] boardIndicesUser = {112, 127, 142, 143, 144};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -261,21 +227,10 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile9 = new Tile('C', 4);
-        Tile tile10 = new Tile('A', 3);
-        Tile tile11 = new Tile('T', 5);
-        Tile tile12 = new Tile('E', 2);
-        Tile tile13 = new Tile('A', 3);
-
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(127, tile10);
-        expectedPlayfield.set(142, tile11);
-        expectedPlayfield.set(143, tile12);
-        expectedPlayfield.set(144, tile13);
+        char[] lettersExpected = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesExpected = {4, 3, 5, 2, 3};
+        int[] boardIndicesExpected = {112, 127, 142, 143, 144};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
     }
@@ -287,36 +242,18 @@ public class GameServiceTest {
 
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(127, tile2);
-        generatedPlayfield.set(142, tile3);
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndices = {112, 127, 142};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndices);
         testGame.setPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('E', 2);
-        Tile tile8 = new Tile('A', 3);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(127, tile5);
-        userPlayfield.set(142, tile6);
-        userPlayfield.set(126, tile7);
-        userPlayfield.set(128, tile8);
+        char[] lettersUser = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesUser = {4, 3, 5, 2, 3};
+        int[] boardIndicesUser = {112, 127, 142, 126, 128};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -324,21 +261,10 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile9 = new Tile('C', 4);
-        Tile tile10 = new Tile('A', 3);
-        Tile tile11 = new Tile('T', 5);
-        Tile tile12 = new Tile('E', 2);
-        Tile tile13 = new Tile('A', 3);
-
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(127, tile10);
-        expectedPlayfield.set(142, tile11);
-        expectedPlayfield.set(126, tile12);
-        expectedPlayfield.set(128, tile13);
+        char[] lettersExpected = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesExpected = {4, 3, 5, 2, 3};
+        int[] boardIndicesExpected = {112, 127, 142, 126, 128};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
     }
@@ -347,40 +273,18 @@ public class GameServiceTest {
     public void wordIsPlacedHorizontallyAndParallelToExistingWord_validMove_saveUpdatedPlayfield() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(113, tile2);
-        generatedPlayfield.set(114, tile3);
-
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 113, 114};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('D', 2);
-        Tile tile8 = new Tile('O', 6);
-        Tile tile9 = new Tile('G', 4);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(113, tile5);
-        userPlayfield.set(114, tile6);
-        userPlayfield.set(128, tile7);
-        userPlayfield.set(129, tile8);
-        userPlayfield.set(130, tile9);
-
+        char[] lettersUser = {'C', 'A', 'T', 'D', 'O', 'G'};
+        int[] valuesUser = {4, 3, 5, 2, 6, 4};
+        int[] boardIndicesUser = {112, 113, 114, 128, 129, 130};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -388,23 +292,10 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile10 = new Tile('C', 4);
-        Tile tile11 = new Tile('A', 3);
-        Tile tile12 = new Tile('T', 5);
-        Tile tile13 = new Tile('D', 2);
-        Tile tile14 = new Tile('O', 6);
-        Tile tile15 = new Tile('G', 4);
-
-        expectedPlayfield.set(112, tile10);
-        expectedPlayfield.set(113, tile11);
-        expectedPlayfield.set(114, tile12);
-        expectedPlayfield.set(128, tile13);
-        expectedPlayfield.set(129, tile14);
-        expectedPlayfield.set(130, tile15);
+        char[] lettersExpected = {'C', 'A', 'T', 'D', 'O', 'G'};
+        int[] valuesExpected = {4, 3, 5, 2, 6, 4};
+        int[] boardIndicesExpected = {112, 113, 114, 128, 129, 130};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
     }
@@ -416,39 +307,18 @@ public class GameServiceTest {
 
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(113, tile2);
-        generatedPlayfield.set(114, tile3);
-
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 113, 114};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('C', 4);
-        Tile tile8 = new Tile('A', 3);
-
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(113, tile5);
-        userPlayfield.set(114, tile6);
-        userPlayfield.set(82, tile7);
-        userPlayfield.set(97, tile8);
-
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A'};
+        int[] valuesUser = {4, 3, 5, 4, 3};
+        int[] boardIndicesUser = {112, 113, 114, 82, 97};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -456,21 +326,10 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile10 = new Tile('C', 4);
-        Tile tile11 = new Tile('A', 3);
-        Tile tile12 = new Tile('T', 5);
-        Tile tile13 = new Tile('C', 4);
-        Tile tile14 = new Tile('A', 3);
-
-        expectedPlayfield.set(112, tile10);
-        expectedPlayfield.set(113, tile11);
-        expectedPlayfield.set(114, tile12);
-        expectedPlayfield.set(82, tile13);
-        expectedPlayfield.set(97, tile14);
+        char[] lettersExpected = {'C', 'A', 'T', 'C', 'A'};
+        int[] valuesExpected = {4, 3, 5, 4, 3};
+        int[] boardIndicesExpected = {112, 113, 114, 82, 97};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
     }
@@ -479,39 +338,18 @@ public class GameServiceTest {
     public void newWordIsPlacedVerticallyAcrossExistingWord_validMove_saveUpdatedPlayfield() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(111, tile1);
-        generatedPlayfield.set(112, tile2);
-        generatedPlayfield.set(113, tile3);
-
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {111, 112, 113};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('C', 4);
-        Tile tile8 = new Tile('R', 7);
-
-
-        userPlayfield.set(111, tile4);
-        userPlayfield.set(112, tile5);
-        userPlayfield.set(113, tile6);
-        userPlayfield.set(97, tile7);
-        userPlayfield.set(127, tile8);
-
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'R'};
+        int[] valuesUser = {4, 3, 5, 4, 7};
+        int[] boardIndicesUser = {111, 112, 113, 97, 127};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -519,21 +357,10 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile10 = new Tile('C', 4);
-        Tile tile11 = new Tile('A', 3);
-        Tile tile12 = new Tile('T', 5);
-        Tile tile13 = new Tile('C', 4);
-        Tile tile14 = new Tile('R', 7);
-
-        expectedPlayfield.set(111, tile10);
-        expectedPlayfield.set(112, tile11);
-        expectedPlayfield.set(113, tile12);
-        expectedPlayfield.set(97, tile13);
-        expectedPlayfield.set(127, tile14);
+        char[] lettersExpected = {'C', 'A', 'T', 'C', 'R'};
+        int[] valuesExpected = {4, 3, 5, 4, 7};
+        int[] boardIndicesExpected = {111, 112, 113, 97, 127};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
     }
@@ -542,40 +369,18 @@ public class GameServiceTest {
     public void newWordIsPlacedVerticallyAndParallelToExistingWord_validMove_saveUpdatedPlayfield() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(97, tile1);
-        generatedPlayfield.set(112, tile2);
-        generatedPlayfield.set(127, tile3);
-
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {97, 112, 127};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('C', 4);
-        Tile tile8 = new Tile('A', 3);
-        Tile tile9 = new Tile('R', 7);
-
-        userPlayfield.set(97, tile4);
-        userPlayfield.set(112, tile5);
-        userPlayfield.set(127, tile6);
-        userPlayfield.set(113, tile7);
-        userPlayfield.set(128, tile8);
-        userPlayfield.set(143, tile9);
-
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesUser = {97, 112, 127, 113, 128, 143};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -583,23 +388,10 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile10 = new Tile('C', 4);
-        Tile tile11 = new Tile('A', 3);
-        Tile tile12 = new Tile('T', 5);
-        Tile tile13 = new Tile('C', 4);
-        Tile tile14 = new Tile('A', 3);
-        Tile tile15 = new Tile('R', 7);
-
-        expectedPlayfield.set(97, tile10);
-        expectedPlayfield.set(112, tile11);
-        expectedPlayfield.set(127, tile12);
-        expectedPlayfield.set(113, tile13);
-        expectedPlayfield.set(128, tile14);
-        expectedPlayfield.set(143, tile15);
+        char[] lettersExpected = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesExpected = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesExpected = {97, 112, 127, 113, 128, 143};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
     }
@@ -608,53 +400,18 @@ public class GameServiceTest {
     public void singleLetterIsPlacedOnPlayfield_validMove_saveUpdatedPlayfield() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-        Tile tile4 = new Tile('T', 5);
-        Tile tile5 = new Tile('T', 5);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(113, tile2);
-        generatedPlayfield.set(114, tile3);
-        generatedPlayfield.set(115, tile4);
-        generatedPlayfield.set(116, tile5);
-        generatedPlayfield.set(117, tile6);
-        generatedPlayfield.set(118, tile7);
-
+        char[] lettersGenerated = {'C', 'A', 'T', 'T', 'T', 'T', 'T'};
+        int[] valuesGenerated = {4, 3, 5, 5, 5, 5, 5};
+        int[] boardIndicesGenerated = {112, 113, 114, 115, 116, 117, 118};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-
-        Tile tile8 = new Tile('C', 4);
-        Tile tile9 = new Tile('A', 3);
-        Tile tile10 = new Tile('T', 5);
-        Tile tile11 = new Tile('T', 5);
-        Tile tile12 = new Tile('T', 5);
-        Tile tile13 = new Tile('T', 5);
-        Tile tile14 = new Tile('T', 5);
-        Tile tile15 = new Tile('T', 5);
-
-        userPlayfield.set(112, tile8);
-        userPlayfield.set(113, tile9);
-        userPlayfield.set(114, tile10);
-        userPlayfield.set(115, tile11);
-        userPlayfield.set(116, tile12);
-        userPlayfield.set(117, tile13);
-        userPlayfield.set(118, tile14);
-        userPlayfield.set(119, tile15);
-
+        char[] lettersUser = {'C', 'A', 'T', 'T', 'T', 'T', 'T', 'T'};
+        int[] valuesUser = {4, 3, 5, 5, 5, 5, 5, 5};
+        int[] boardIndicesUser = {112, 113, 114, 115, 116, 117, 118, 119};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
         // when
@@ -662,28 +419,11 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            expectedPlayfield.add(i, null);
-        }
-        Tile tile16 = new Tile('C', 4);
-        Tile tile17 = new Tile('A', 3);
-        Tile tile18 = new Tile('T', 5);
-        Tile tile19 = new Tile('T', 5);
-        Tile tile20 = new Tile('T', 5);
-        Tile tile21 = new Tile('T', 5);
-        Tile tile22 = new Tile('T', 5);
-        Tile tile23 = new Tile('T', 5);
-
-        expectedPlayfield.set(112, tile16);
-        expectedPlayfield.set(113, tile17);
-        expectedPlayfield.set(114, tile18);
-        expectedPlayfield.set(115, tile19);
-        expectedPlayfield.set(116, tile20);
-        expectedPlayfield.set(117, tile21);
-        expectedPlayfield.set(118, tile22);
-        expectedPlayfield.set(119, tile23);
-
+        char[] lettersExpected = {'C', 'A', 'T', 'T', 'T', 'T', 'T', 'T'};
+        int[] valuesExpected = {4, 3, 5, 5, 5, 5, 5, 5};
+        int[] boardIndicesExpected = {112, 113, 114, 115, 116, 117, 118, 119};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+        
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
 
     }
@@ -1254,5 +994,20 @@ public class GameServiceTest {
         assertTrue(newBag.contains('A'));
         assertTrue(newBag.contains('C'));
         assertTrue(newBag.contains('Q'));
+    }
+
+    private List<Tile> fillBoard(char[] letters, int[] values, int[] boardIndices){
+        List<Tile> generatedPlayfield = new ArrayList<>();
+        for (int i = 0; i < 225; i++){
+            generatedPlayfield.add(i, null);
+        }
+
+        for (int i = 0; i < letters.length; i++){
+            Tile tile = new Tile(letters[i], values[i]);
+            tile.setBoardidx(boardIndices[i]);
+            generatedPlayfield.set(tile.getBoardidx(), tile);
+        }
+
+        return generatedPlayfield;
     }
 }
