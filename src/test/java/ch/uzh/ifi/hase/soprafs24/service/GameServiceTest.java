@@ -438,17 +438,10 @@ public class GameServiceTest {
         }
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        userPlayfield.set(113, tile1);
-        userPlayfield.set(128, tile2);
-        userPlayfield.set(143, tile3);
+        char[] lettersUser = {'C', 'A', 'T'};
+        int[] valuesUser = {4, 3, 5};
+        int[] boardIndicesUser = {113, 128, 143};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -464,12 +457,10 @@ public class GameServiceTest {
         }
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        userPlayfield.set(112, tile1);
+        char[] letterUser = {'C'};
+        int[] valueUser = {4};
+        int[] boardIndexUser = {112};
+        List<Tile> userPlayfield = fillBoard(letterUser, valueUser, boardIndexUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -479,34 +470,16 @@ public class GameServiceTest {
     public void newWordPlacedHorizontally_notConnectedToExistingTile_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(127, tile2);
-        generatedPlayfield.set(142, tile3);
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 127, 142};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('E', 2);
-        Tile tile8 = new Tile('A', 3);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(127, tile5);
-        userPlayfield.set(142, tile6);
-        userPlayfield.set(144, tile7);
-        userPlayfield.set(145, tile8);
+        char[] lettersUser = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesUser = {4, 3, 5, 2, 3};
+        int[] boardIndicesUser = {112, 127, 142, 144, 145};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -516,34 +489,16 @@ public class GameServiceTest {
     public void newWordPlacedHorizontally_newTilesNotConnected_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(127, tile2);
-        generatedPlayfield.set(142, tile3);
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 127, 142};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('E', 2);
-        Tile tile8 = new Tile('A', 3);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(127, tile5);
-        userPlayfield.set(142, tile6);
-        userPlayfield.set(141, tile7);
-        userPlayfield.set(144, tile8);
+        char[] lettersUser = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesUser = {4, 3, 5, 2, 3};
+        int[] boardIndicesUser = {112, 127, 142, 141, 144};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -553,34 +508,16 @@ public class GameServiceTest {
     public void newWordPlacedVertically_notConnectedToExistingWord_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(127, tile2);
-        generatedPlayfield.set(142, tile3);
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 127, 142};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('E', 2);
-        Tile tile8 = new Tile('A', 3);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(127, tile5);
-        userPlayfield.set(142, tile6);
-        userPlayfield.set(144, tile7);
-        userPlayfield.set(159, tile8);
+        char[] lettersUser = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesUser = {4, 3, 5, 2, 3};
+        int[] boardIndicesUser = {112, 127, 142, 144, 159};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -590,34 +527,16 @@ public class GameServiceTest {
     public void newWordPlacedVertically_newTilesNotConnected_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(127, tile2);
-        generatedPlayfield.set(142, tile3);
+        char[] letterGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 127, 142};
+        List<Tile> generatedPlayfield = fillBoard(letterGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('E', 2);
-        Tile tile8 = new Tile('A', 3);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(127, tile5);
-        userPlayfield.set(142, tile6);
-        userPlayfield.set(143, tile7);
-        userPlayfield.set(173, tile8);
+        char[] lettersUser = {'C', 'A', 'T', 'E', 'A'};
+        int[] valuesUser = {4, 3, 5, 2, 3};
+        int[] boardIndicesUser = {112, 127, 142, 143, 173};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -627,36 +546,16 @@ public class GameServiceTest {
     public void newWordIsPlaced_NotHorizontallyNorVertically_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(127, tile2);
-        generatedPlayfield.set(142, tile3);
+        char[] letterGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 127, 142};
+        List<Tile> generatedPlayfield = fillBoard(letterGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('C', 4);
-        Tile tile8 = new Tile('A', 3);
-        Tile tile9 = new Tile('T', 5);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(127, tile5);
-        userPlayfield.set(142, tile6);
-        userPlayfield.set(143, tile7);
-        userPlayfield.set(159, tile8);
-        userPlayfield.set(173, tile9);
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'T'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 5};
+        int[] boardIndicesUser = {112, 127, 142, 143, 159, 173};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -666,36 +565,16 @@ public class GameServiceTest {
     public void newWordIsPlaced_NotHorizontallyNorVertically2_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(113, tile2);
-        generatedPlayfield.set(114, tile3);
+        char[] letterGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 113, 114};
+        List<Tile> generatedPlayfield = fillBoard(letterGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('C', 4);
-        Tile tile8 = new Tile('A', 3);
-        Tile tile9 = new Tile('T', 5);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(113, tile5);
-        userPlayfield.set(114, tile6);
-        userPlayfield.set(129, tile7);
-        userPlayfield.set(145, tile8);
-        userPlayfield.set(161, tile9);
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'T'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 5};
+        int[] boardIndicesUser = {112, 113, 114, 129, 145, 161};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -705,36 +584,16 @@ public class GameServiceTest {
     public void newWordIsPlaced_existingTileIsOverwritten_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(113, tile2);
-        generatedPlayfield.set(114, tile3);
+        char[] letterGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 113, 114};
+        List<Tile> generatedPlayfield = fillBoard(letterGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('C', 4);
-        Tile tile8 = new Tile('A', 3);
-        Tile tile9 = new Tile('T', 5);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(113, tile5);
-        userPlayfield.set(114, tile6);
-        userPlayfield.set(113, tile7);
-        userPlayfield.set(114, tile8);
-        userPlayfield.set(115, tile9);
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'T'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 5};
+        int[] boardIndicesUser = {112, 113, 114, 113, 114, 115};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -744,32 +603,16 @@ public class GameServiceTest {
     public void singleTileIsPlaced_NotConnectedToExistingTile_throwError() {
         // given
         // saved Playfield in database
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-        }
-        Tile tile1 = new Tile('C', 4);
-        Tile tile2 = new Tile('A', 3);
-        Tile tile3 = new Tile('T', 5);
-
-        generatedPlayfield.set(112, tile1);
-        generatedPlayfield.set(113, tile2);
-        generatedPlayfield.set(114, tile3);
+        char[] letterGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {112, 113, 114};
+        List<Tile> generatedPlayfield = fillBoard(letterGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        List<Tile> userPlayfield = new ArrayList<>();
-        for (int i = 0; i < 225; i++){
-            userPlayfield.add(i, null);
-        }
-        Tile tile4 = new Tile('C', 4);
-        Tile tile5 = new Tile('A', 3);
-        Tile tile6 = new Tile('T', 5);
-        Tile tile7 = new Tile('C', 4);
-
-        userPlayfield.set(112, tile4);
-        userPlayfield.set(113, tile5);
-        userPlayfield.set(114, tile6);
-        userPlayfield.set(224, tile7);
+        char[] lettersUser = {'C', 'A', 'T', 'C'};
+        int[] valuesUser = {4, 3, 5, 4};
+        int[] boardIndicesUser = {112, 113, 114, 224};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -799,14 +642,9 @@ public class GameServiceTest {
         returnedHand.setId(1L);
         returnedHand.setHanduserid(1L);
 
-        List<Tile> handTiles = new ArrayList<>();
         char[] letters = {'A', 'C', 'J', 'K', 'Q', 'A', 'E', 'E'};
         int[] values = {3, 4, 6, 6, 7, 3, 2, 2};
-
-        for (int i = 0; i < letters.length; i++){
-            Tile tile = new Tile(letters[i], values[i]);
-            handTiles.add(tile);
-        }
+        List<Tile> handTiles = fillHandOrBag(letters, values);
 
         Game returnedGame = new Game();
 
@@ -843,25 +681,15 @@ public class GameServiceTest {
         returnedHand.setHanduserid(1L);
 
         // saved hand in database
-        List<Tile> handTiles = new ArrayList<>();
-        char[] letters = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
-        int[] values = {3, 4, 6, 6, 7, 3, 2};
-
-        for (int i = 0; i < letters.length; i++){
-            Tile tile = new Tile(letters[i], values[i]);
-            handTiles.add(tile);
-        }
+        char[] lettersDatabase = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
+        int[] valuesDatabase = {3, 4, 6, 6, 7, 3, 2};
+        List<Tile> handTiles = fillHandOrBag(lettersDatabase, valuesDatabase);
         returnedHand.setHandtiles(handTiles);
 
         // tiles to be swapped
-        List<Tile> tilesToBeSwapped = new ArrayList<>();
         char[] letters_tilesToBeSwapped = {'A', 'C', 'Z'};
         int[] values_tilesToBeSwapped = {3, 4, 10};
-
-        for (int j = 0; j < letters_tilesToBeSwapped.length; j++){
-            Tile tileToBeSwapped = new Tile(letters_tilesToBeSwapped[j], values_tilesToBeSwapped[j]);
-            tilesToBeSwapped.add(tileToBeSwapped);
-        }
+        List<Tile> tilesToBeSwapped = fillHandOrBag(letters_tilesToBeSwapped, values_tilesToBeSwapped);
 
         Game returnedGame = new Game();
 
@@ -880,39 +708,24 @@ public class GameServiceTest {
         returnedHand.setHanduserid(1L);
 
         // saved hand in database
-        List<Tile> handTiles = new ArrayList<>();
-        char[] letters = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
-        int[] values = {3, 4, 6, 6, 7, 3, 2};
-
-        for (int i = 0; i < letters.length; i++){
-            Tile tile = new Tile(letters[i], values[i]);
-            handTiles.add(tile);
-        }
+        char[] lettersDatabase = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
+        int[] valuesDatabase = {3, 4, 6, 6, 7, 3, 2};
+        List<Tile> handTiles = fillHandOrBag(lettersDatabase, valuesDatabase);
         returnedHand.setHandtiles(handTiles);
 
         // tiles to be swapped
-        List<Tile> tilesToBeSwapped = new ArrayList<>();
         char[] letters_tilesToBeSwapped = {'A', 'C', 'J'};
         int[] values_tilesToBeSwapped = {3, 4, 6};
-
-        for (int j = 0; j < letters_tilesToBeSwapped.length; j++){
-            Tile tileToBeSwapped = new Tile(letters_tilesToBeSwapped[j], values_tilesToBeSwapped[j]);
-            tilesToBeSwapped.add(tileToBeSwapped);
-        }
+        List<Tile> tilesToBeSwapped = fillHandOrBag(letters_tilesToBeSwapped, values_tilesToBeSwapped);
 
         Game returnedGame = new Game();
         Bag returnedBag = new Bag();
         returnedBag.setId(1L);
 
         // tiles in Bag
-        List<Tile> tilesInBag = new ArrayList<>();
         char[] lettersInBag = {'Q', 'T'};
         int[] valuesInBag = {7, 6};
-
-        for (int j = 0; j < lettersInBag.length; j++){
-            Tile tileInBag = new Tile(lettersInBag[j], valuesInBag[j]);
-            tilesInBag.add(tileInBag);
-        }
+        List<Tile> tilesInBag = fillHandOrBag(lettersInBag, valuesInBag);
         returnedBag.setTiles(tilesInBag);
         returnedGame.setBag(returnedBag);
 
@@ -932,39 +745,24 @@ public class GameServiceTest {
         returnedHand.setHanduserid(1L);
 
         // saved hand in database
-        List<Tile> handTiles = new ArrayList<>();
-        char[] letters = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
-        int[] values = {3, 4, 6, 6, 7, 3, 2};
-
-        for (int i = 0; i < letters.length; i++){
-            Tile tile = new Tile(letters[i], values[i]);
-            handTiles.add(tile);
-        }
+        char[] lettersDatabase = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
+        int[] valuesDatabase = {3, 4, 6, 6, 7, 3, 2};
+        List<Tile> handTiles = fillHandOrBag(lettersDatabase, valuesDatabase);
         returnedHand.setHandtiles(handTiles);
 
         // tiles to be swapped
-        List<Tile> tilesToBeSwapped = new ArrayList<>();
         char[] letters_tilesToBeSwapped = {'A', 'C', 'Q'};
         int[] values_tilesToBeSwapped = {3, 4, 7};
-
-        for (int j = 0; j < letters_tilesToBeSwapped.length; j++){
-            Tile tileToBeSwapped = new Tile(letters_tilesToBeSwapped[j], values_tilesToBeSwapped[j]);
-            tilesToBeSwapped.add(tileToBeSwapped);
-        }
+        List<Tile> tilesToBeSwapped = fillHandOrBag(letters_tilesToBeSwapped, values_tilesToBeSwapped);
 
         // tiles in Bag
         Game returnedGame = new Game();
         Bag returnedBag = new Bag();
         returnedBag.setId(1L);
 
-        List<Tile> tilesInBag = new ArrayList<>();
         char[] lettersInBag = {'Q', 'T', 'M'};
         int[] valuesInBag = {7, 6, 4};
-
-        for (int j = 0; j < lettersInBag.length; j++){
-            Tile tileInBag = new Tile(lettersInBag[j], valuesInBag[j]);
-            tilesInBag.add(tileInBag);
-        }
+        List<Tile> tilesInBag = fillHandOrBag(lettersInBag, valuesInBag);
         returnedBag.setTiles(tilesInBag);
         returnedGame.setBag(returnedBag);
 
@@ -1009,5 +807,13 @@ public class GameServiceTest {
         }
 
         return generatedPlayfield;
+    }
+    private List<Tile> fillHandOrBag(char[] letters, int[] values){
+        List<Tile> listToBeFilled = new ArrayList<>();
+        for (int i = 0; i < letters.length; i++){
+            Tile tile = new Tile(letters[i], values[i]);
+            listToBeFilled.add(tile);
+        }
+        return listToBeFilled;
     }
 }
