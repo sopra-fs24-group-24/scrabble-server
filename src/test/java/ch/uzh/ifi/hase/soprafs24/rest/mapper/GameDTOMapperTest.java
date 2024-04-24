@@ -22,9 +22,11 @@ public class GameDTOMapperTest {
             playfield.add(null);
         }
         Tile tile1 = new Tile('C', 3);
-
+        tile1.setBoardidx(112);
         Tile tile2 = new Tile('A', 3);
+        tile2.setBoardidx(113);
         Tile tile3 = new Tile('T', 5);
+        tile3.setBoardidx(114);
 
         playfield.set(112, tile1);
         playfield.set(113, tile2);
@@ -37,5 +39,6 @@ public class GameDTOMapperTest {
         // check content
         assertEquals(gamePostDTO.getId(), game.getId());
         assertEquals(gamePostDTO.getCurrentPlayer(), game.getCurrentPlayer());
+        assertEquals(gamePostDTO.getPlayfield(), game.getPlayfield());
     }
 }

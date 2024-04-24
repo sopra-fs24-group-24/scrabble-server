@@ -38,6 +38,7 @@ public class Game implements Serializable{
     private boolean wordContested;
 
     @Column
+    @ElementCollection
     private Map<Long, Boolean> decisionPlayersContestation;
 
     @OneToMany(cascade= CascadeType.ALL)

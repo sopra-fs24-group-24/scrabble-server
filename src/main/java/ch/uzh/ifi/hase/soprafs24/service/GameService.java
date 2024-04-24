@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.dictionary.Dictionary;
-import ch.uzh.ifi.hase.soprafs24.dictionary.WordnikClient;
 import ch.uzh.ifi.hase.soprafs24.entity.Bag;
 import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
@@ -21,8 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.*;
 
@@ -126,7 +123,7 @@ public class GameService {
                 }
                 // word is contested
                 if (wordContested){
-
+                    // fill in code
                 }
                 // word is not contested
                 else{
