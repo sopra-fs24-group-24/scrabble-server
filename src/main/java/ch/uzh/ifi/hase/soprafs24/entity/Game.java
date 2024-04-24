@@ -31,12 +31,14 @@ public class Game implements Serializable{
     @OneToMany(cascade = CascadeType.MERGE)
     private List<Tile> playfield;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.MERGE)
     private List<Tile> oldPlayfield;
 
     @Column(nullable = false)
     private boolean wordContested;
 
+    @Column
+    private Map<Long, Boolean> decisionPlayersContestation;
 
     @OneToMany(cascade= CascadeType.ALL)
     private List<Hand> hands;
@@ -70,6 +72,20 @@ public class Game implements Serializable{
 
     public void setPlayfield(List<Tile> playfield) {
         this.playfield = playfield;
+    }
+
+    public void setDecisionPlayersContestation(Map<Long, Boolean> decisionPlayersContestation) {
+        this.decisionPlayersContestation = decisionPlayersContestation;
+    }
+
+    public Map<Long, Boolean> getDecisionPlayersContestation(){
+        return decisionPlayersContestation;
+    }
+
+    public void addDecision(Long userId, boolean wordContested){
+        Map<Long, Boolean> getMap = getDecisionPlayersContestation();
+        getMap.put(userId, wordContested);
+        setDecisionPlayersContestation(getMap);
     }
 
     public List<Tile> getPlayfield() {

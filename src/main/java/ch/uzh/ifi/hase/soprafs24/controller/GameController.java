@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -66,6 +67,13 @@ public class GameController
     public void skipTurn(@PathVariable Long gameId, @RequestParam String token) {
         User user = userService.isTokenValid(token);
         gameService.skipTurn(user, gameId);
+    }
+
+    @PostMapping("moves/contestations/{gameId}/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void contestWord(@PathVariable Long gameId, @PathVariable Long userId, @RequestBody Map<String, Boolean> requestBody){
+        boolean wordContested = requestBody.get("wordContested");
+        gameService.contestWord(gameId, userId, wordContested);
     }
 
     // TODO: temporary endpoint for testing purposes: Delete when not needed anymore

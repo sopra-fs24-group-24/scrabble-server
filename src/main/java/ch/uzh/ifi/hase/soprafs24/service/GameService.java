@@ -77,7 +77,7 @@ public class GameService {
     }
 
     public List<Tile> placeTilesOnBoard(Game game) {
-        Game foundGame = checkIfGameExists(game);
+        Game foundGame = checkIfGameExists(game.getId());
         checkIfBoardValid(game.getPlayfield());
 
         // if in the last round the word was not contested, then the variable oldPlayfield is updated by
@@ -100,6 +100,42 @@ public class GameService {
         foundGame.setWordContested(false);
 
         return foundGame.getPlayfield();
+    }
+
+    public void contestWord(Long gameId, Long userId, boolean playerContestWord){
+        Game foundGame = checkIfGameExists(gameId);
+        checkIfUserPartOfGame(foundGame, userId);
+        int GameSize = foundGame.getPlayers().size();
+
+        if (foundGame.getDecisionPlayersContestation() == null){
+            Map<Long, Boolean> currentPlayer = new HashMap<>();
+            currentPlayer.put(userId, playerContestWord);
+            foundGame.setDecisionPlayersContestation(currentPlayer);
+        }
+        else if (foundGame.getDecisionPlayersContestation() != null){
+            foundGame.addDecision(userId, playerContestWord);
+            // all players have decided whether to contest the word or not
+            if (foundGame.getDecisionPlayersContestation().size() == GameSize){
+                boolean wordContested = false;
+                // check if someone wants to contest the word
+                for (boolean value : foundGame.getDecisionPlayersContestation().values()){
+                    if (value){
+                        wordContested = true;
+                        break;
+                    }
+                }
+                // word is contested
+                if (wordContested){
+
+                }
+                // word is not contested
+                else{
+                    foundGame.setOldPlayfield(foundGame.getPlayfield());
+                    makeNextPlayerToCurrentPlayer(gameId);
+                }
+            }
+        }
+
     }
 
     public boolean validateWord(String word) {
@@ -505,13 +541,13 @@ public class GameService {
      * with the specified ID exists or not. The method will return
      * found game or else throw an error.
      *
-     * @param game
+     * @param gameId
      * @throws org.springframework.web.server.ResponseStatusException
      * @see Game
      */
 
-    private Game checkIfGameExists(Game game) {
-        return gameRepository.findById(game.getId())
+    private Game checkIfGameExists(Long gameId) {
+        return gameRepository.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indicated Game not found!"));
     }
 
@@ -530,6 +566,30 @@ public class GameService {
         if (board.size() != 225) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Board Dimensions need to be 15x15");
+        }
+    }
+
+    /**
+     * This is a helper method that will check whether a player
+     * is part of the specified game. If the indicated userId is
+     * part of the game, the method does nothing
+     * or else throw an error.
+     * @param game
+     * @throws org.springframework.web.server.ResponseStatusException
+     * @see Game
+     */
+    private void checkIfUserPartOfGame(Game game, Long userId) {
+        // check if user is part of specific Game
+        boolean userPartOfGame = false;
+        for (User player : game.getPlayers()){
+            if (Objects.equals(player.getId(), userId)) {
+                userPartOfGame = true;
+                break;
+            }
+        }
+        if (!userPartOfGame){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Indicated User not part of this Game!");
         }
     }
 }
