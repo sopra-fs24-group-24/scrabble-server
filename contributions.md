@@ -116,6 +116,51 @@ in Progress
 
 -created necessary states and assign everything
 
+### *Week 3*
+
+**Implement functionality to regularly update Gameobject [(issue 38)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/38)**: </br>
+completed on Monday 22.04.2024
+
+-implemented display of scores and players
+
+-overhauled updates to update every 2 seconds
+
+
+**Implemented get Game endpoint[(issue 17)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/26)**: </br>
+completed on Monday 22.04.2024
+
+-implemented get Endpoint
+
+-created gamegetdto
+
+**Create functionality to update game screen after succesful swap of tiles[(issue 14)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/14)**: </br>
+completed on Wednesday 24.04.2024
+
+-implemented updating game state after swap
+
+
+**Create functionality to select tiles and highlight them[(issue 15)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/15)**: </br>
+completed on Wednesday 24.04.2024
+
+- implemented custom popup to select tiles
+
+- implemented function to manage selected tiles
+
+
+**Implement pop up window and sound for unsuccessful swap notification[(issue 16)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/16)**: </br>
+completed on Wednesday 24.04.2024
+
+-implemented notification if swap didn't work
+
+
+**Implement swap button and confirmation button in game page[(issue 17)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/17)**: </br>
+completed on Wednesday 24.04.2024
+
+- implemented swap button to open pop up
+- implemented api call to swap selected tiles
+- implemented confirm button to make api call
+
+
 ## Michael Kevin Barry
 
 ### *Week 0 and 1*
