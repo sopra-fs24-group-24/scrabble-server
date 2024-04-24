@@ -28,7 +28,7 @@ public class Game implements Serializable{
     @OneToOne(cascade = CascadeType.ALL)
     private Bag bag;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.MERGE)
     private List<Tile> playfield;
 
     @OneToMany(cascade = CascadeType.ALL)
