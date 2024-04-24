@@ -15,7 +15,7 @@ public class Score implements Serializable{
     @Column(nullable=false)
     private int Score;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long ScoreUserId;
 
     public Long getId() {

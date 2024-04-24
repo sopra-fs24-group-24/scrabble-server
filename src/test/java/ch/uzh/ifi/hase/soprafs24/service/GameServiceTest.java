@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.dictionary.Dictionary;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,9 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -34,6 +33,9 @@ public class GameServiceTest {
     private HandRepository handRepository;
 
     @Mock
+    private ScoreRepository scoreRepository;
+
+    @Mock
     private Bag bag;
 
     @Mock
@@ -44,6 +46,8 @@ public class GameServiceTest {
 
     private Game testGame;
     private List<User> testUsers = new ArrayList<>();
+    private Score testScore1;
+    private Score testScore2;
 
     @BeforeEach
     public void setup() {
@@ -62,6 +66,19 @@ public class GameServiceTest {
 
         testGame.setPlayers(testUsers);
         testGame.setCurrentPlayer(1L);
+
+        testScore1 = new Score();
+        testScore1.setId(1L);
+        testScore1.setScore(0);
+
+        testScore2 = new Score();
+        testScore2.setId(2L);
+        testScore2.setScore(0);
+
+        Mockito.when(scoreRepository.findByScoreUserId(Mockito.any())).thenReturn(testScore1);
+
+        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        Mockito.when(mockResponse.statusCode()).thenReturn(200);
     }
 
     @Test
@@ -171,6 +188,116 @@ public class GameServiceTest {
     }
 
     @Test
+    public void wordContested_wordInvalid_scoresUpdated() {
+        List<Score> scores = new ArrayList<>();
+        testScore1.setScore(50);
+        testScore1.setScoreUserId(1L);
+        testScore2.setScore(50);
+        testScore2.setScoreUserId(2L);
+        scores.add(testScore1);
+        scores.add(testScore2);
+        testGame.setScores(scores);
+
+        Map<Long, Boolean> contested = new HashMap<>();
+        contested.put(2L, true);
+
+        Map<String, Integer> words = new HashMap<>();
+        words.put("test", 10);
+
+        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.of(testGame));
+        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+
+
+        gameService.changeScoresAfterContesting(testGame, contested, words);
+
+        assertEquals(40, testGame.getScores().get(0).getScore());
+        assertEquals(70, testGame.getScores().get(1).getScore());
+    }
+
+    @Test
+    public void wordContested_wordValid_scoresUpdated() {
+        List<Score> scores = new ArrayList<>();
+        testScore1.setScore(50);
+        testScore1.setScoreUserId(1L);
+        testScore2.setScore(50);
+        testScore2.setScoreUserId(2L);
+        scores.add(testScore1);
+        scores.add(testScore2);
+        testGame.setScores(scores);
+
+        Map<Long, Boolean> contested = new HashMap<>();
+        contested.put(2L, true);
+
+        Map<String, Integer> words = new HashMap<>();
+        words.put("test", 10);
+
+        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.of(testGame));
+
+        gameService.changeScoresAfterContesting(testGame, contested, words);
+
+        assertEquals(70, testGame.getScores().get(0).getScore());
+        assertEquals(30, testGame.getScores().get(1).getScore());
+    }
+
+    @Test
+    public void allTilesPlayed_validMove_saveUpdatedPlayfield() {
+        List<Tile> generatedPlayfield = new ArrayList<>();
+
+        for (int i = 0; i < 225; i++) {
+            generatedPlayfield.add(i, null);
+        }
+
+        testGame.setPlayfield(generatedPlayfield);
+
+        Game userGame = new Game();
+        char[] lettersUser = {'A', 'A', 'A', 'A', 'A', 'A', 'A'};
+        int[] valuesUser = {3, 3, 3, 3, 3, 3, 3};
+        int[] boardIndicesUser = {109, 110, 111, 112, 113, 114, 115};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        char[] lettersExpected = {'A', 'A', 'A', 'A', 'A', 'A', 'A'};
+        int[] valuesExpected = {3, 3, 3, 3, 3, 3, 3};
+        int[] boardIndicesExpected = {109, 110, 111, 112, 113, 114, 115};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals(7 * 3 * 2 + 50, testScore1.getScore());
+    }
+
+    @Test
+    public void wordPlayed_invalidWord_saveOriginalPlayfield() {
+        List<Tile> generatedPlayfield = new ArrayList<>();
+        List<Tile> expectedPlayfield = new ArrayList<>();
+        for (int i = 0; i < 225; i++){
+            generatedPlayfield.add(i, null);
+            expectedPlayfield.add(i, null);
+        }
+        testGame.setPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'A', 'A', 'A'};
+        int[] valuesUser = {4, 3, 5};
+        int[] boardIndicesUser = {112, 127, 142};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+
+        gameService.placeTilesOnBoard(userGame);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals(0, testScore1.getScore());
+    }
+
+    @Test
     public void firstWordPlaced_validMove_saveUpdatedPlayfield() {
         // given
         // saved Playfield in database
@@ -199,6 +326,7 @@ public class GameServiceTest {
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals((4 + 3 + 5) * 2, testScore1.getScore());
     }
 
     @Test
@@ -233,6 +361,7 @@ public class GameServiceTest {
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals(5 + 2 + 3 * 3, testScore1.getScore());
     }
 
     @Test
@@ -267,6 +396,7 @@ public class GameServiceTest {
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals(2 * 2 + 3 + 3 * 2, testScore1.getScore());
     }
 
     @Test
@@ -298,6 +428,7 @@ public class GameServiceTest {
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals((3 + 2 * 2) + (5 + 6) + (2 * 2 + 6 + 4), testScore1.getScore());
     }
 
     @Test
@@ -332,6 +463,7 @@ public class GameServiceTest {
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals(4 + 3 + 4, testScore1.getScore());
     }
 
     @Test
@@ -363,6 +495,7 @@ public class GameServiceTest {
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertEquals(4 + 3 + 7, testScore1.getScore());
     }
 
     @Test
@@ -425,7 +558,7 @@ public class GameServiceTest {
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
         
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-
+        assertEquals(4 + 3 + 5 + 5 + 5 + 5 + 5 + 3 * 5, testScore1.getScore());
     }
 
     @Test
