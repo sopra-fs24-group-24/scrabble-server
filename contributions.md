@@ -237,3 +237,9 @@ completed on Wednesday 24.04.2024
 **Create functionality to assign a new player as the current player [(issue #66)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/66)** </br>
 
 **Create REST POST endpoint to skip turn [(issue #67)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/67)** </br>
+
+### *Week 3*
+
+**Create functionality to compute score changes for contesting [(issue #34)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/34)** >/br>
+
+**Save current score in game object [(issue #94)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/94)** </br>
