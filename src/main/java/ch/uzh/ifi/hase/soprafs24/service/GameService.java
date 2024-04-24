@@ -5,8 +5,10 @@ import ch.uzh.ifi.hase.soprafs24.entity.Bag;
 import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -31,6 +33,7 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final HandRepository handRepository;
+    private final ScoreRepository scoreRepository;
     private final Dictionary dictionary;
     private final Bag bag;
 
@@ -38,9 +41,11 @@ public class GameService {
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("handRepository") HandRepository handRepository,
-                       @Qualifier("dictionary") Dictionary dictionary) {
+                       @Qualifier("dictionary") Dictionary dictionary,
+                       @Qualifier("scoreRepository") ScoreRepository scoreRepository) {
         this.gameRepository = gameRepository;
         this.handRepository = handRepository;
+        this.scoreRepository = scoreRepository;
         this.dictionary = dictionary;
         this.bag = new Bag();
     }
@@ -91,10 +96,23 @@ public class GameService {
         // check if move is valid
         validMove(updatedPlayfield, persistedPlayfield);
 
+        Map<String, Integer> words = getWordsAndScoreForPlayedTiles(updatedPlayfield, persistedPlayfield);
+
+        int score = 0;
+
+        for (int wordScore : words.values()) {
+            score += wordScore;
+        }
+
+        Score playerScore = scoreRepository.findByScoreUserId(foundGame.getCurrentPlayer());
+        playerScore.setScore(playerScore.getScore() + score);
+
         // update playfield and save it in database
-        foundGame.setPlayfield(updatedPlayfield);
-        gameRepository.flush();
-        foundGame.setWordContested(false);
+        if (!words.isEmpty()) {
+            foundGame.setPlayfield(updatedPlayfield);
+            gameRepository.flush();
+            foundGame.setWordContested(false);
+        }
 
         return foundGame.getPlayfield();
     }
@@ -463,6 +481,295 @@ public class GameService {
 
         }
 
+    }
+
+    public void changeScoresAfterContesting(Game userGame, Map<Long, Boolean> contested, Map<String, Integer> words) {
+        Optional<Game> optGame = gameRepository.findById(userGame.getId());
+
+        if (optGame.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
+        }
+
+        Game game = optGame.get();
+        boolean isValid = true;
+        for (String word : words.keySet()) {
+            if (!validateWord(word)) {
+                isValid = false;
+                break;
+            }
+        }
+        if (contested.containsValue(true) && !isValid) {
+            for (Score score : game.getScores()) {
+                Long userID = score.getScoreUserId();
+                int userScore = score.getScore();
+
+                if (game.getCurrentPlayer().equals(userID)) {
+                    for (String word: words.keySet()) {
+                        score.setScore(userScore - words.get(word));
+                        userScore = score.getScore();
+                    }
+                } else if (contested.get(userID)) {
+                    score.setScore(userScore + 20);
+                }
+            }
+        } else if (contested.containsValue(true) && isValid) {
+            for (Score score : game.getScores()) {
+                Long userID = score.getScoreUserId();
+                int userScore = score.getScore();
+
+                if (game.getCurrentPlayer().equals(userID)) {
+                    score.setScore(userScore + 20);
+                } else if (contested.get(userID)) {
+                    if (userScore >= 20) {
+                        score.setScore(userScore - 20);
+                    } else {
+                        score.setScore(0);
+                    }
+                }
+            }
+        }
+    }
+
+    public Map<String, Integer> getWordsAndScoreForPlayedTiles(List<Tile> updatedPlayfield, List<Tile> currentPlayfield) {
+        Integer[] dwsArray = {16, 28, 32, 42, 48, 56, 64, 70, 112, 154, 160, 168, 176, 182, 192, 196, 208};
+        List<Integer> dws = Arrays.asList(dwsArray);
+        Integer[] twsArray = {0, 7, 14, 105, 119, 210, 217, 224};
+        List<Integer> tws = Arrays.asList(twsArray);
+        Integer[] dlsArray = {3, 11, 36, 38, 45, 52, 59, 92, 96, 98, 102, 108, 116, 122, 126, 128, 132, 165, 172, 179, 186, 188, 213, 221};
+        List<Integer> dls = Arrays.asList(dlsArray);
+        Integer[] tlsArray = {20, 24, 76, 80, 84, 88, 136, 140, 144, 148, 200, 204};
+        List<Integer> tls = Arrays.asList(tlsArray);
+
+        List<Integer> newTileHorizontal = new ArrayList<Integer>();
+        List<Integer> newTileVertical = new ArrayList<Integer>();
+
+        //Get all newly played tiles
+        for (int i = 0; i < currentPlayfield.size(); i++) {
+            if (currentPlayfield.get(i) == null && updatedPlayfield.get(i) != null) {
+                newTileHorizontal.add(i);
+                newTileVertical.add(i);
+            }
+        }
+
+        List<Integer> checkedHorizontal = new ArrayList<Integer>();
+        List<Integer> checkedVertical = new ArrayList<Integer>();
+
+        Map<String, Integer> words = new HashMap<>();
+
+        //Check horizontal words
+        for(int i : newTileHorizontal) {
+            StringBuilder word = new StringBuilder();
+            int wordScore = 0;
+            int playedTilesScore = 0;
+            int wordMultiplier = 1;
+            boolean moreThanOneTile = false;
+
+            if (!checkedHorizontal.contains(i)) {
+                checkedHorizontal.add(i);
+                word.append(updatedPlayfield.get(i).getLetter());
+
+                //check for letter multiplier
+                if (dls.contains(i)) {
+                    wordScore += updatedPlayfield.get(i).getValue() * 2;
+                    playedTilesScore += updatedPlayfield.get(i).getValue() * 2;
+                } else if (tls.contains(i)) {
+                    wordScore += updatedPlayfield.get(i).getValue() * 3;
+                    playedTilesScore += updatedPlayfield.get(i).getValue() * 3;
+                } else {
+                    wordScore += updatedPlayfield.get(i).getValue();
+                    playedTilesScore += updatedPlayfield.get(i).getValue();
+                }
+
+                //check for word multiplier
+                if (dws.contains(i)) {
+                    wordMultiplier *= 2;
+                } else if (tws.contains(i)) {
+                    wordMultiplier *= 3;
+                }
+
+                //check all tiles before played one
+                for (int j = i - 1; j >= (i / 15) * 15 && updatedPlayfield.get(j) != null; j--) {
+                    moreThanOneTile = true;
+                    word.insert(0, updatedPlayfield.get(j).getLetter());
+
+                    if (newTileHorizontal.contains(j)) {
+                        checkedHorizontal.add(j);
+
+                        if (dls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 2;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 2;
+                        } else if (tls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 3;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 3;
+                        } else {
+                            wordScore += updatedPlayfield.get(j).getValue();
+                            playedTilesScore += updatedPlayfield.get(j).getValue();
+                        }
+
+                        if (dws.contains(j)) {
+                            wordMultiplier *= 2;
+                        } else if (tws.contains(j)) {
+                            wordMultiplier *= 3;
+                        }
+                    } else {
+                        wordScore += updatedPlayfield.get(j).getValue();
+                    }
+                }
+
+                //check all tiles after played one
+                for (int j = i + 1; j < (i / 15) * 15 + 15 && updatedPlayfield.get(j) != null; j++) {
+                    moreThanOneTile = true;
+                    word.append(updatedPlayfield.get(j).getLetter());
+
+                    if (newTileHorizontal.contains(j)) {
+                        checkedHorizontal.add(j);
+
+                        if (dls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 2;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 2;
+                        } else if (tls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 3;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 3;
+                        } else {
+                            wordScore += updatedPlayfield.get(j).getValue();
+                            playedTilesScore += updatedPlayfield.get(j).getValue();
+                        }
+
+                        if (dws.contains(j)) {
+                            wordMultiplier *= 2;
+                        } else if (tws.contains(j)) {
+                            wordMultiplier *= 3;
+                        }
+                    } else {
+                        wordScore += updatedPlayfield.get(j).getValue();
+                    }
+                }
+
+                //TODO: Change when implementing constesting
+                boolean validWord = validateWord(word.toString());
+                if (moreThanOneTile && validWord) {
+                    if (words.containsKey(word.toString())) {
+                        int temp = words.get(word.toString());
+                        words.put(word.toString(), temp + wordScore + (playedTilesScore * (wordMultiplier - 1)));
+                    } else {
+                        words.put(word.toString(), wordScore + (playedTilesScore * (wordMultiplier - 1)));
+                    }
+                } else if (!validWord) {
+                    words.clear();
+                    return words;
+                }
+            }
+        }
+
+        //Check vertical words
+        for (int i : newTileVertical) {
+            StringBuilder word = new StringBuilder();
+            int wordScore = 0;
+            int playedTilesScore = 0;
+            int wordMultiplier = 1;
+            boolean moreThanOneTile = false;
+
+            if (!checkedVertical.contains(i)) {
+                checkedVertical.add(i);
+                word.append(updatedPlayfield.get(i).getLetter());
+
+                if (dls.contains(i)) {
+                    wordScore += updatedPlayfield.get(i).getValue() * 2;
+                    playedTilesScore += updatedPlayfield.get(i).getValue() * 2;
+                } else if (tls.contains(i)) {
+                    wordScore += updatedPlayfield.get(i).getValue() * 3;
+                    playedTilesScore += updatedPlayfield.get(i).getValue() * 3;
+                } else {
+                    wordScore += updatedPlayfield.get(i).getValue();
+                    playedTilesScore += updatedPlayfield.get(i).getValue();
+                }
+
+                if (dws.contains(i)) {
+                    wordMultiplier *= 2;
+                } else if (tws.contains(i)) {
+                    wordMultiplier *= 3;
+                }
+
+                //check all tiles before played one
+                for (int j = i - 15; j >= i % 15 && updatedPlayfield.get(j) != null; j -= 15) {
+                    moreThanOneTile = true;
+                    word.insert(0, updatedPlayfield.get(i).getLetter());
+
+                    if (newTileVertical.contains(j)) {
+                        checkedVertical.add(j);
+
+                        if (dls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 2;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 2;
+                        } else if (tls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 3;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 3;
+                        } else {
+                            wordScore += updatedPlayfield.get(j).getValue();
+                            playedTilesScore += updatedPlayfield.get(j).getValue();
+                        }
+
+                        if (dws.contains(j)) {
+                            wordMultiplier *= 2;
+                        } else if (tws.contains(j)) {
+                            wordMultiplier *= 3;
+                        }
+                    } else {
+                        wordScore += updatedPlayfield.get(i).getValue();
+                    }
+                }
+
+                for (int j = i + 15; j < (i % 15) + 15 * 15 && updatedPlayfield.get(j) != null; j += 15) {
+                    moreThanOneTile = true;
+                    word.append(updatedPlayfield.get(j).getLetter());
+
+                    if (newTileVertical.contains(j)) {
+                        checkedVertical.add(j);
+
+                        if (dls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 2;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 2;
+                        } else if (tls.contains(j)) {
+                            wordScore += updatedPlayfield.get(j).getValue() * 3;
+                            playedTilesScore += updatedPlayfield.get(j).getValue() * 3;
+                        } else {
+                            wordScore += updatedPlayfield.get(j).getValue();
+                            playedTilesScore += updatedPlayfield.get(j).getValue();
+                        }
+
+                        if (dws.contains(j)) {
+                            wordMultiplier *= 2;
+                        } else if (tws.contains(j)) {
+                            wordMultiplier *= 3;
+                        }
+                    } else {
+                        wordScore += updatedPlayfield.get(j).getValue();
+                    }
+                }
+            }
+
+            //TODO: Change when implementing constesting
+            boolean validWord = validateWord(word.toString());
+            if (moreThanOneTile && validWord) {
+                if (words.containsKey(word.toString())) {
+                    int temp = words.get(word.toString());
+                    words.put(word.toString(), temp + wordScore + (playedTilesScore * (wordMultiplier - 1)));
+                } else {
+                    words.put(word.toString(), wordScore + (playedTilesScore * (wordMultiplier - 1)));
+                }
+            } else if (!validWord) {
+                words.clear();
+                return words;
+            }
+        }
+
+        if (newTileHorizontal.size() == 7) {
+            String key = words.keySet().iterator().next();
+            int score = words.get(key);
+            words.put(key, score + 50);
+        }
+
+        return words;
     }
 
     public List<Tile> swapTiles(Long gameId, Long userId, Long handId, List<Tile> tilesToBeExchanged) {
