@@ -62,6 +62,31 @@ completed on Wednesday, 17.04.2024
 
 **Create functionality to swap tiles from player's hand and bag (issue 54)** (in Progress - not completed yet)
 
+### *Week 3 (18.04.24 - 24.04.24)*
+
+**Implement REST POST to send played tiles [(issue 27)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/27)**:</br>
+completed on Wednesday, 24.04.2024
+
+- Created REST POST endpoint
+- Created tests in GameController and created 1 test for GamePostDTO
+
+**Create functionality to swap tiles from player's hand and bag [(issue 54)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/54)**:</br>
+completed on Tuesday, 23.04.2024
+
+- Created function swapTiles() in GameService
+- Created tests for function swapTiles() in file GameServiceTest
+
+**Implement functionality to validate move [(issue 28)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/28)**:</br>
+completed on Tuesday, 23.04.2024
+
+- Created and updated function validMove() in GameService
+- Created tests for function validMove() in file GameServiceTest
+
+**Implement REST POST endpoint for contesting (issue 31)** (in Progress - not completed yet)
+
+**Other tasks carried out:**
+- fixed tests in file UserServiceIntegrationTest
+
 
 ## Luca Stephan Christl
 
