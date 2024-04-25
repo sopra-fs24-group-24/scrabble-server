@@ -206,11 +206,19 @@ completed on Wednesday 24.04.2024
 
 **Create REST POST endpoints to register user [(issue #80)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/80)**: </br>
 
+### *Week 2*
+
 **Multiple bug fixes**: </br>
 
 **Make sure validity of token can be verified by all controllers [(issue #89)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/89)**: </br>
 
 **Initialise game [(issue #90)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/90)**: </br>
+
+### *Week 3*
+
+**Implement end of game screen [(issue #28)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/28)**: </br>
+
+**Create functionality to persist highscore of winner [(issue #75)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/75)**: </br>
 
 ## Florian Lanz
 
