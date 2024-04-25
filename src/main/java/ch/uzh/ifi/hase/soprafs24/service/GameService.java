@@ -96,6 +96,7 @@ public class GameService {
         // check if move is valid
         validMove(updatedPlayfield, persistedPlayfield);
 
+        /*
         Map<String, Integer> words = getWordsAndScoreForPlayedTiles(updatedPlayfield, persistedPlayfield);
 
         int score = 0;
@@ -106,13 +107,15 @@ public class GameService {
 
         Score playerScore = scoreRepository.findByScoreUserId(foundGame.getCurrentPlayer());
         playerScore.setScore(playerScore.getScore() + score);
-
+        */
         // update playfield and save it in database
-        if (!words.isEmpty()) {
+        // if (!words.isEmpty()) 
+        
             foundGame.setPlayfield(updatedPlayfield);
+            gameRepository.save(foundGame);
             gameRepository.flush();
             foundGame.setWordContested(false);
-        }
+        
 
         return foundGame.getPlayfield();
     }
