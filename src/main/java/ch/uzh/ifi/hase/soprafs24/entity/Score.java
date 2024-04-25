@@ -16,7 +16,7 @@ public class Score implements Serializable{
     private int Score;
 
     @Column(nullable = false, unique = true)
-    private Long ScoreUserId;
+    private Long scoreUserId;
 
     public Long getId() {
         return id;
@@ -35,10 +35,10 @@ public class Score implements Serializable{
     }
 
     public Long getScoreUserId() {
-        return ScoreUserId;
+        return scoreUserId;
     }
 
     public void setScoreUserId(Long scoreUserId) {
-        ScoreUserId = scoreUserId;
+        this.scoreUserId = scoreUserId;
     }
 }

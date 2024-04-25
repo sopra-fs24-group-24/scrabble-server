@@ -53,14 +53,23 @@ public class GameControllerTest {
     // given
     Game game = new Game();
 
+    List<Tile> playfield = new ArrayList<>();
+
+    for (int i = 0; i < 255; i++) {
+        playfield.add(null);
+    }
+
     game.setId(1L);
     game.setMode(GameMode.CLASSIC);
     game.setCurrentPlayer(0L);
+    game.setPlayfield(playfield);
+
 
     
     GameGetDTO gameGetDTO = new GameGetDTO();
     gameGetDTO.setId(1L);
     gameGetDTO.setCurrentPlayer(0L);
+    gameGetDTO.setPlayfield(playfield);
     
     given(gameService.getGameParams(Mockito.any())).willReturn(game);
 
