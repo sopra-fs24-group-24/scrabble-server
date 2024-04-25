@@ -25,7 +25,7 @@ public class Game implements Serializable{
     @Column
     private GameMode mode;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     private Bag bag;
 
     @OneToMany(cascade = CascadeType.MERGE)
@@ -41,7 +41,7 @@ public class Game implements Serializable{
     @ElementCollection
     private Map<Long, Boolean> decisionPlayersContestation;
 
-    @OneToMany(cascade= CascadeType.ALL)
+    @OneToMany
     private List<Hand> hands;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -183,6 +183,9 @@ public class Game implements Serializable{
 
         // Randomly choose the starting player
         this.setCurrentPlayer(players.get(randomInt(0, players.size()-1)).getId());
+
+        
+
     }
 
     public User getNextPlayer() {

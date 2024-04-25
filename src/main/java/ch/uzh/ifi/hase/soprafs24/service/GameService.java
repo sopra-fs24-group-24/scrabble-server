@@ -824,6 +824,14 @@ public class GameService {
         // add new tiles to hand
         foundhand.putTilesInHand(tilesToAddToHand);
         gameRepository.save(foundGame);
+
+        bagRepository.save(bag);
+
+        handRepository.save(foundhand);
+
+        gameRepository.flush();
+        bagRepository.flush();
+        handRepository.flush();
         // return new hand
         return foundhand.getHandtiles();
     }

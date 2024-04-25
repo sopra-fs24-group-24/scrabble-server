@@ -1,6 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
+
+import ch.uzh.ifi.hase.soprafs24.repository.BagRepository;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +20,7 @@ public class Bag implements Serializable{
     @GeneratedValue
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<Tile> tiles;
 
     public Long getId() {
@@ -151,5 +154,7 @@ public class Bag implements Serializable{
 
         // Put tiles in bag
         this.setTiles(tempTiles);
+
+
     }
 }
