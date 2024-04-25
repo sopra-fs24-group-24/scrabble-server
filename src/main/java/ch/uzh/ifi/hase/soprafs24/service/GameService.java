@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.BagRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
@@ -34,6 +35,7 @@ public class GameService {
     private final GameRepository gameRepository;
     private final HandRepository handRepository;
     private final ScoreRepository scoreRepository;
+    private final BagRepository bagRepository;
     private final Dictionary dictionary;
     private final Bag bag;
 
@@ -42,10 +44,12 @@ public class GameService {
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("handRepository") HandRepository handRepository,
                        @Qualifier("dictionary") Dictionary dictionary,
-                       @Qualifier("scoreRepository") ScoreRepository scoreRepository) {
+                       @Qualifier("scoreRepository") ScoreRepository scoreRepository,
+                       @Qualifier("bagRepository") BagRepository bagRepository) {
         this.gameRepository = gameRepository;
         this.handRepository = handRepository;
         this.scoreRepository = scoreRepository;
+        this.bagRepository = bagRepository;
         this.dictionary = dictionary;
         this.bag = new Bag();
     }
@@ -96,7 +100,7 @@ public class GameService {
         // check if move is valid
         validMove(updatedPlayfield, persistedPlayfield);
 
-        /*
+
         Map<String, Integer> words = getWordsAndScoreForPlayedTiles(updatedPlayfield, persistedPlayfield);
 
         int score = 0;
@@ -107,15 +111,14 @@ public class GameService {
 
         Score playerScore = scoreRepository.findByScoreUserId(foundGame.getCurrentPlayer());
         playerScore.setScore(playerScore.getScore() + score);
-        */
+
         // update playfield and save it in database
-        // if (!words.isEmpty()) 
-        
-            foundGame.setPlayfield(updatedPlayfield);
-            gameRepository.save(foundGame);
-            gameRepository.flush();
-            foundGame.setWordContested(false);
-        
+         if (!words.isEmpty()) {
+             foundGame.setPlayfield(updatedPlayfield);
+             gameRepository.save(foundGame);
+             gameRepository.flush();
+             foundGame.setWordContested(false);
+         }
 
         return foundGame.getPlayfield();
     }
@@ -657,7 +660,7 @@ public class GameService {
                     } else {
                         words.put(word.toString(), wordScore + (playedTilesScore * (wordMultiplier - 1)));
                     }
-                } else if (!validWord) {
+                } else if (!validWord && moreThanOneTile) {
                     words.clear();
                     return words;
                 }
@@ -760,7 +763,7 @@ public class GameService {
                 } else {
                     words.put(word.toString(), wordScore + (playedTilesScore * (wordMultiplier - 1)));
                 }
-            } else if (!validWord) {
+            } else if (!validWord && moreThanOneTile) {
                 words.clear();
                 return words;
             }
@@ -804,7 +807,7 @@ public class GameService {
             }
         }
 
-        Bag bag = foundGame.getBag();
+        Bag bag = bagRepository.findById(foundGame.getBag().getId()).orElseThrow();
 
         // check if enough tiles are in bag
         if (bag.tilesleft() < tilesToBeExchanged.size()) {
@@ -820,6 +823,7 @@ public class GameService {
         foundhand.removeTilesFromHand(tilesToBeExchanged);
         // add new tiles to hand
         foundhand.putTilesInHand(tilesToAddToHand);
+        gameRepository.save(foundGame);
         // return new hand
         return foundhand.getHandtiles();
     }

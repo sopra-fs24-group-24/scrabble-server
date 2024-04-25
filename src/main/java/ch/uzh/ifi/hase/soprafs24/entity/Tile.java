@@ -22,14 +22,14 @@ public class Tile implements Serializable{
 
     @Column(nullable = true)
     private int boardidx;
-    public Tile(char letter, int value){
+    /*public Tile(char letter, int value){
         this.letter = letter;
         this.value = value;
-    }
+    }*/
 
-    public Tile() {
+    /*public Tile() {
 
-    }
+    }*/
 
     public void setBoardidx(int boardidx) {
         this.boardidx = boardidx;
