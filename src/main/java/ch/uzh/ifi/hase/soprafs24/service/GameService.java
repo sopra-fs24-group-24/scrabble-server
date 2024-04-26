@@ -101,7 +101,6 @@ public class GameService {
         // check if move is valid
         validMove(updatedPlayfield, persistedPlayfield);
 
-
         Map<String, Integer> words = getWordsAndScoreForPlayedTiles(updatedPlayfield, persistedPlayfield);
 
         int score = 0;
@@ -115,13 +114,40 @@ public class GameService {
 
         // update playfield and save it in database
          if (!words.isEmpty()) {
+             List<Integer> playedTilesIndices = getChangedIndexesOfGame(persistedPlayfield, updatedPlayfield);
+             List<Tile> tiles = new ArrayList<>();
+
+             for (int playedTileIndex : playedTilesIndices) {
+                 tiles.add(updatedPlayfield.get(playedTileIndex));
+             }
+
+             Hand currentPlayerHand = handRepository.findByHanduserid(foundGame.getCurrentPlayer());
+             currentPlayerHand.removeTilesFromHand(tiles);
+
+             List<Tile> newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+             currentPlayerHand.putTilesInHand(newTiles);
+
              foundGame.setPlayfield(updatedPlayfield);
+             foundGame.setWordContested(false);
              gameRepository.save(foundGame);
              gameRepository.flush();
-             foundGame.setWordContested(false);
          }
 
+        makeNextPlayerToCurrentPlayer(foundGame.getId());
+
         return foundGame.getPlayfield();
+    }
+
+    private List<Integer> getChangedIndexesOfGame (List<Tile> previousField, List<Tile> currentField) {
+        List<Integer> indices = new ArrayList<>();
+
+        for (int i = 0; i < previousField.size(); i++) {
+            if(previousField.get(i) == null && currentField.get(i) != null) {
+                indices.add(i);
+            }
+        }
+
+        return indices;
     }
 
     /*

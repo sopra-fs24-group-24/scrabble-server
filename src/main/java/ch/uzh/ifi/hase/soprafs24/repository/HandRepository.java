@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository("handRepository")
 public interface HandRepository extends JpaRepository<Hand, Long> {
+    Hand findByHanduserid(Long id);
 }

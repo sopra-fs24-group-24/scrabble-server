@@ -13,7 +13,7 @@ public class Hand implements Serializable{
     @GeneratedValue
     private Long id;
 
-    @Column
+    @Column (unique = true)
     private Long handuserid;
     
     @OneToMany(cascade = CascadeType.ALL)
