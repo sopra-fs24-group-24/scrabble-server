@@ -20,7 +20,7 @@ public class Bag implements Serializable{
     @GeneratedValue
     private Long id;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Tile> tiles;
 
     public Long getId() {
@@ -95,7 +95,7 @@ public class Bag implements Serializable{
         tileCounts.put("X", 1);
         tileCounts.put("Y", 2);
         tileCounts.put("Z", 1);
-        tileCounts.put(" ", 2);
+        tileCounts.put("o", 2);
 
         HashMap<String, Integer> tileValues = new HashMap<String, Integer>();
 
@@ -128,7 +128,7 @@ public class Bag implements Serializable{
         tileValues.put("X", 8);
         tileValues.put("Y", 4);
         tileValues.put("Z", 10);
-        tileValues.put(" ", 0);
+        tileValues.put("o", 0);
 
         // Generate the tiles, add them to bag:
 

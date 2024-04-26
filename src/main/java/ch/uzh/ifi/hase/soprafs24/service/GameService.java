@@ -10,6 +10,8 @@ import ch.uzh.ifi.hase.soprafs24.repository.BagRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.TileRepository;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -25,6 +27,8 @@ import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
 import java.net.http.HttpResponse;
 import java.util.*;
+
+import javax.persistence.EntityManager;
 
 @Service
 @Transactional
@@ -52,6 +56,7 @@ public class GameService {
         this.bagRepository = bagRepository;
         this.dictionary = dictionary;
         this.bag = new Bag();
+        
     }
 
 
@@ -123,6 +128,7 @@ public class GameService {
         return foundGame.getPlayfield();
     }
 
+    /*
     public void contestWord(Long gameId, Long userId, boolean playerContestWord){
         Game foundGame = checkIfGameExists(gameId);
         checkIfUserPartOfGame(foundGame, userId);
@@ -158,6 +164,7 @@ public class GameService {
         }
 
     }
+     */
 
     public boolean validateWord(String word) {
         HttpResponse<String> response = dictionary.getScrabbleScore(word);

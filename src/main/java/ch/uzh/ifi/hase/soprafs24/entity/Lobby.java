@@ -26,7 +26,7 @@ public class Lobby implements Serializable{
     @Column(nullable = true)
     private GameMode mode;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @ElementCollection
     private List<Long> usersInLobby;
 

@@ -25,23 +25,25 @@ public class Game implements Serializable{
     @Column
     private GameMode mode;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Bag bag;
 
-    @OneToMany(cascade = CascadeType.MERGE)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Tile> playfield;
 
-    @OneToMany(cascade = CascadeType.MERGE)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Tile> oldPlayfield;
 
     @Column(nullable = false)
     private boolean wordContested;
 
+    /*
     @Column
     @ElementCollection
     private Map<Long, Boolean> decisionPlayersContestation;
+    */
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Hand> hands;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -75,6 +77,7 @@ public class Game implements Serializable{
         this.playfield = playfield;
     }
 
+    /*
     public void setDecisionPlayersContestation(Map<Long, Boolean> decisionPlayersContestation) {
         this.decisionPlayersContestation = decisionPlayersContestation;
     }
@@ -88,7 +91,7 @@ public class Game implements Serializable{
         getMap.put(userId, wordContested);
         setDecisionPlayersContestation(getMap);
     }
-
+ */
     public List<Tile> getPlayfield() {
         List<Tile> filledfield = new ArrayList<>();
         for (int i = 0; i< 225;i++){
@@ -152,11 +155,16 @@ public class Game implements Serializable{
 
         // Initialise playfield:
         List<Tile> playfield = new ArrayList<Tile>();
+        List<Tile> oldPlayfield = new ArrayList<Tile>();
 
-        for(int i=0;i<225;i++) {
+        for(int i=0;i<225;i++) 
+        {
             playfield.add(null);
+            oldPlayfield.add(null);
         }
         setPlayfield(playfield);
+        setOldPlayfield(oldPlayfield);
+
         Bag bag =new Bag();
         bag.initialisebag();
         setBag(bag);
@@ -184,7 +192,7 @@ public class Game implements Serializable{
         // Randomly choose the starting player
         this.setCurrentPlayer(players.get(randomInt(0, players.size()-1)).getId());
 
-        
+
 
     }
 
