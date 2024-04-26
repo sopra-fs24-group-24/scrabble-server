@@ -47,6 +47,8 @@ public class Bag implements Serializable{
 
     public synchronized List<Tile> getSomeTiles(int numberOfTiles)
     {
+        Collections.shuffle(this.tiles);
+
         List<Tile> tilesToReturn = new ArrayList<>(tiles.subList(tiles.size()-numberOfTiles, tiles.size()));
 
         tiles = new ArrayList<>(tiles.subList(0,tiles.size()-numberOfTiles));
@@ -95,7 +97,7 @@ public class Bag implements Serializable{
         tileCounts.put("X", 1);
         tileCounts.put("Y", 2);
         tileCounts.put("Z", 1);
-        tileCounts.put("o", 2);
+        //tileCounts.put("?", 2);
 
         HashMap<String, Integer> tileValues = new HashMap<String, Integer>();
 
@@ -128,7 +130,7 @@ public class Bag implements Serializable{
         tileValues.put("X", 8);
         tileValues.put("Y", 4);
         tileValues.put("Z", 10);
-        tileValues.put("o", 0);
+        //tileValues.put("?", 0);
 
         // Generate the tiles, add them to bag:
 

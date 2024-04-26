@@ -124,11 +124,28 @@ public class GameService {
              Hand currentPlayerHand = handRepository.findByHanduserid(foundGame.getCurrentPlayer());
              currentPlayerHand.removeTilesFromHand(tiles);
 
-             List<Tile> newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+             List<Tile> newTiles;
+             Bag bag = foundGame.getBag();
+
+             if (bag.tilesleft() < tiles.size()) {
+                 newTiles = bag.getSomeTiles(bag.tilesleft());
+             } else {
+                 newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+             }
+
              currentPlayerHand.putTilesInHand(newTiles);
 
              foundGame.setPlayfield(updatedPlayfield);
              foundGame.setWordContested(false);
+
+             List<Tile> tempPlayfield = new ArrayList<>();
+
+             for (int i = 0; i < 225; i++) {
+                 tempPlayfield.add(null);
+             }
+
+             foundGame.setOldPlayfield(tempPlayfield);
+
              gameRepository.save(foundGame);
              gameRepository.flush();
          }
@@ -728,7 +745,7 @@ public class GameService {
                 //check all tiles before played one
                 for (int j = i - 15; j >= i % 15 && updatedPlayfield.get(j) != null; j -= 15) {
                     moreThanOneTile = true;
-                    word.insert(0, updatedPlayfield.get(i).getLetter());
+                    word.insert(0, updatedPlayfield.get(j).getLetter());
 
                     if (newTileVertical.contains(j)) {
                         checkedVertical.add(j);
@@ -852,6 +869,7 @@ public class GameService {
         foundhand.removeTilesFromHand(tilesToBeExchanged);
         // add new tiles to hand
         foundhand.putTilesInHand(tilesToAddToHand);
+        makeNextPlayerToCurrentPlayer(foundGame.getId());
         gameRepository.save(foundGame);
 
         bagRepository.save(bag);

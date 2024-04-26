@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.dictionary.Dictionary;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.BagRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
@@ -36,6 +37,9 @@ public class GameServiceTest {
     private ScoreRepository scoreRepository;
 
     @Mock
+    private BagRepository bagRepository;
+
+    @Mock
     private Bag bag;
 
     @Mock
@@ -53,8 +57,20 @@ public class GameServiceTest {
     public void setup() {
         MockitoAnnotations.openMocks(this);
 
+        Tile tile1 = new Tile('A', 1);
+        Tile tile2 = new Tile('B', 2);
+        Tile tile3 = new Tile('C', 3);
+
+        List<Tile> tiles = new ArrayList<>();
+        tiles.add(tile1);
+        tiles.add(tile2);
+        tiles.add(tile3);
+
+        bag.setTiles(tiles);
+
         testGame = new Game();
         testGame.setId(1L);
+        testGame.setBag(bag);
 
         User testUser1 = new User();
         testUser1.setId(1L);
@@ -64,6 +80,17 @@ public class GameServiceTest {
         testUsers.add(testUser1);
         testUsers.add(testUser2);
 
+        Hand testHand1 = new Hand();
+        testHand1.setHanduserid(1L);
+        testHand1.setHandtiles(new ArrayList<>());
+        Hand testHand2 = new Hand();
+        testHand2.setHanduserid(2L);
+
+        List<Hand> hands = new ArrayList<>();
+        hands.add(testHand1);
+        hands.add(testHand2);
+
+        testGame.setHands(hands);
         testGame.setPlayers(testUsers);
         testGame.setCurrentPlayer(1L);
 
@@ -76,6 +103,8 @@ public class GameServiceTest {
         testScore2.setScore(0);
 
         Mockito.when(scoreRepository.findByScoreUserId(Mockito.any())).thenReturn(testScore1);
+        Mockito.when(bagRepository.findById(Mockito.any())).thenReturn(Optional.of(bag));
+        Mockito.when(handRepository.findByHanduserid(Mockito.any())).thenReturn(testHand1);
 
         Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
         Mockito.when(mockResponse.statusCode()).thenReturn(200);
@@ -817,12 +846,18 @@ public class GameServiceTest {
         char[] lettersDatabase = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
         int[] valuesDatabase = {3, 4, 6, 6, 7, 3, 2};
         List<Tile> handTiles = fillHandOrBag(lettersDatabase, valuesDatabase);
+        for (int i = 0; i < handTiles.size(); i++) {
+            handTiles.get(i).setId((long) i + 1);
+        }
         returnedHand.setHandtiles(handTiles);
 
         // tiles to be swapped
         char[] letters_tilesToBeSwapped = {'A', 'C', 'Z'};
         int[] values_tilesToBeSwapped = {3, 4, 10};
         List<Tile> tilesToBeSwapped = fillHandOrBag(letters_tilesToBeSwapped, values_tilesToBeSwapped);
+        tilesToBeSwapped.get(0).setId(1L);
+        tilesToBeSwapped.get(1).setId(2L);
+        tilesToBeSwapped.get(2).setId(12L);
 
         Game returnedGame = new Game();
 
@@ -881,12 +916,18 @@ public class GameServiceTest {
         char[] lettersDatabase = {'A', 'C', 'J', 'K', 'Q', 'A', 'E'};
         int[] valuesDatabase = {3, 4, 6, 6, 7, 3, 2};
         List<Tile> handTiles = fillHandOrBag(lettersDatabase, valuesDatabase);
+        for (int i = 0; i < handTiles.size(); i++) {
+            handTiles.get(i).setId((long) i + 1);
+        }
         returnedHand.setHandtiles(handTiles);
 
         // tiles to be swapped
         char[] letters_tilesToBeSwapped = {'A', 'C', 'Q'};
         int[] values_tilesToBeSwapped = {3, 4, 7};
         List<Tile> tilesToBeSwapped = fillHandOrBag(letters_tilesToBeSwapped, values_tilesToBeSwapped);
+        tilesToBeSwapped.get(0).setId(1L);
+        tilesToBeSwapped.get(1).setId(2L);
+        tilesToBeSwapped.get(2).setId(5L);
 
         // tiles in Bag
         Game returnedGame = new Game();
@@ -896,11 +937,19 @@ public class GameServiceTest {
         char[] lettersInBag = {'Q', 'T', 'M'};
         int[] valuesInBag = {7, 6, 4};
         List<Tile> tilesInBag = fillHandOrBag(lettersInBag, valuesInBag);
+        tilesInBag.get(0).setId(12L);
+        tilesInBag.get(1).setId(13L);
+        tilesInBag.get(2).setId(14L);
         returnedBag.setTiles(tilesInBag);
         returnedGame.setBag(returnedBag);
+        returnedGame.setPlayers(testUsers);
+        returnedGame.setCurrentPlayer(1L);
 
         given(handRepository.findById(Mockito.any())).willReturn(Optional.of(returnedHand));
         given(gameRepository.findById(Mockito.any())).willReturn(Optional.of(returnedGame));
+        Mockito.when(bagRepository.findById(Mockito.any())).thenReturn(Optional.of(returnedBag));
+        //given(bag.tilesleft()).willReturn(3);
+        //given(bag.getSomeTiles(3)).willReturn(tilesInBag);
 
         // when/then
         List<Tile> newHand = gameService.swapTiles(1L, 1L, 1L, tilesToBeSwapped);
@@ -936,6 +985,7 @@ public class GameServiceTest {
         for (int i = 0; i < letters.length; i++){
             Tile tile = new Tile(letters[i], values[i]);
             tile.setBoardidx(boardIndices[i]);
+            tile.setId((long) i);
             generatedPlayfield.set(tile.getBoardidx(), tile);
         }
 
