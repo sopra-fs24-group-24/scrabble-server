@@ -64,7 +64,7 @@ public class LobbyServiceIntegrationTest {
         Lobby createdLobby = lobbyService.createLobby(testLobby);
 
         // then
-        //assertEquals(testLobby.getId(), createdLobby.getId());
+        assertEquals(testLobby.getId(), createdLobby.getId());
         assertEquals(testLobby.getUsersInLobby(), createdLobby.getUsersInLobby());
         assertEquals(createdUser.getId(), createdLobby.getPlayers().get(0).getId());
         assertEquals(createdUser.getUsername(), createdLobby.getPlayers().get(0).getUsername());

@@ -86,22 +86,25 @@ public class GameService {
     public List<Tile> placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game.getId());
         checkIfBoardValid(game.getPlayfield());
+        //TODO: add function to check whether userinput is sent from the correct player
 
         // if in the last round the word was not contested, then the variable oldPlayfield is updated by
         // assigning the current Playfield to the variable oldPlayfield
         // if the word was contested, then the word-validation-method will handle the storing of the playfields
+/*
         if (!foundGame.getWordContested()) {
             List<Tile> newPlayfield = foundGame.getPlayfield();
             foundGame.setOldPlayfield(newPlayfield);
         }
+*/
 
         List<Tile> updatedPlayfield = game.getPlayfield();
         List<Tile> persistedPlayfield = foundGame.getPlayfield();
 
         // check if move is valid
         validMove(updatedPlayfield, persistedPlayfield);
-
-        Map<String, Integer> words = getWordsAndScoreForPlayedTiles(updatedPlayfield, persistedPlayfield);
+/*
+        Map<String, Integer> words = getWordsAndScoreForPlayedTiles(updatedPlayfield, persistedPlayfield, true);
 
         int score = 0;
 
@@ -113,7 +116,7 @@ public class GameService {
         playerScore.setScore(playerScore.getScore() + score);
 
         // update playfield and save it in database
-         if (!words.isEmpty()) {
+        if (!words.isEmpty()) {
              List<Integer> playedTilesIndices = getChangedIndexesOfGame(persistedPlayfield, updatedPlayfield);
              List<Tile> tiles = new ArrayList<>();
 
@@ -148,9 +151,15 @@ public class GameService {
 
              gameRepository.save(foundGame);
              gameRepository.flush();
-         }
+        }
 
         makeNextPlayerToCurrentPlayer(foundGame.getId());
+*/
+        foundGame.setPlayfield(updatedPlayfield);
+        foundGame.setWordContested(false);
+        gameRepository.save(foundGame);
+        gameRepository.flush();
+
 
         return foundGame.getPlayfield();
     }
@@ -167,11 +176,12 @@ public class GameService {
         return indices;
     }
 
-    /*
     public void contestWord(Long gameId, Long userId, boolean playerContestWord){
         Game foundGame = checkIfGameExists(gameId);
         checkIfUserPartOfGame(foundGame, userId);
-        int GameSize = foundGame.getPlayers().size();
+        // TODO: implement below functionality in REST endpoint
+        // if (foundGame.getCurrentPlayer() == user.getId()) --> throw error since user wo placed word cannot contest own word
+        int gameSize = foundGame.getPlayers().size();
 
         if (foundGame.getDecisionPlayersContestation() == null){
             Map<Long, Boolean> currentPlayer = new HashMap<>();
@@ -181,7 +191,7 @@ public class GameService {
         else if (foundGame.getDecisionPlayersContestation() != null){
             foundGame.addDecision(userId, playerContestWord);
             // all players have decided whether to contest the word or not
-            if (foundGame.getDecisionPlayersContestation().size() == GameSize){
+            if (foundGame.getDecisionPlayersContestation().size() == gameSize-1){
                 boolean wordContested = false;
                 // check if someone wants to contest the word
                 for (boolean value : foundGame.getDecisionPlayersContestation().values()){
@@ -192,18 +202,98 @@ public class GameService {
                 }
                 // word is contested
                 if (wordContested){
-                    // fill in code
+                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), true);
+
+                    // word is correct - contestation unsuccessful
+                    if (!words.isEmpty()) {
+                        changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
+
+                        List<Integer> playedTilesIndices = getChangedIndexesOfGame(foundGame.getOldPlayfield(), foundGame.getPlayfield());
+                        List<Tile> tiles = new ArrayList<>();
+
+                        for (int playedTileIndex : playedTilesIndices) {
+                            tiles.add(foundGame.getPlayfield().get(playedTileIndex));
+                        }
+
+                        Hand currentPlayerHand = handRepository.findByHanduserid(foundGame.getCurrentPlayer());
+                        currentPlayerHand.removeTilesFromHand(tiles);
+
+                        List<Tile> newTiles;
+                        Bag bag = foundGame.getBag();
+
+                        if (bag.tilesleft() < tiles.size()) {
+                            newTiles = bag.getSomeTiles(bag.tilesleft());
+                        } else {
+                            newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+                        }
+
+                        currentPlayerHand.putTilesInHand(newTiles);
+
+                        //foundGame.setPlayfield(foundGame.getPlayfield());
+                        foundGame.setWordContested(false);
+                        /*
+                        List<Tile> tempPlayfield = new ArrayList<>();
+
+                        for (int i = 0; i < 225; i++) {
+                            tempPlayfield.add(null);
+                        }
+                        */
+                        //foundGame.setOldPlayfield(tempPlayfield);
+                        //gameRepository.save(foundGame);
+                        //gameRepository.flush();
+                        foundGame.setOldPlayfield(foundGame.getPlayfield());
+                    }
+                    // word is false - contestation successful
+                    else{
+                        //TODO: change score function
+                        //changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
+                        foundGame.setPlayfield(foundGame.getOldPlayfield());
+                    }
                 }
                 // word is not contested
                 else{
+                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), false);
+
+                    int score = 0;
+
+                    for (int wordScore : words.values()) {
+                        score += wordScore;
+                    }
+
+                    Score playerScore = scoreRepository.findByScoreUserId(foundGame.getCurrentPlayer());
+                    playerScore.setScore(playerScore.getScore() + score);
+
+                    List<Integer> playedTilesIndices = getChangedIndexesOfGame(foundGame.getOldPlayfield(), foundGame.getPlayfield());
+                    List<Tile> tiles = new ArrayList<>();
+
+                    for (int playedTileIndex : playedTilesIndices) {
+                        tiles.add(foundGame.getPlayfield().get(playedTileIndex));
+                    }
+
+                    Hand currentPlayerHand = handRepository.findByHanduserid(foundGame.getCurrentPlayer());
+                    currentPlayerHand.removeTilesFromHand(tiles);
+
+                    List<Tile> newTiles;
+                    Bag bag = foundGame.getBag();
+
+                    if (bag.tilesleft() < tiles.size()) {
+                        newTiles = bag.getSomeTiles(bag.tilesleft());
+                    } else {
+                        newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+                    }
+
+                    currentPlayerHand.putTilesInHand(newTiles);
                     foundGame.setOldPlayfield(foundGame.getPlayfield());
-                    makeNextPlayerToCurrentPlayer(gameId);
+                    //foundGame.setPlayfield(foundGame.getPlayfield());
+                    foundGame.setWordContested(false);
+
                 }
+                gameRepository.save(foundGame);
+                gameRepository.flush();
+                makeNextPlayerToCurrentPlayer(gameId);
             }
         }
-
     }
-     */
 
     public boolean validateWord(String word) {
         HttpResponse<String> response = dictionary.getScrabbleScore(word);
@@ -582,7 +672,7 @@ public class GameService {
         }
     }
 
-    public Map<String, Integer> getWordsAndScoreForPlayedTiles(List<Tile> updatedPlayfield, List<Tile> currentPlayfield) {
+    public Map<String, Integer> getWordsAndScoreForPlayedTiles(List<Tile> updatedPlayfield, List<Tile> currentPlayfield, boolean validateWord) {
         Integer[] dwsArray = {16, 28, 32, 42, 48, 56, 64, 70, 112, 154, 160, 168, 176, 182, 192, 196, 208};
         List<Integer> dws = Arrays.asList(dwsArray);
         Integer[] twsArray = {0, 7, 14, 105, 119, 210, 217, 224};
@@ -698,7 +788,14 @@ public class GameService {
                 }
 
                 //TODO: Change when implementing constesting
-                boolean validWord = validateWord(word.toString());
+                boolean validWord;
+                if (validateWord){
+                    validWord = validateWord(word.toString());
+                }
+                else{
+                    validWord = true;
+                }
+
                 if (moreThanOneTile && validWord) {
                     if (words.containsKey(word.toString())) {
                         int temp = words.get(word.toString());
@@ -801,7 +898,14 @@ public class GameService {
             }
 
             //TODO: Change when implementing constesting
-            boolean validWord = validateWord(word.toString());
+            boolean validWord;
+            if (validateWord){
+                validWord = validateWord(word.toString());
+            }
+            else{
+                validWord = true;
+            }
+
             if (moreThanOneTile && validWord) {
                 if (words.containsKey(word.toString())) {
                     int temp = words.get(word.toString());

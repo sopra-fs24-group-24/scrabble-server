@@ -37,11 +37,9 @@ public class Game implements Serializable{
     @Column(nullable = false)
     private boolean wordContested;
 
-    /*
     @Column
     @ElementCollection
     private Map<Long, Boolean> decisionPlayersContestation;
-    */
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Hand> hands;
@@ -77,7 +75,6 @@ public class Game implements Serializable{
         this.playfield = playfield;
     }
 
-    /*
     public void setDecisionPlayersContestation(Map<Long, Boolean> decisionPlayersContestation) {
         this.decisionPlayersContestation = decisionPlayersContestation;
     }
@@ -91,7 +88,7 @@ public class Game implements Serializable{
         getMap.put(userId, wordContested);
         setDecisionPlayersContestation(getMap);
     }
- */
+
     public List<Tile> getPlayfield() {
         List<Tile> filledfield = new ArrayList<>();
         for (int i = 0; i< 225;i++){
@@ -110,7 +107,16 @@ public class Game implements Serializable{
     }
 
     public List<Tile> getOldPlayfield() {
-        return oldPlayfield;
+        List<Tile> filledfield = new ArrayList<>();
+        for (int i = 0; i< 225;i++){
+            filledfield.add(null);
+        }
+        for (int i = 0; i<this.oldPlayfield.size(); i++){
+            if (this.oldPlayfield.get(i)!= null){
+                filledfield.set(this.oldPlayfield.get(i).getBoardidx(), this.oldPlayfield.get(i));
+            }
+        }
+        return filledfield;
     }
 
     public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
