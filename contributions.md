@@ -87,6 +87,28 @@ completed on Tuesday, 23.04.2024
 **Other tasks carried out:**
 - fixed tests in file UserServiceIntegrationTest
 
+### *Week 4 (25.04.24 - 01.05.24)*
+
+**Implement REST POST endpoint for contesting [(issue 31)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/31)**:</br>
+completed on Wednesday, 01.05.2024
+
+- Created/Updated REST POST endpoint for contesting
+- Created tests in file GameControllerTest
+- Created/Updated method contestWord() in file GameService
+- Created tests for method contestWord()
+
+**Create functionality to reset state of board to beginning of players move in server [(issue 33)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/33)**:</br>
+completed on Wednesday, 01.05.2024
+
+- Implemented functionality to update oldPlayfield and currentPlayfield in database in method contestWord()
+- Created tests which check whether the correct versions of oldPlayfield and currentPlayfield are saved in the database
+- Updated method getOldPlayfield in entity Game
+
+**Implement pop up window for player to contest word in game page [(issue 4)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/4)**:</br>
+completed on Wednesday, 01.05.2024
+
+- Implemented contest pop up window in game page
+
 
 ## Luca Stephan Christl
 
