@@ -25,6 +25,12 @@ public class GameGetDTO {
 
     private List<User> players;
 
+    private boolean wordContested;
+
+    public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
+
+    public boolean getWordContested() { return wordContested; }
+
     public void setPlayfield(List<Tile> playfield) {
         this.playfield = playfield;
     }

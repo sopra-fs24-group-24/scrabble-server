@@ -86,6 +86,12 @@ public class GameService {
     public List<Tile> placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game.getId());
         checkIfBoardValid(game.getPlayfield());
+        /*
+        foundGame.setWordContested(false);
+        gameRepository.save(foundGame);
+        gameRepository.flush();
+
+         */
         //TODO: add function to check whether userinput is sent from the correct player
 
         // if in the last round the word was not contested, then the variable oldPlayfield is updated by
@@ -156,7 +162,7 @@ public class GameService {
         makeNextPlayerToCurrentPlayer(foundGame.getId());
 */
         foundGame.setPlayfield(updatedPlayfield);
-        foundGame.setWordContested(false);
+        foundGame.setWordContested(true);
         gameRepository.save(foundGame);
         gameRepository.flush();
 
@@ -176,20 +182,29 @@ public class GameService {
         return indices;
     }
 
-    public void contestWord(Long gameId, Long userId, boolean playerContestWord){
+    public void contestWord(Long gameId, User user, boolean playerContestWord){
         Game foundGame = checkIfGameExists(gameId);
-        checkIfUserPartOfGame(foundGame, userId);
-        // TODO: implement below functionality in REST endpoint
-        // if (foundGame.getCurrentPlayer() == user.getId()) --> throw error since user wo placed word cannot contest own word
+        checkIfUserPartOfGame(foundGame, user.getId());
+
+        if (foundGame.getCurrentPlayer().equals(user.getId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "The player who placed the word cannot contest!");
+        }
+
         int gameSize = foundGame.getPlayers().size();
 
         if (foundGame.getDecisionPlayersContestation() == null){
             Map<Long, Boolean> currentPlayer = new HashMap<>();
-            currentPlayer.put(userId, playerContestWord);
+            currentPlayer.put(user.getId(), playerContestWord);
             foundGame.setDecisionPlayersContestation(currentPlayer);
         }
         else if (foundGame.getDecisionPlayersContestation() != null){
-            foundGame.addDecision(userId, playerContestWord);
+            // check if player already contested
+            if (foundGame.getDecisionPlayersContestation().containsKey(user.getId())){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "A player can only contest once!");
+            }
+            foundGame.addDecision(user.getId(), playerContestWord);
             // all players have decided whether to contest the word or not
             if (foundGame.getDecisionPlayersContestation().size() == gameSize-1){
                 boolean wordContested = false;
@@ -203,7 +218,6 @@ public class GameService {
                 // word is contested
                 if (wordContested){
                     Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), true);
-
                     // word is correct - contestation unsuccessful
                     if (!words.isEmpty()) {
                         changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
@@ -246,7 +260,7 @@ public class GameService {
                     // word is false - contestation successful
                     else{
                         //TODO: change score function
-                        //changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
+                        changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
                         foundGame.setPlayfield(foundGame.getOldPlayfield());
                     }
                 }
@@ -285,12 +299,14 @@ public class GameService {
                     currentPlayerHand.putTilesInHand(newTiles);
                     foundGame.setOldPlayfield(foundGame.getPlayfield());
                     //foundGame.setPlayfield(foundGame.getPlayfield());
-                    foundGame.setWordContested(false);
+                    //foundGame.setWordContested(false);
 
                 }
+                foundGame.setWordContested(false);
+                foundGame.setDecisionPlayersContestation(null);
+                makeNextPlayerToCurrentPlayer(gameId);
                 gameRepository.save(foundGame);
                 gameRepository.flush();
-                makeNextPlayerToCurrentPlayer(gameId);
             }
         }
     }
@@ -640,6 +656,11 @@ public class GameService {
                 break;
             }
         }
+
+        if (words.isEmpty()){
+            isValid = false;
+        }
+
         if (contested.containsValue(true) && !isValid) {
             for (Score score : game.getScores()) {
                 Long userID = score.getScoreUserId();

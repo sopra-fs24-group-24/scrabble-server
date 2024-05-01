@@ -69,11 +69,13 @@ public class GameController
         gameService.skipTurn(user, gameId);
     }
 
-    @PostMapping("moves/contestations/{gameId}/{userId}")
+    @PostMapping("moves/contestations/{gameId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void contestWord(@PathVariable Long gameId, @PathVariable Long userId, @RequestBody Map<String, Boolean> requestBody){
-        boolean wordContested = requestBody.get("wordContested");
-        gameService.contestWord(gameId, userId, wordContested);
+    public void contestWord(@PathVariable Long gameId, @RequestBody Map<String, Boolean> requestBody,
+                            @RequestParam String token){
+        User user = userService.isTokenValid(token);
+        boolean wordContested = requestBody.get("decisionContesting");
+        gameService.contestWord(gameId, user, wordContested);
     }
 
     // TODO: temporary endpoint for testing purposes: Delete when not needed anymore
