@@ -276,6 +276,12 @@ completed on Monday 1.05.2024
 
 **Create functionality to persist highscore of winner [(issue #75)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/75)**: </br>
 
+### *Week 4*
+
+**Create functionality to end game and compute final scores [(issue #76)](https://github.com/sopra-fs24-group-24 scrabble-server/issues/76)**: </br>
+
+**Implement routing from game page to end game screen client [(issue #21)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/21)**: </br>
+
 ## Florian Lanz
 
 ### *Week 1*
