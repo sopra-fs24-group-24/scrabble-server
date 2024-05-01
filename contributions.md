@@ -282,6 +282,16 @@ completed on Monday 1.05.2024
 
 ### *Week 3*
 
-**Create functionality to compute score changes for contesting [(issue #34)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/34)** >/br>
+**Create functionality to compute score changes for contesting [(issue #34)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/34)** </br>
 
 **Save current score in game object [(issue #94)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/94)** </br>
+
+### *Week 4*
+
+**Create functional add friend button [(issue #49)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/49)** </br>
+
+**Create REST endpoint to add a friend [(issue #117)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/117)** </br>
+
+**Create REST endpoint to remove a friend [(issue #118)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/118)** </br>
+
+**Create REST enpoint to accept a friend request [(issue #119)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/119)** </br>
