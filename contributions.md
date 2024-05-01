@@ -185,6 +185,40 @@ completed on Wednesday 24.04.2024
 - implemented api call to swap selected tiles
 - implemented confirm button to make api call
 
+### *Week 4*
+
+**Implement main page screen [(issue 26)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/26)**: </br>
+completed on Monday 1.05.2024
+
+- implemented fetching lobbies regularly
+- made the lobbies clickable
+- added styling for the home page
+
+
+**Implement routing from main page to profile screen  [(issue 24)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/24)**: </br>
+completed on Monday 1.05.2024
+
+- implemented clickable username in home page
+
+**Implement pop up window for deciding the size of the lobby and who can join [(issue 9)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/9)**: </br>
+completed on Monday 1.05.2024
+
+- created new LobbyCreator component which is a popup
+- added styling to the pop up
+- implemented choosing lobbySize and GameMode
+- implemented create button to make api call
+
+**Implement create lobby button on main page [(issue 10)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/10)**: </br>
+completed on Monday 1.05.2024
+
+- created createLobby Button
+- added functionality to display popup
+
+**Implement routing from main page to lobby page[(issue 7)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/7)**: </br>
+completed on Monday 1.05.2024
+
+- implemented clicking on lobbies makes api call to join lobby
+- implemented routing to lobbypage
 
 ## Michael Kevin Barry
 
