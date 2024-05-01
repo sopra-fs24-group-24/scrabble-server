@@ -25,6 +25,8 @@ public class GameGetDTO {
 
     private List<User> players;
 
+    private boolean gameOver;
+
     public void setPlayfield(List<Tile> playfield) {
         this.playfield = playfield;
     }
@@ -80,5 +82,15 @@ public class GameGetDTO {
 
     public void setCurrentPlayer(Long currentPlayer) {
         this.currentPlayer = currentPlayer;
+    }
+
+    public boolean getGameOver()
+    {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean state)
+    {
+        gameOver=state;
     }
 }

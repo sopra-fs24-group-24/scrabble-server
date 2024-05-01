@@ -67,9 +67,32 @@ public class GameService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(baseErrorMessage, "Game ID"));
     }
 
-    public void skipTurn(User user, Long gameId) {
-        authenticateUserForMove(user, gameId);
-        makeNextPlayerToCurrentPlayer(gameId);
+    public void skipTurn(User user, Long gameId) 
+    {
+        Optional<Game> game=gameRepository.findById(gameId);
+
+        if (game.isPresent()) 
+        {
+            Game foundGame=game.get();
+
+            int count=foundGame.getGlobalSkipCounter();
+            foundGame.setGlobalSkipCounter(++count);
+
+            // End if all players skip twice in a row
+            if(count==2*foundGame.getPlayers().size())
+            {
+                foundGame.initialiseGameOver();
+            }
+            else
+            {
+                authenticateUserForMove(user, gameId);
+                makeNextPlayerToCurrentPlayer(gameId);
+            }
+        } 
+        else 
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The game with id %s does not exist!", gameId));
+        }      
     }
 
     public void makeNextPlayerToCurrentPlayer(Long gameId) {
@@ -146,9 +169,25 @@ public class GameService {
 
              foundGame.setOldPlayfield(tempPlayfield);
 
+             // Reset skip counter
+             foundGame.setGlobalSkipCounter(0);
+
              gameRepository.save(foundGame);
              gameRepository.flush();
+
+             if(foundGame.getBag().tilesleft()==0)
+             {
+                for(Hand hand:foundGame.getHands())
+                {
+                    if(hand.getHandtiles().size()==0)
+                    {
+                        foundGame.initialiseGameOver();
+                    }
+                }
+             }
          }
+
+      
 
         makeNextPlayerToCurrentPlayer(foundGame.getId());
 
@@ -869,6 +908,10 @@ public class GameService {
         foundhand.removeTilesFromHand(tilesToBeExchanged);
         // add new tiles to hand
         foundhand.putTilesInHand(tilesToAddToHand);
+
+        // Reset skip counter
+        foundGame.setGlobalSkipCounter(0);
+
         makeNextPlayerToCurrentPlayer(foundGame.getId());
         gameRepository.save(foundGame);
 

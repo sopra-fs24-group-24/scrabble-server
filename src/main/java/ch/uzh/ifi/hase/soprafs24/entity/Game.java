@@ -37,6 +37,12 @@ public class Game implements Serializable{
     @Column(nullable = false)
     private boolean wordContested;
 
+    @Column(nullable = false)
+    private boolean gameOver;
+
+    @Column(nullable = false)
+    private int globalSkipCounter;
+
     /*
     @Column
     @ElementCollection
@@ -149,8 +155,32 @@ public class Game implements Serializable{
         return id;
     }
 
+    public boolean getGameOver()
+    {
+        return gameOver;
+    }
+
+    public int getGlobalSkipCounter()
+    {
+        return globalSkipCounter;
+    }
+
+    public void setGameOver(boolean state)
+    {
+        gameOver=state;
+    }
+
+    public void setGlobalSkipCounter(int count)
+    {
+        globalSkipCounter=count;
+    }
+
     public void initialiseGame(List<User> players)
     {
+        gameOver=false;
+
+        globalSkipCounter=0;
+
         setPlayers(players);
 
         // Initialise playfield:
@@ -207,5 +237,70 @@ public class Game implements Serializable{
     private static int randomInt(int min, int max)
     {
         return min + (int)(Math.random() * ((max - min) + 1));
+    }
+
+    private int getTotalTileValue(Hand hand)
+    {
+        int sum=0;
+
+        for(Tile tile: hand.getHandtiles())
+        {
+            sum+=tile.getValue();
+        }
+
+        return sum;
+    }
+
+    private void adjustFinalScores()
+    {
+        Long emptyHandUserId=-1L;
+        int sumOfHandTiles=0;
+
+        for(Hand hand: this.getHands())
+        {
+            if(hand.getHandtiles().size()==0)
+            {
+                emptyHandUserId=hand.getHanduserid();
+            }
+            else
+            {
+                sumOfHandTiles+=getTotalTileValue(hand);
+            }
+        }
+
+        /*
+            one hand is empty: adjust scores by subtracting sum of tile values from each non-empty hand and adding th
+            the total of all the remaining tiles of all hands to the score of the empty hand
+        */
+        
+  
+        for(Hand hand: this.getHands())
+        {
+            for(Score score: this.getScores())
+            {
+                if(hand.getHanduserid()==score.getScoreUserId())
+                {
+                    if(score.getScoreUserId()==emptyHandUserId)
+                    {
+                        score.setScore(score.getScore()+sumOfHandTiles);
+                    }
+                    else
+                    {
+                        score.setScore(score.getScore()-getTotalTileValue(hand));
+                    }
+                }
+            }
+        }
+        
+    }
+
+    public Game initialiseGameOver()
+    {
+        // take care of updating the scores, looking at the different hands...
+        adjustFinalScores();
+
+        setGameOver(true);
+
+        return this;
     }
 }
