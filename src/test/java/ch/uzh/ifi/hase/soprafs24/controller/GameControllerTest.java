@@ -24,7 +24,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 import static org.hamcrest.Matchers.is;
@@ -385,6 +387,60 @@ mockMvc.perform(getRequest)
 
         mockMvc.perform(postRequest)
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void contestWord_validContest() throws Exception {
+      // given
+      User user = new User();
+      user.setId(1L);
+      user.setToken("1");
+      Game game = new Game();
+      game.setId(2L);
+
+      Map<String, Boolean> playerInput = new HashMap<>();
+      playerInput.put("decisionContesting", false);
+
+      given(userService.isTokenValid(Mockito.any())).willReturn(user);
+      Mockito.doNothing().when(gameService).contestWord(2L, user, false);
+
+      // when
+        MockHttpServletRequestBuilder postRequest = post("/moves/contestations/2?token=1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(playerInput));
+
+      // then
+        mockMvc.perform(postRequest)
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    public void contestWord_invalidContest() throws Exception {
+      // given
+      User user = new User();
+      user.setId(1L);
+      user.setToken("1");
+      Game game = new Game();
+      game.setId(2L);
+
+      Map<String, Boolean> playerInput = new HashMap<>();
+      playerInput.put("decisionContesting", true);
+
+      given(userService.isTokenValid(Mockito.any())).willReturn(user);
+      Mockito.doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN))
+              .when(gameService)
+              .contestWord(2L, user, true);
+
+      // when
+      MockHttpServletRequestBuilder postRequest = post("/moves/contestations/2?token=1")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(asJsonString(playerInput));
+
+      // then
+      mockMvc.perform(postRequest)
+              .andExpect(status().isForbidden())
+              .andExpect(content().string(""));
     }
 
   /**
