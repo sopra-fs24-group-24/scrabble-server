@@ -86,86 +86,19 @@ public class GameService {
     public List<Tile> placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game.getId());
         checkIfBoardValid(game.getPlayfield());
-        /*
-        foundGame.setWordContested(false);
-        gameRepository.save(foundGame);
-        gameRepository.flush();
 
-         */
         //TODO: add function to check whether userinput is sent from the correct player
-
-        // if in the last round the word was not contested, then the variable oldPlayfield is updated by
-        // assigning the current Playfield to the variable oldPlayfield
-        // if the word was contested, then the word-validation-method will handle the storing of the playfields
-/*
-        if (!foundGame.getWordContested()) {
-            List<Tile> newPlayfield = foundGame.getPlayfield();
-            foundGame.setOldPlayfield(newPlayfield);
-        }
-*/
 
         List<Tile> updatedPlayfield = game.getPlayfield();
         List<Tile> persistedPlayfield = foundGame.getPlayfield();
 
         // check if move is valid
         validMove(updatedPlayfield, persistedPlayfield);
-/*
-        Map<String, Integer> words = getWordsAndScoreForPlayedTiles(updatedPlayfield, persistedPlayfield, true);
 
-        int score = 0;
-
-        for (int wordScore : words.values()) {
-            score += wordScore;
-        }
-
-        Score playerScore = scoreRepository.findByScoreUserId(foundGame.getCurrentPlayer());
-        playerScore.setScore(playerScore.getScore() + score);
-
-        // update playfield and save it in database
-        if (!words.isEmpty()) {
-             List<Integer> playedTilesIndices = getChangedIndexesOfGame(persistedPlayfield, updatedPlayfield);
-             List<Tile> tiles = new ArrayList<>();
-
-             for (int playedTileIndex : playedTilesIndices) {
-                 tiles.add(updatedPlayfield.get(playedTileIndex));
-             }
-
-             Hand currentPlayerHand = handRepository.findByHanduserid(foundGame.getCurrentPlayer());
-             currentPlayerHand.removeTilesFromHand(tiles);
-
-             List<Tile> newTiles;
-             Bag bag = foundGame.getBag();
-
-             if (bag.tilesleft() < tiles.size()) {
-                 newTiles = bag.getSomeTiles(bag.tilesleft());
-             } else {
-                 newTiles = foundGame.getBag().getSomeTiles(tiles.size());
-             }
-
-             currentPlayerHand.putTilesInHand(newTiles);
-
-             foundGame.setPlayfield(updatedPlayfield);
-             foundGame.setWordContested(false);
-
-             List<Tile> tempPlayfield = new ArrayList<>();
-
-             for (int i = 0; i < 225; i++) {
-                 tempPlayfield.add(null);
-             }
-
-             foundGame.setOldPlayfield(tempPlayfield);
-
-             gameRepository.save(foundGame);
-             gameRepository.flush();
-        }
-
-        makeNextPlayerToCurrentPlayer(foundGame.getId());
-*/
         foundGame.setPlayfield(updatedPlayfield);
         foundGame.setWordContested(true);
         gameRepository.save(foundGame);
         gameRepository.flush();
-
 
         return foundGame.getPlayfield();
     }
@@ -243,18 +176,8 @@ public class GameService {
 
                         currentPlayerHand.putTilesInHand(newTiles);
 
-                        //foundGame.setPlayfield(foundGame.getPlayfield());
                         foundGame.setWordContested(false);
-                        /*
-                        List<Tile> tempPlayfield = new ArrayList<>();
 
-                        for (int i = 0; i < 225; i++) {
-                            tempPlayfield.add(null);
-                        }
-                        */
-                        //foundGame.setOldPlayfield(tempPlayfield);
-                        //gameRepository.save(foundGame);
-                        //gameRepository.flush();
                         foundGame.setOldPlayfield(foundGame.getPlayfield());
                     }
                     // word is false - contestation successful
@@ -298,9 +221,6 @@ public class GameService {
 
                     currentPlayerHand.putTilesInHand(newTiles);
                     foundGame.setOldPlayfield(foundGame.getPlayfield());
-                    //foundGame.setPlayfield(foundGame.getPlayfield());
-                    //foundGame.setWordContested(false);
-
                 }
                 foundGame.setWordContested(false);
                 foundGame.setDecisionPlayersContestation(null);
