@@ -369,6 +369,80 @@ mockMvc.perform(getRequest)
 .andExpect(status().isNotFound());
   }
 
+  @Test
+  public void addFriend_validInput_friendAdded() throws Exception {
+      MockHttpServletRequestBuilder putRequest = put("/friends/1/2/?token=testToken")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(putRequest)
+              .andExpect(status().isNoContent());
+  }
+
+  @Test
+  public void addFriend_invalidFriendId_noAddedFriend() throws Exception {
+      ResponseStatusException response = new ResponseStatusException(HttpStatus.NOT_FOUND);
+      doThrow(response).when(userService).addFriend(Mockito.any(), Mockito.any(), Mockito.any());
+
+      MockHttpServletRequestBuilder putRequest = put("/friends/1/2/?token=testToken")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(putRequest)
+              .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void addFriend_alreadyHasFriendRequest_noAddedFriend() throws Exception {
+      ResponseStatusException response = new ResponseStatusException(HttpStatus.CONFLICT);
+      doThrow(response).when(userService).addFriend(Mockito.any(), Mockito.any(), Mockito.any());
+
+      MockHttpServletRequestBuilder putRequest = put("/friends/1/2/?token=testToken")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(putRequest)
+              .andExpect(status().isConflict());
+  }
+
+  @Test
+  public void removeFriend_validInput_friendRemoved() throws Exception {
+      MockHttpServletRequestBuilder deleteRequest = delete("/friends/1/2/?token=testToken")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(deleteRequest)
+              .andExpect(status().isNoContent());
+  }
+
+  @Test
+  public void removeFriend_invalidFriendId_nothingRemoved() throws Exception {
+      ResponseStatusException response = new ResponseStatusException(HttpStatus.NOT_FOUND);
+      doThrow(response).when(userService).removeFriend(Mockito.any(), Mockito.any(), Mockito.any());
+
+      MockHttpServletRequestBuilder deleteRequest = delete("/friends/1/2/?accept=true&token=testToken")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(deleteRequest)
+              .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void acceptFriendRequest_validInput_friendAdded() throws Exception {
+      MockHttpServletRequestBuilder postRequest = post("/friends/1/2/?accept=true&token=testToken")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(postRequest)
+              .andExpect(status().isNoContent());
+  }
+
+  @Test
+  public void acceptFriendRequest_invalidFriendId_nothingAdded() throws Exception {
+      ResponseStatusException response = new ResponseStatusException(HttpStatus.NOT_FOUND);
+      doThrow(response).when(userService).acceptFriendRequest(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyBoolean(), Mockito.anyString());
+
+      MockHttpServletRequestBuilder postRequest = post("/friends/1/2/?accept=true&token=testToken")
+              .contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(postRequest)
+              .andExpect(status().isNotFound());
+  }
 
   /**
    * Helper Method to convert userPostDTO into a JSON string such that the input
