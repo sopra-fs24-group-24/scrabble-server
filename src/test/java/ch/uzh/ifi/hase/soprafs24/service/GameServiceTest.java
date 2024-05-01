@@ -21,6 +21,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 public class GameServiceTest {
 
@@ -102,25 +103,25 @@ public class GameServiceTest {
         testScore2.setId(2L);
         testScore2.setScore(0);
 
-        Mockito.when(scoreRepository.findByScoreUserId(Mockito.any())).thenReturn(testScore1);
-        Mockito.when(bagRepository.findById(Mockito.any())).thenReturn(Optional.of(bag));
-        Mockito.when(handRepository.findByHanduserid(Mockito.any())).thenReturn(testHand1);
+        when(scoreRepository.findByScoreUserId(Mockito.any())).thenReturn(testScore1);
+        when(bagRepository.findById(Mockito.any())).thenReturn(Optional.of(bag));
+        when(handRepository.findByHanduserid(Mockito.any())).thenReturn(testHand1);
 
-        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
-        Mockito.when(mockResponse.statusCode()).thenReturn(200);
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(200);
     }
 
     @Test
     public void skipTurn_2Players_success() {
         User user = testGame.getPlayers().get(0);
-        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
         gameService.skipTurn(user, 1L);
         assertEquals(2L, testGame.getCurrentPlayer());
     }
 
     @Test
     public void nextPlayer_2Players_success() {
-        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
         gameService.makeNextPlayerToCurrentPlayer(1L);
         assertEquals(2L, testGame.getCurrentPlayer());
     }
@@ -132,14 +133,14 @@ public class GameServiceTest {
         testGame.getPlayers().add(testUser3);
         testGame.setCurrentPlayer(3L);
 
-        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
         gameService.makeNextPlayerToCurrentPlayer(1L);
         assertEquals(1L, testGame.getCurrentPlayer());
     }
 
     @Test
     public void nextPlayer_wrongId_fail() {
-        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.empty());
+        when(gameRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class ,() -> gameService.makeNextPlayerToCurrentPlayer(2L));
     }
 
@@ -147,7 +148,7 @@ public class GameServiceTest {
     public void authenticatePlayer_invalidGameId_fail() {
         User user = testGame.getPlayers().get(0);
 
-        Mockito.when(gameRepository.findById(2L)).thenReturn(Optional.empty());
+        when(gameRepository.findById(2L)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class ,() -> gameService.authenticateUserForMove(user, 2L));
     }
 
@@ -155,7 +156,7 @@ public class GameServiceTest {
     public void authenticatePlayer_invalidUserId_fail() {
         User user = testGame.getPlayers().get(1);
 
-        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
         assertThrows(ResponseStatusException.class ,() -> gameService.authenticateUserForMove(user, 1L));
     }
 
@@ -163,23 +164,23 @@ public class GameServiceTest {
     public void authenticatePlayer_success() {
         User user = testGame.getPlayers().get(0);
 
-        Mockito.when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+        when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
 
         assertDoesNotThrow(() -> gameService.authenticateUserForMove(user, 1L));
     }
 
     @Test
     public void validateWord_isValid() {
-        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
-        Mockito.when(mockResponse.statusCode()).thenReturn(200);
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(200);
 
         assertTrue(gameService.validateWord("testWord"));
     }
 
     @Test
     public void validateWord_isInvalid() {
-        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
-        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(404);
 
         assertFalse(gameService.validateWord("testWord"));
     }
@@ -193,17 +194,17 @@ public class GameServiceTest {
 
     @Test
     public void getScrabbleScore_wordIsValid() {
-        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
-        Mockito.when(mockResponse.statusCode()).thenReturn(200);
-        Mockito.when(mockResponse.body()).thenReturn("{" + '"' + "value" + '"' + ":8}");
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(200);
+        when(mockResponse.body()).thenReturn("{" + '"' + "value" + '"' + ":8}");
 
         assertEquals(8, gameService.getScrabbleScore("testWord"));
     }
 
     @Test
     public void getScrabbleScore_wordIsInvalid() {
-        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
-        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(404);
 
         assertEquals(0, gameService.getScrabbleScore("testWord"));
     }
@@ -233,8 +234,8 @@ public class GameServiceTest {
         Map<String, Integer> words = new HashMap<>();
         words.put("test", 10);
 
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.of(testGame));
-        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.of(testGame));
+        when(mockResponse.statusCode()).thenReturn(404);
 
 
         gameService.changeScoresAfterContesting(testGame, contested, words);
@@ -260,7 +261,7 @@ public class GameServiceTest {
         Map<String, Integer> words = new HashMap<>();
         words.put("test", 10);
 
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.of(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.of(testGame));
 
         gameService.changeScoresAfterContesting(testGame, contested, words);
 
@@ -285,7 +286,7 @@ public class GameServiceTest {
         List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
 
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         char[] lettersExpected = {'A', 'A', 'A', 'A', 'A', 'A', 'A'};
@@ -316,9 +317,9 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
-        Mockito.when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
-        Mockito.when(mockResponse.statusCode()).thenReturn(404);
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(404);
 
         gameService.placeTilesOnBoard(userGame);
 
@@ -345,7 +346,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -380,7 +381,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -415,7 +416,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -447,7 +448,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -482,7 +483,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -514,7 +515,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -546,7 +547,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -577,7 +578,7 @@ public class GameServiceTest {
         userGame.setPlayfield(userPlayfield);
 
         // when
-        Mockito.when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
         gameService.placeTilesOnBoard(userGame);
 
         // then
@@ -947,7 +948,7 @@ public class GameServiceTest {
 
         given(handRepository.findById(Mockito.any())).willReturn(Optional.of(returnedHand));
         given(gameRepository.findById(Mockito.any())).willReturn(Optional.of(returnedGame));
-        Mockito.when(bagRepository.findById(Mockito.any())).thenReturn(Optional.of(returnedBag));
+        when(bagRepository.findById(Mockito.any())).thenReturn(Optional.of(returnedBag));
         //given(bag.tilesleft()).willReturn(3);
         //given(bag.getSomeTiles(3)).willReturn(tilesInBag);
 
@@ -974,6 +975,704 @@ public class GameServiceTest {
         assertTrue(newBag.contains('A'));
         assertTrue(newBag.contains('C'));
         assertTrue(newBag.contains('Q'));
+    }
+
+    @Test
+    public void contestWord_validContest_allPlayersContested_contestSuccessful() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        Game game = new Game();
+        game.setId(3L);
+
+        Bag bag = new Bag();
+        bag.setId(4L);
+
+        List<Tile> tilesInBag = new ArrayList<>();
+        tilesInBag.add(new Tile('A', 2));
+        tilesInBag.add(new Tile('C', 3));
+        bag.setTiles(tilesInBag);
+
+        Hand hand1 = new Hand();
+        hand1.setId(5L);
+        List<Tile> tilesInHand1 = new ArrayList<>();
+        tilesInHand1.add(new Tile('A', 2));
+        tilesInHand1.add(new Tile('C', 3));
+        tilesInHand1.add(new Tile('A', 2));
+        tilesInHand1.add(new Tile('Z', 10));
+        tilesInHand1.add(new Tile('K', 4));
+        tilesInHand1.add(new Tile('T', 5));
+        tilesInHand1.add(new Tile('Q', 10));
+
+        Hand hand2 = new Hand();
+        hand2.setId(6L);
+        List<Tile> tilesInHand2 = new ArrayList<>();
+        tilesInHand2.add(new Tile('A', 2));
+        tilesInHand2.add(new Tile('C', 3));
+        tilesInHand2.add(new Tile('A', 2));
+        tilesInHand2.add(new Tile('Z', 10));
+        tilesInHand2.add(new Tile('K', 4));
+        tilesInHand2.add(new Tile('T', 5));
+        tilesInHand2.add(new Tile('Q', 10));
+
+        game.setDecisionPlayersContestation(new HashMap<Long, Boolean>());
+        game.setCurrentPlayer(1L);
+        game.setBag(bag);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        game.setPlayers(players);
+        List<Hand> handsInGame = new ArrayList<>();
+        handsInGame.add(hand1);
+        handsInGame.add(hand2);
+        game.setHands(handsInGame);
+        game.setWordContested(true);
+
+        List<Tile> oldPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            oldPlayfield.add(null);
+        }
+        game.setOldPlayfield(oldPlayfield);
+
+        List<Tile> currentPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            currentPlayfield.add(null);
+        }
+        Tile tile1 = new Tile('Q', 10);
+        tile1.setBoardidx(112);
+        Tile tile2 = new Tile('O', 6);
+        tile2.setBoardidx(113);
+        currentPlayfield.set(112, tile1);
+        currentPlayfield.set(113, tile2);
+        game.setPlayfield(currentPlayfield);
+
+        Score score1 = new Score();
+        score1.setId(10L);
+        score1.setScoreUserId(1L);
+        score1.setScore(0);
+        Score score2 = new Score();
+        score2.setId(11L);
+        score2.setScoreUserId(2L);
+        score2.setScore(0);
+
+        List<Score> scores = new ArrayList<>();
+        scores.add(score1);
+        scores.add(score2);
+        game.setScores(scores);
+
+        given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(404);
+
+
+        // when
+        gameService.contestWord(game.getId(), user2, true);
+
+        // then
+        List<Tile> expectedPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            expectedPlayfield.add(null);
+        }
+
+        assertEquals(2L, game.getCurrentPlayer());
+        assertFalse(game.getWordContested());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
+    }
+
+    @Test
+    public void contestWord_validContest_allPlayersContested_contestSuccessful2() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        Game game = new Game();
+        game.setId(3L);
+
+        Bag bag = new Bag();
+        bag.setId(4L);
+
+        List<Tile> tilesInBag = new ArrayList<>();
+        tilesInBag.add(new Tile('A', 2));
+        tilesInBag.add(new Tile('C', 3));
+        bag.setTiles(tilesInBag);
+
+        Hand hand1 = new Hand();
+        hand1.setId(5L);
+        List<Tile> tilesInHand1 = new ArrayList<>();
+        tilesInHand1.add(new Tile('A', 2));
+        tilesInHand1.add(new Tile('C', 3));
+        tilesInHand1.add(new Tile('A', 2));
+        tilesInHand1.add(new Tile('Z', 10));
+        tilesInHand1.add(new Tile('K', 4));
+        tilesInHand1.add(new Tile('T', 5));
+        tilesInHand1.add(new Tile('Q', 10));
+
+        Hand hand2 = new Hand();
+        hand2.setId(6L);
+        List<Tile> tilesInHand2 = new ArrayList<>();
+        tilesInHand2.add(new Tile('A', 2));
+        tilesInHand2.add(new Tile('C', 3));
+        tilesInHand2.add(new Tile('A', 2));
+        tilesInHand2.add(new Tile('Z', 10));
+        tilesInHand2.add(new Tile('K', 4));
+        tilesInHand2.add(new Tile('T', 5));
+        tilesInHand2.add(new Tile('Q', 10));
+
+        game.setDecisionPlayersContestation(new HashMap<Long, Boolean>());
+        game.setCurrentPlayer(1L);
+        game.setBag(bag);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        game.setPlayers(players);
+        List<Hand> handsInGame = new ArrayList<>();
+        handsInGame.add(hand1);
+        handsInGame.add(hand2);
+        game.setHands(handsInGame);
+        game.setWordContested(true);
+
+        List<Tile> oldPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            oldPlayfield.add(null);
+        }
+        Tile tile1 = new Tile('C', 3);
+        tile1.setBoardidx(112);
+        Tile tile2 = new Tile('A', 2);
+        tile2.setBoardidx(113);
+        Tile tile3 = new Tile('R', 5);
+        tile3.setBoardidx(114);
+        oldPlayfield.set(112, tile1);
+        oldPlayfield.set(113, tile2);
+        oldPlayfield.set(114, tile3);
+        game.setOldPlayfield(oldPlayfield);
+
+        List<Tile> currentPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            currentPlayfield.add(null);
+        }
+        Tile tile4 = new Tile('Q', 10);
+        tile4.setBoardidx(84);
+        Tile tile5 = new Tile('O', 6);
+        tile5.setBoardidx(99);
+        Tile tile6 = new Tile('C', 3);
+        tile6.setBoardidx(112);
+        Tile tile7 = new Tile('A', 2);
+        tile7.setBoardidx(113);
+        Tile tile8 = new Tile('R', 5);
+        tile8.setBoardidx(114);
+
+        currentPlayfield.set(84, tile4);
+        currentPlayfield.set(99, tile5);
+        currentPlayfield.set(112, tile6);
+        currentPlayfield.set(113, tile7);
+        currentPlayfield.set(114, tile8);
+        game.setPlayfield(currentPlayfield);
+
+        Score score1 = new Score();
+        score1.setId(10L);
+        score1.setScoreUserId(1L);
+        score1.setScore(0);
+        Score score2 = new Score();
+        score2.setId(11L);
+        score2.setScoreUserId(2L);
+        score2.setScore(10);
+
+        List<Score> scores = new ArrayList<>();
+        scores.add(score1);
+        scores.add(score2);
+        game.setScores(scores);
+
+        given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
+        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.statusCode()).thenReturn(404);
+
+        // when
+        gameService.contestWord(game.getId(), user2, true);
+
+        // then
+        List<Tile> expectedPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            expectedPlayfield.add(null);
+        }
+
+        Tile tile9 = new Tile('C', 3);
+        tile9.setBoardidx(112);
+        Tile tile10 = new Tile('A', 2);
+        tile10.setBoardidx(113);
+        Tile tile11 = new Tile('R', 5);
+        tile11.setBoardidx(114);
+        expectedPlayfield.set(112, tile9);
+        expectedPlayfield.set(113, tile10);
+        expectedPlayfield.set(114, tile11);
+
+        assertEquals(2L, game.getCurrentPlayer());
+        assertFalse(game.getWordContested());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
+    }
+
+    @Test
+    public void contestWord_wordNotContested_oldPlayfieldOverwritten() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        Game game = new Game();
+        game.setId(3L);
+
+        Bag bag = new Bag();
+        bag.setId(4L);
+
+        List<Tile> tilesInBag = new ArrayList<>();
+        tilesInBag.add(new Tile('A', 2));
+        tilesInBag.add(new Tile('C', 3));
+        bag.setTiles(tilesInBag);
+
+        Hand hand1 = new Hand();
+        hand1.setId(5L);
+        List<Tile> tilesInHand1 = new ArrayList<>();
+        tilesInHand1.add(new Tile('Q', 10));
+        tilesInHand1.add(new Tile('O', 6));
+        hand1.setHandtiles(tilesInHand1);
+        hand1.setHanduserid(1L);
+
+        Hand hand2 = new Hand();
+        hand2.setId(6L);
+        List<Tile> tilesInHand2 = new ArrayList<>();
+        tilesInHand2.add(new Tile('A', 2));
+        tilesInHand2.add(new Tile('C', 3));
+        tilesInHand2.add(new Tile('S', 5));
+        tilesInHand2.add(new Tile('Z', 10));
+        tilesInHand2.add(new Tile('L', 5));
+        tilesInHand2.add(new Tile('T', 5));
+        tilesInHand2.add(new Tile('Q', 10));
+        hand2.setHandtiles(tilesInHand2);
+        hand2.setHanduserid(2L);
+
+        game.setDecisionPlayersContestation(new HashMap<Long, Boolean>());
+        game.setCurrentPlayer(1L);
+        game.setBag(bag);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        game.setPlayers(players);
+        List<Hand> handsInGame = new ArrayList<>();
+        handsInGame.add(hand1);
+        handsInGame.add(hand2);
+        game.setHands(handsInGame);
+        game.setWordContested(true);
+
+        List<Tile> oldPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            oldPlayfield.add(null);
+        }
+        Tile tile1 = new Tile('C', 3);
+        tile1.setBoardidx(112);
+        Tile tile2 = new Tile('A', 2);
+        tile2.setBoardidx(113);
+        Tile tile3 = new Tile('R', 5);
+        tile3.setBoardidx(114);
+        oldPlayfield.set(112, tile1);
+        oldPlayfield.set(113, tile2);
+        oldPlayfield.set(114, tile3);
+        game.setOldPlayfield(oldPlayfield);
+
+        List<Tile> currentPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            currentPlayfield.add(null);
+        }
+        Tile tile4 = new Tile('Q', 10);
+        tile4.setBoardidx(84);
+        Tile tile5 = new Tile('O', 6);
+        tile5.setBoardidx(99);
+        Tile tile6 = new Tile('C', 3);
+        tile6.setBoardidx(112);
+        Tile tile7 = new Tile('A', 2);
+        tile7.setBoardidx(113);
+        Tile tile8 = new Tile('R', 5);
+        tile8.setBoardidx(114);
+
+        currentPlayfield.set(84, tile4);
+        currentPlayfield.set(99, tile5);
+        currentPlayfield.set(112, tile6);
+        currentPlayfield.set(113, tile7);
+        currentPlayfield.set(114, tile8);
+        game.setPlayfield(currentPlayfield);
+
+        Score score1 = new Score();
+        score1.setId(10L);
+        score1.setScoreUserId(1L);
+        score1.setScore(0);
+        Score score2 = new Score();
+        score2.setId(11L);
+        score2.setScoreUserId(2L);
+        score2.setScore(10);
+
+        List<Score> scores = new ArrayList<>();
+        scores.add(score1);
+        scores.add(score2);
+        game.setScores(scores);
+
+        given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
+        given(handRepository.findByHanduserid(game.getCurrentPlayer())).willReturn(hand1);
+        given(scoreRepository.findByScoreUserId(game.getCurrentPlayer())).willReturn(score1);
+
+        // when
+        gameService.contestWord(game.getId(), user2, false);
+
+        // then
+        List<Tile> expectedPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            expectedPlayfield.add(null);
+        }
+
+        Tile tile9 = new Tile('C', 3);
+        tile9.setBoardidx(112);
+        Tile tile10 = new Tile('A', 2);
+        tile10.setBoardidx(113);
+        Tile tile11 = new Tile('R', 5);
+        tile11.setBoardidx(114);
+        Tile tile12 = new Tile('Q', 10);
+        tile12.setBoardidx(84);
+        Tile tile13 = new Tile('O', 6);
+        tile13.setBoardidx(99);
+        expectedPlayfield.set(112, tile9);
+        expectedPlayfield.set(113, tile10);
+        expectedPlayfield.set(114, tile11);
+        expectedPlayfield.set(84, tile12);
+        expectedPlayfield.set(99, tile13);
+
+        List<Character> lettersInHand1 = new ArrayList<>();
+        for (int i = 0; i < 2; i++){
+            lettersInHand1.add(game.getHands().get(0).getHandtiles().get(i).getLetter());
+        }
+
+        assertEquals(2L, game.getCurrentPlayer());
+        assertFalse(game.getWordContested());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
+        assertEquals(0, game.getBag().getTiles().size());
+        assertEquals(2, game.getHands().get(0).getHandtiles().size());
+        assertEquals(7, game.getHands().get(1).getHandtiles().size());
+        assertTrue(lettersInHand1.contains('A'));
+        assertTrue(lettersInHand1.contains('C'));
+    }
+
+    @Test
+    public void contestWord_validContest_allPlayersContested_ContestUnsuccessful_oldPlayfieldOverwritten() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        Game game = new Game();
+        game.setId(3L);
+
+        Bag bag = new Bag();
+        bag.setId(4L);
+
+        List<Tile> tilesInBag = new ArrayList<>();
+        tilesInBag.add(new Tile('A', 2));
+        tilesInBag.add(new Tile('C', 3));
+        bag.setTiles(tilesInBag);
+
+        Hand hand1 = new Hand();
+        hand1.setId(5L);
+        List<Tile> tilesInHand1 = new ArrayList<>();
+        tilesInHand1.add(new Tile('Q', 10));
+        tilesInHand1.add(new Tile('O', 6));
+        hand1.setHandtiles(tilesInHand1);
+        hand1.setHanduserid(1L);
+
+        Hand hand2 = new Hand();
+        hand2.setId(6L);
+        List<Tile> tilesInHand2 = new ArrayList<>();
+        tilesInHand2.add(new Tile('A', 2));
+        tilesInHand2.add(new Tile('C', 3));
+        tilesInHand2.add(new Tile('S', 5));
+        tilesInHand2.add(new Tile('Z', 10));
+        tilesInHand2.add(new Tile('L', 5));
+        tilesInHand2.add(new Tile('T', 5));
+        tilesInHand2.add(new Tile('Q', 10));
+        hand2.setHandtiles(tilesInHand2);
+        hand2.setHanduserid(2L);
+
+        game.setDecisionPlayersContestation(new HashMap<Long, Boolean>());
+        game.setCurrentPlayer(1L);
+        game.setBag(bag);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        game.setPlayers(players);
+        List<Hand> handsInGame = new ArrayList<>();
+        handsInGame.add(hand1);
+        handsInGame.add(hand2);
+        game.setHands(handsInGame);
+        game.setWordContested(true);
+
+        List<Tile> oldPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            oldPlayfield.add(null);
+        }
+        Tile tile1 = new Tile('C', 3);
+        tile1.setBoardidx(112);
+        Tile tile2 = new Tile('A', 2);
+        tile2.setBoardidx(113);
+        Tile tile3 = new Tile('R', 5);
+        tile3.setBoardidx(114);
+        oldPlayfield.set(112, tile1);
+        oldPlayfield.set(113, tile2);
+        oldPlayfield.set(114, tile3);
+        game.setOldPlayfield(oldPlayfield);
+
+        List<Tile> currentPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            currentPlayfield.add(null);
+        }
+        Tile tile4 = new Tile('Q', 10);
+        tile4.setBoardidx(84);
+        Tile tile5 = new Tile('O', 6);
+        tile5.setBoardidx(99);
+        Tile tile6 = new Tile('C', 3);
+        tile6.setBoardidx(112);
+        Tile tile7 = new Tile('A', 2);
+        tile7.setBoardidx(113);
+        Tile tile8 = new Tile('R', 5);
+        tile8.setBoardidx(114);
+
+        currentPlayfield.set(84, tile4);
+        currentPlayfield.set(99, tile5);
+        currentPlayfield.set(112, tile6);
+        currentPlayfield.set(113, tile7);
+        currentPlayfield.set(114, tile8);
+        game.setPlayfield(currentPlayfield);
+
+        Score score1 = new Score();
+        score1.setId(10L);
+        score1.setScoreUserId(1L);
+        score1.setScore(0);
+        Score score2 = new Score();
+        score2.setId(11L);
+        score2.setScoreUserId(2L);
+        score2.setScore(10);
+
+        List<Score> scores = new ArrayList<>();
+        scores.add(score1);
+        scores.add(score2);
+        game.setScores(scores);
+
+        given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
+        given(handRepository.findByHanduserid(game.getCurrentPlayer())).willReturn(hand1);
+
+        // when
+        gameService.contestWord(game.getId(), user2, true);
+
+        // then
+        List<Tile> expectedPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            expectedPlayfield.add(null);
+        }
+
+        Tile tile9 = new Tile('C', 3);
+        tile9.setBoardidx(112);
+        Tile tile10 = new Tile('A', 2);
+        tile10.setBoardidx(113);
+        Tile tile11 = new Tile('R', 5);
+        tile11.setBoardidx(114);
+        Tile tile12 = new Tile('Q', 10);
+        tile12.setBoardidx(84);
+        Tile tile13 = new Tile('O', 6);
+        tile13.setBoardidx(99);
+        expectedPlayfield.set(112, tile9);
+        expectedPlayfield.set(113, tile10);
+        expectedPlayfield.set(114, tile11);
+        expectedPlayfield.set(84, tile12);
+        expectedPlayfield.set(99, tile13);
+
+        List<Character> lettersInHand1 = new ArrayList<>();
+        for (int i = 0; i < 2; i++){
+            lettersInHand1.add(game.getHands().get(0).getHandtiles().get(i).getLetter());
+        }
+
+        assertEquals(2L, game.getCurrentPlayer());
+        assertFalse(game.getWordContested());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
+        assertEquals(0, game.getBag().getTiles().size());
+        assertEquals(2, game.getHands().get(0).getHandtiles().size());
+        assertEquals(7, game.getHands().get(1).getHandtiles().size());
+        assertTrue(lettersInHand1.contains('A'));
+        assertTrue(lettersInHand1.contains('C'));
+    }
+
+    @Test
+    public void contestWord_validContest_notAllPlayersContestedYet_nothingUpdated() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        User user3 = new User();
+        user3.setId(20L);
+
+        Game game = new Game();
+        game.setId(3L);
+        game.setWordContested(true);
+        game.setCurrentPlayer(1L);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user3);
+        game.setPlayers(players);
+
+        List<Tile> oldPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            oldPlayfield.add(null);
+        }
+        Tile tile1 = new Tile('C', 3);
+        tile1.setBoardidx(112);
+        Tile tile2 = new Tile('A', 2);
+        tile2.setBoardidx(113);
+        Tile tile3 = new Tile('R', 5);
+        tile3.setBoardidx(114);
+        oldPlayfield.set(112, tile1);
+        oldPlayfield.set(113, tile2);
+        oldPlayfield.set(114, tile3);
+        game.setOldPlayfield(oldPlayfield);
+
+        List<Tile> currentPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            currentPlayfield.add(null);
+        }
+        Tile tile4 = new Tile('Q', 10);
+        tile4.setBoardidx(84);
+        Tile tile5 = new Tile('O', 6);
+        tile5.setBoardidx(99);
+        Tile tile6 = new Tile('C', 3);
+        tile6.setBoardidx(112);
+        Tile tile7 = new Tile('A', 2);
+        tile7.setBoardidx(113);
+        Tile tile8 = new Tile('R', 5);
+        tile8.setBoardidx(114);
+
+        currentPlayfield.set(84, tile4);
+        currentPlayfield.set(99, tile5);
+        currentPlayfield.set(112, tile6);
+        currentPlayfield.set(113, tile7);
+        currentPlayfield.set(114, tile8);
+        game.setPlayfield(currentPlayfield);
+
+        given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
+
+        // when
+        gameService.contestWord(game.getId(), user2, true);
+
+        // then
+        List<Tile> expectedPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            expectedPlayfield.add(null);
+        }
+
+        Tile tile9 = new Tile('C', 3);
+        tile9.setBoardidx(112);
+        Tile tile10 = new Tile('A', 2);
+        tile10.setBoardidx(113);
+        Tile tile11 = new Tile('R', 5);
+        tile11.setBoardidx(114);
+        Tile tile12 = new Tile('Q', 10);
+        tile12.setBoardidx(84);
+        Tile tile13 = new Tile('O', 6);
+        tile13.setBoardidx(99);
+        expectedPlayfield.set(112, tile9);
+        expectedPlayfield.set(113, tile10);
+        expectedPlayfield.set(114, tile11);
+        expectedPlayfield.set(84, tile12);
+        expectedPlayfield.set(99, tile13);
+
+        List<Tile> expectedoldPlayfield = new ArrayList<>();
+        for (int i = 0; i<225; i++){
+            expectedoldPlayfield.add(null);
+        }
+
+        Tile tile14 = new Tile('C', 3);
+        tile14.setBoardidx(112);
+        Tile tile15 = new Tile('A', 2);
+        tile15.setBoardidx(113);
+        Tile tile16 = new Tile('R', 5);
+        tile16.setBoardidx(114);
+        expectedoldPlayfield.set(112, tile14);
+        expectedoldPlayfield.set(113, tile15);
+        expectedoldPlayfield.set(114, tile16);
+
+        assertEquals(1L, game.getCurrentPlayer());
+        assertTrue(game.getWordContested());
+        assertArrayEquals(expectedoldPlayfield.toArray(), game.getOldPlayfield().toArray());
+        assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
+    }
+
+    @Test
+    public void contestWord_playerContestsMoreThanOnce_invalidContest_throwError() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        User user3 = new User();
+        user3.setId(20L);
+
+        Game game = new Game();
+        game.setId(3L);
+        game.setWordContested(true);
+        game.setCurrentPlayer(1L);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user3);
+        game.setPlayers(players);
+
+        Map<Long, Boolean> decisionsContesting = new HashMap<>();
+        decisionsContesting.put(user2.getId(), true);
+        game.setDecisionPlayersContestation(decisionsContesting);
+
+        given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> gameService.contestWord(game.getId(), user2, true));
+    }
+
+    @Test
+    public void contestWord_playerWhoPlacedWordWantsToContest_invalidContest_throwError() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        User user3 = new User();
+        user3.setId(20L);
+
+        Game game = new Game();
+        game.setId(3L);
+        game.setWordContested(true);
+        game.setCurrentPlayer(1L);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user3);
+        game.setPlayers(players);
+
+        Map<Long, Boolean> decisionsContesting = new HashMap<>();
+        decisionsContesting.put(user2.getId(), true);
+        game.setDecisionPlayersContestation(decisionsContesting);
+
+        given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> gameService.contestWord(game.getId(), user1, true));
     }
 
     private List<Tile> fillBoard(char[] letters, int[] values, int[] boardIndices){
