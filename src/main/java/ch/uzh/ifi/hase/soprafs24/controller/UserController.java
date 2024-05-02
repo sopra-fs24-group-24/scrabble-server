@@ -131,4 +131,22 @@ public class UserController {
 
     return userGetDTOs;
   }
+
+  @PutMapping("/friends/{userId}/{friendId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void addFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId, @RequestParam String token) {
+      userService.addFriend(userId, friendId, token);
+  }
+
+  @DeleteMapping("/friends/{userId}/{friendId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void removeFriend(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId, @RequestParam String token) {
+      userService.removeFriend(userId, friendId, token);
+  }
+
+  @PostMapping("/friends/{userId}/{friendId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void acceptFriendRequest(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId, @RequestParam boolean accept, @RequestParam String token) {
+      userService.acceptFriendRequest(userId, friendId, accept, token);
+  }
 }

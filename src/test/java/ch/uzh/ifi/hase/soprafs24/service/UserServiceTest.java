@@ -170,4 +170,153 @@ public class UserServiceTest {
 
     assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
   }
+
+  @Test
+  public void addFriend_validInput_success() {
+      testUser.setToken("testToken");
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      userService.addFriend(1L, 2L, "testToken");
+
+      assertTrue(friend.getFriendRequests().contains(1L));
+  }
+
+  @Test
+  public void addFriend_invalidFriendId_throwsException() {
+      testUser.setToken("testToken");
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.empty());
+
+      assertThrows(ResponseStatusException.class, () -> userService.addFriend(1L, 2L, "testToken"));
+  }
+
+  @Test
+  public void addFriend_alreadyHaveFriendRequest_throwsException() {
+      testUser.setToken("testToken");
+      testUser.addFriendRequest(2L);
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      assertThrows(ResponseStatusException.class, () -> userService.addFriend(1L, 2L, "testToken"));
+  }
+
+  @Test
+  public void removeFriend_validInput_success() {
+      testUser.setToken("testToken");
+      testUser.addFriend(2L);
+
+      User friend = new User();
+      friend.addFriend(1L);
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      userService.removeFriend(1L, 2L, "testToken");
+
+      assertTrue(testUser.getFriends().isEmpty());
+      assertTrue(friend.getFriends().isEmpty());
+  }
+
+  @Test
+  public void removeFriend_invalidFriendId_throwsException() {
+      testUser.setToken("testToken");
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.empty());
+
+      assertThrows(ResponseStatusException.class, () -> userService.removeFriend(1L, 2L, "testToken"));
+  }
+
+  @Test
+  public void removeFriend_isNotFriend_throwsException() {
+      testUser.setToken("testToken");
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      assertThrows(ResponseStatusException.class, () -> userService.removeFriend(1L, 2L, "testToken"));
+  }
+
+  @Test
+  public void acceptFriendRequest_validInput_success() {
+      testUser.setToken("testToken");
+      testUser.addFriendRequest(2L);
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      userService.acceptFriendRequest(1L, 2L, true, "testToken");
+
+      assertTrue(testUser.getFriends().contains(2L));
+      assertTrue(friend.getFriends().contains(1L));
+  }
+
+  @Test
+  public void denyFriendRequest_validInput_success() {
+      testUser.setToken("testToken");
+      testUser.addFriendRequest(2L);
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      userService.acceptFriendRequest(1L, 2L, false, "testToken");
+
+      assertFalse(testUser.getFriends().contains(2L));
+      assertFalse(testUser.getFriendRequests().contains(2L));
+      assertFalse(friend.getFriends().contains(1L));
+      assertFalse(friend.getFriendRequests().contains(1L));
+  }
+
+  @Test
+  public void acceptFriendRequest_invalidFriendId_throwsException() {
+      testUser.setToken("testToken");
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.empty());
+
+      assertThrows(ResponseStatusException.class, () -> userService.acceptFriendRequest(1L, 2L, true, "testToken"));
+  }
+
+  @Test
+  public void acceptFriendRequest_alreadyFriends_throwsException() {
+      testUser.setToken("testToken");
+      testUser.addFriend(2L);
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      assertThrows(ResponseStatusException.class, () -> userService.acceptFriendRequest(1L, 2L, true, "testToken"));
+  }
+
+  @Test
+  public void acceptFriendRequest_noFriendRequests_throwsException() {
+      testUser.setToken("testToken");
+
+      User friend = new User();
+
+      Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+      Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(friend));
+
+      assertThrows(ResponseStatusException.class, () -> userService.acceptFriendRequest(1L, 2L, true, "testToken"));
+  }
 }
