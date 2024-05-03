@@ -86,6 +86,63 @@ public class UserService
     return friends;
   }
 
+  public void addFriend(Long userId, Long friendId, String token) {
+        authenticateUser(userId, token);
+
+        Optional<User> user = userRepository.findById(userId);
+        Optional<User> friend = userRepository.findById(friendId);
+
+        if(friend.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The user with id: %s doesn't exist and could not be added as a friend!", friendId));
+        } else if (user.get().getFriends().contains(friendId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user with id: %s is already your friend.", friendId));
+        } else if (user.get().getFriendRequests().contains(friendId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user with id: %s already sent you a friend request!", friendId));
+        } else if (!friend.get().getFriendRequests().contains(userId)) {
+            friend.get().addFriendRequest(userId);
+            user.get().addSentFriendRequest(friendId);
+        }
+  }
+
+  public void removeFriend(Long userId, Long friendId, String token) {
+      authenticateUser(userId, token);
+
+      Optional<User> user = userRepository.findById(userId);
+      Optional<User> friend = userRepository.findById(friendId);
+
+      if (friend.isEmpty()) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The user with id: %s doesn't exist!", friendId));
+      } else if (!user.get().getFriends().contains(friendId)) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The user with id: %s is not your friend!", friendId));
+      } else {
+          user.get().removeFriend(friendId);
+          friend.get().removeFriend(userId);
+      }
+  }
+
+  public void acceptFriendRequest(Long userId, Long friendId, boolean accept, String token) {
+        authenticateUser(userId, token);
+
+        Optional<User> user = userRepository.findById(userId);
+        Optional<User> friend = userRepository.findById(friendId);
+
+        if (friend.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The user with id: %s doesn't exist!", friendId));
+        } else if (user.get().getFriends().contains(friendId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user with id: %s is already your friend!", friendId));
+        } else if (!user.get().getFriendRequests().contains(friendId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("The user with id %s did not send a friend request!", friendId));
+        } else if (accept) {
+            user.get().addFriend(friendId);
+            user.get().removeFriendRequest(friendId);
+            friend.get().addFriend(userId);
+            friend.get().removeSentFriendRequest(userId);
+        } else {
+            user.get().removeFriendRequest(friendId);
+            friend.get().removeSentFriendRequest(userId);
+        }
+  }
+
   public void logoutUser(User user) {
     authenticateUser(user.getId(), user.getToken());
 

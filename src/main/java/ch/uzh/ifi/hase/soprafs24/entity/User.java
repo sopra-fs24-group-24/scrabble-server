@@ -46,6 +46,14 @@ public class User implements Serializable {
   @ElementCollection
   private List<Long> friends = new ArrayList<Long>();
 
+  @Column(nullable = false)
+  @ElementCollection
+  private List<Long> friendRequests = new ArrayList<>();
+
+  @Column(nullable = false)
+  @ElementCollection
+  private List<Long> sentFriendRequests = new ArrayList<>();
+
     public Long getId() {
     return id;
   }
@@ -105,4 +113,22 @@ public class User implements Serializable {
   {
     friends.add(friend);
   }
+
+  public void removeFriend(Long friend) { friends.remove(friend); }
+
+  public List<Long> getFriendRequests() { return friendRequests; }
+
+  public void setFriendRequests(List<Long> friendRequests) { this.friendRequests = friendRequests; }
+
+  public void addFriendRequest(Long friend) { friendRequests.add(friend); }
+
+  public void removeFriendRequest(Long friend) { friendRequests.remove(friend); }
+
+  public List<Long> getSentFriendRequests() { return sentFriendRequests; }
+
+  public void setSentFriendRequests(List<Long> sentFriendRequests) { this.sentFriendRequests = sentFriendRequests; }
+
+  public void addSentFriendRequest(Long friend) { sentFriendRequests.add(friend); }
+
+  public void removeSentFriendRequest(Long friend) { sentFriendRequests.remove(friend); }
 }

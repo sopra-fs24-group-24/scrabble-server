@@ -87,6 +87,28 @@ completed on Tuesday, 23.04.2024
 **Other tasks carried out:**
 - fixed tests in file UserServiceIntegrationTest
 
+### *Week 4 (25.04.24 - 01.05.24)*
+
+**Implement REST POST endpoint for contesting [(issue 31)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/31)**:</br>
+completed on Wednesday, 01.05.2024
+
+- Created/Updated REST POST endpoint for contesting
+- Created tests in file GameControllerTest
+- Created/Updated method contestWord() in file GameService
+- Created tests for method contestWord()
+
+**Create functionality to reset state of board to beginning of players move in server [(issue 33)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/33)**:</br>
+completed on Wednesday, 01.05.2024
+
+- Implemented functionality to update oldPlayfield and currentPlayfield in database in method contestWord()
+- Created tests which check whether the correct versions of oldPlayfield and currentPlayfield are saved in the database
+- Updated method getOldPlayfield in entity Game
+
+**Implement pop up window for player to contest word in game page [(issue 4)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/4)**:</br>
+completed on Wednesday, 01.05.2024
+
+- Implemented contest pop up window in game page
+
 
 ## Luca Stephan Christl
 
@@ -185,6 +207,40 @@ completed on Wednesday 24.04.2024
 - implemented api call to swap selected tiles
 - implemented confirm button to make api call
 
+### *Week 4*
+
+**Implement main page screen [(issue 26)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/26)**: </br>
+completed on Monday 1.05.2024
+
+- implemented fetching lobbies regularly
+- made the lobbies clickable
+- added styling for the home page
+
+
+**Implement routing from main page to profile screen  [(issue 24)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/24)**: </br>
+completed on Monday 1.05.2024
+
+- implemented clickable username in home page
+
+**Implement pop up window for deciding the size of the lobby and who can join [(issue 9)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/9)**: </br>
+completed on Monday 1.05.2024
+
+- created new LobbyCreator component which is a popup
+- added styling to the pop up
+- implemented choosing lobbySize and GameMode
+- implemented create button to make api call
+
+**Implement create lobby button on main page [(issue 10)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/10)**: </br>
+completed on Monday 1.05.2024
+
+- created createLobby Button
+- added functionality to display popup
+
+**Implement routing from main page to lobby page[(issue 7)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/7)**: </br>
+completed on Monday 1.05.2024
+
+- implemented clicking on lobbies makes api call to join lobby
+- implemented routing to lobbypage
 
 ## Michael Kevin Barry
 
@@ -220,6 +276,12 @@ completed on Wednesday 24.04.2024
 
 **Create functionality to persist highscore of winner [(issue #75)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/75)**: </br>
 
+### *Week 4*
+
+**Create functionality to end game and compute final scores [(issue #76)](https://github.com/sopra-fs24-group-24 scrabble-server/issues/76)**: </br>
+
+**Implement routing from game page to end game screen client [(issue #21)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/21)**: </br>
+
 ## Florian Lanz
 
 ### *Week 1*
@@ -248,6 +310,16 @@ completed on Wednesday 24.04.2024
 
 ### *Week 3*
 
-**Create functionality to compute score changes for contesting [(issue #34)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/34)** >/br>
+**Create functionality to compute score changes for contesting [(issue #34)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/34)** </br>
 
 **Save current score in game object [(issue #94)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/94)** </br>
+
+### *Week 4*
+
+**Create functional add friend button [(issue #49)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/49)** </br>
+
+**Create REST endpoint to add a friend [(issue #117)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/117)** </br>
+
+**Create REST endpoint to remove a friend [(issue #118)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/118)** </br>
+
+**Create REST enpoint to accept a friend request [(issue #119)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/119)** </br>

@@ -31,6 +31,8 @@ public class GameGetDTO {
 
     public boolean getWordContested() { return wordContested; }
 
+    private boolean gameOver;
+
     public void setPlayfield(List<Tile> playfield) {
         this.playfield = playfield;
     }
@@ -86,5 +88,15 @@ public class GameGetDTO {
 
     public void setCurrentPlayer(Long currentPlayer) {
         this.currentPlayer = currentPlayer;
+    }
+
+    public boolean getGameOver()
+    {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean state)
+    {
+        gameOver=state;
     }
 }
