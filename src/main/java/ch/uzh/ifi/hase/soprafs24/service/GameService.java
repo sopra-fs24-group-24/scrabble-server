@@ -304,13 +304,24 @@ public class GameService {
                         "First word needs to contain at least 2 letters and has to be placed on the center of the board");
             }
             else {
-                int firstElement = updatedIndices.get(0);
+                int indexOfFirstTile = updatedIndices.get(0);
+                int indexOfLastTile = updatedIndices.get(sizeOfUpdatedIndices - 1);
                 // word is placed horizontally
-                if (updatedIndices.get(0) / 15 == updatedIndices.get(sizeOfUpdatedIndices - 1) / 15) {
-
+                if (indexOfFirstTile / 15 == indexOfLastTile / 15) {
                     // check if all newly placed tiles are on the same row and connected with each other
                     for (int j = 1; j < sizeOfUpdatedIndices; j++) {
-                        int index = firstElement + j;
+                        int index = indexOfFirstTile + j;
+                        if (!updatedIndices.contains(index)) {
+                            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                    "You either have to place a word vertically or horizontally");
+                        }
+                    }
+                }
+                // word is placed vertically
+                else {
+                    // check if all newly placed tiles are on the same column and connected with each other
+                    for (int j = 1; j < sizeOfUpdatedIndices; j++) {
+                        int index = indexOfFirstTile + j*15;
                         if (!updatedIndices.contains(index)) {
                             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                                     "You either have to place a word vertically or horizontally");
@@ -330,7 +341,16 @@ public class GameService {
             // word is placed horizontally, since first and last tile are on the same row
             if (firstElement / 15 == lastElement / 15) {
 
-                // check if all newly placed tiles are on the same row and directly connected with an existing tile
+                // check if all newly placed tiles are on the same row
+                int rowOfFirstTile = firstElement / 15;
+                for (int i = 1; i < sizeOfUpdatedIndices; i++){
+                    if (updatedIndices.get(i) / 15 != rowOfFirstTile){
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                "You have to place horizontally or vertically connected tiles");
+                    }
+                }
+
+                // check if all newly placed tiles are directly connected with each other or with an existing tile
                 int step = 1;
                 while (updatedPlayfield.get(firstElement+step) != null) {
                     int index = firstElement + step;
@@ -345,13 +365,6 @@ public class GameService {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                                 "You cannot overwrite an existing tile");
                     }
-                }
-
-                // check if there are further placed tiles which are not connected to an existing tile or a placed tile
-                final int surplus = step;
-                if (updatedIndices.stream().anyMatch(num -> num > firstElement+surplus)) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                            "You have to place connected tiles");
                 }
 
                 // check for already existing tiles at top/below the horizontal word
@@ -426,9 +439,18 @@ public class GameService {
 
             // word is placed vertically
             else {
-                // check if all newly placed tiles are on the same column and connected with each other
+                // check if all newly placed tiles are on the same column
+                int columnOfFirstTile = firstElement % 15;
+                for (int i = 1; i < sizeOfUpdatedIndices; i++){
+                    if (updatedIndices.get(i) % 15 != columnOfFirstTile){
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                "You have to place horizontally or vertically connected tiles");
+                    }
+                }
+
+                // check if all newly placed tiles are connected to each other or to existing tiles
                 int step = 1;
-                while (updatedPlayfield.get(firstElement + step*15) != null) {
+                while (firstElement + step*15 <= 224 && updatedPlayfield.get(firstElement + step*15) != null) {
                     int index = firstElement + 15 * step;
                     if (updatedIndices.contains(index) && persistedPlayfield.get(index) == null) {
                         step++;
@@ -441,13 +463,6 @@ public class GameService {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                                 "You cannot overwrite an existing tile");
                     }
-                }
-
-                // check if there are further placed tiles which are not connected to an existing tile or a placed tile
-                final int surplus = step*15;
-                if (updatedIndices.stream().anyMatch(num -> num > firstElement+surplus)) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                            "You have to place horizontally or vertically connected tiles");
                 }
 
                 // check for already existing tiles to the right/left of the vertical word
