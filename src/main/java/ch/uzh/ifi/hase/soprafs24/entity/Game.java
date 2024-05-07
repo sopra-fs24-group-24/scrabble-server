@@ -323,4 +323,35 @@ public class Game implements Serializable{
 
         return this;
     }
+
+    public void removeHand(Long userId)
+    {
+        for (Hand hand : getHands()) 
+        {
+            if(hand.getHanduserid()==userId)
+            {
+                bag.putTilesInBag(hand.getHandtiles());
+                getHands().remove(hand);
+                return;
+            }    
+        }
+    }
+
+    public Game removePlayer(User user)
+    {
+        // if current player, switch to next before removing
+        if(getCurrentPlayer()==user.getId())
+        {
+            User nextPlayer = getNextPlayer();
+            setCurrentPlayer(nextPlayer.getId());
+        }
+    
+        // remove hand
+        removeHand(user.getId());
+
+        this.players.remove(user);
+        return this;
+    }
+
+   
 }
