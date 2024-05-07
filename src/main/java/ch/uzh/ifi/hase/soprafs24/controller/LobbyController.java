@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,14 @@ public class LobbyController {
     @ResponseBody
     public LobbyGetDTO joinLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) {
         Long userId = requestBody.get("userId");
+
+        Lobby lobby=lobbyService.getLobby(lobbyId);
+
+        if(lobby.getIsPrivate()&&lobby.getPin()!=requestBody.get("pin"))
+        {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, String.format("Forbidden!"));
+        }
+
         Lobby joinedLobby = lobbyService.addPlayertoLobby(lobbyId, userId);
         return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
     }
@@ -84,8 +93,10 @@ public class LobbyController {
     
 
     @PutMapping("/lobbies/withdrawal/{lobbyId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void withdrawFromLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void withdrawFromLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) 
+    {
         Long userId = requestBody.get("userId");
         lobbyService.removePlayerFromLobby(lobbyId, userId);
     }

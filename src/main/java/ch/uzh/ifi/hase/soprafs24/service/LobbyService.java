@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
@@ -77,8 +78,15 @@ public class LobbyService {
         Lobby lobby = checkIfLobbyExistsById(lobbyId);
         checkIfPlayerInLobby(lobby, userId);
         lobby.removePlayer(foundUser);
-        lobby.getGameOfLobby().removePlayer(foundUser);
-        if (lobby.getNumberOfPlayers() == 0) {
+
+        Game game=lobby.getGameOfLobby();
+
+        if(game!=null)
+        {
+            game.removePlayer(foundUser);
+        }
+        if (lobby.getNumberOfPlayers() == 0) 
+        {
             lobbyRepository.delete(lobby);
             lobbyRepository.flush();
         }
