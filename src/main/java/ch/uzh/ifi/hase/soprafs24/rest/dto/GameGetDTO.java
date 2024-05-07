@@ -27,11 +27,15 @@ public class GameGetDTO {
 
     private boolean wordContested;
 
+    private boolean gameOver;
+
+    private boolean isValid;
+
+    private boolean contestingPhase;
+
     public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
 
     public boolean getWordContested() { return wordContested; }
-
-    private boolean gameOver;
 
     public void setPlayfield(List<Tile> playfield) {
         this.playfield = playfield;
@@ -99,4 +103,12 @@ public class GameGetDTO {
     {
         gameOver=state;
     }
+
+    public void setIsValid(boolean isValid) { this.isValid = isValid; }
+
+    public boolean getIsValid() { return isValid; }
+
+    public void setContestingPhase(boolean contestingPhase) { this.contestingPhase = contestingPhase; }
+
+    public boolean getContestingPhase() { return contestingPhase; }
 }

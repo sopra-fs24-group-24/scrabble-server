@@ -53,6 +53,12 @@ public class Game implements Serializable{
     @OneToMany(cascade = CascadeType.ALL)
     private List<Score> scores;
 
+    @Column
+    private boolean isValid;
+
+    @Column
+    private boolean contestingPhase;
+
     public void setPlayers(List<User> players) {
         this.players = players;
     }
@@ -180,6 +186,14 @@ public class Game implements Serializable{
     {
         globalSkipCounter=count;
     }
+
+    public void setIsValid(boolean isValid) { this.isValid = isValid; }
+
+    public boolean getIsValid() { return isValid; }
+
+    public void setContestingPhase(boolean contestingPhase) { this.contestingPhase = contestingPhase; }
+
+    public boolean getContestingPhase() { return contestingPhase; }
 
     public void initialiseGame(List<User> players)
     {

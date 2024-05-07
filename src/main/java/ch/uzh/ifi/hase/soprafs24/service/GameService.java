@@ -119,7 +119,8 @@ public class GameService {
         validMove(updatedPlayfield, persistedPlayfield);
 
         foundGame.setPlayfield(updatedPlayfield);
-        foundGame.setWordContested(true);
+        foundGame.setContestingPhase(true);
+        foundGame.setWordContested(false);
         gameRepository.save(foundGame);
         gameRepository.flush();
 
@@ -174,6 +175,7 @@ public class GameService {
                 // word is contested
                 if (wordContested){
                     Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), true);
+                    foundGame.setWordContested(true);
                     // word is correct - contestation unsuccessful
                     if (!words.isEmpty()) {
                         changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
@@ -199,15 +201,16 @@ public class GameService {
 
                         currentPlayerHand.putTilesInHand(newTiles);
 
-                        foundGame.setWordContested(false);
-
+                        foundGame.setContestingPhase(false);
                         foundGame.setOldPlayfield(foundGame.getPlayfield());
+                        foundGame.setIsValid(true);
                     }
                     // word is false - contestation successful
                     else{
                         //TODO: change score function
                         changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
                         foundGame.setPlayfield(foundGame.getOldPlayfield());
+                        foundGame.setIsValid(false);
                     }
                 }
                 // word is not contested
@@ -245,7 +248,23 @@ public class GameService {
                     currentPlayerHand.putTilesInHand(newTiles);
                     foundGame.setOldPlayfield(foundGame.getPlayfield());
                 }
-                foundGame.setWordContested(false);
+
+                List<Tile> saveOldPlayfield = new ArrayList<>();
+                for (int i = 0; i < 225; i++){
+                    saveOldPlayfield.add(foundGame.getOldPlayfield().get(i));
+                }
+
+                List<Tile> tempPlayfield = new ArrayList<>();
+                for (int i = 0; i < 225; i++){
+                    tempPlayfield.add(null);
+                }
+
+                foundGame.setOldPlayfield(tempPlayfield);
+                gameRepository.save(foundGame);
+                gameRepository.flush();
+
+                foundGame.setOldPlayfield(saveOldPlayfield);
+                foundGame.setContestingPhase(false);
                 foundGame.setDecisionPlayersContestation(null);
                 makeNextPlayerToCurrentPlayer(gameId);
                 gameRepository.save(foundGame);
