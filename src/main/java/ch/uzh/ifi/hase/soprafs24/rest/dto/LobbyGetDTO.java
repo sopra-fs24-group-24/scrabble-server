@@ -25,6 +25,16 @@ public class LobbyGetDTO {
 
     private List<User> players;
 
+    private String title;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
     public void setGameOfLobby(GameGetDTO gameOfLobby) {
         this.gameOfLobby = gameOfLobby;
     }

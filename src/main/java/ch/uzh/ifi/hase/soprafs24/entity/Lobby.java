@@ -27,6 +27,9 @@ public class Lobby implements Serializable{
     private GameMode mode;
 
     @Column(nullable = true)
+    private String title;
+
+    @Column(nullable = true)
     @ElementCollection
     private List<Long> usersInLobby;
 
@@ -44,6 +47,14 @@ public class Lobby implements Serializable{
 
     @OneToOne(cascade = CascadeType.ALL)
     private Game gameOfLobby;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
 
     public void setMode(GameMode mode) {
         this.mode = mode;
