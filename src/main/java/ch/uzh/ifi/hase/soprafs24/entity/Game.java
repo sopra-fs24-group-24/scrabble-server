@@ -59,6 +59,9 @@ public class Game implements Serializable{
     @Column
     private boolean contestingPhase;
 
+    @Column
+    private String invalidWord;
+
     public void setPlayers(List<User> players) {
         this.players = players;
     }
@@ -194,6 +197,10 @@ public class Game implements Serializable{
     public void setContestingPhase(boolean contestingPhase) { this.contestingPhase = contestingPhase; }
 
     public boolean getContestingPhase() { return contestingPhase; }
+
+    public void setInvalidWord(String invalidWord) { this.invalidWord = invalidWord; }
+
+    public String getInvalidWord() { return invalidWord; }
 
     public void initialiseGame(List<User> players)
     {
