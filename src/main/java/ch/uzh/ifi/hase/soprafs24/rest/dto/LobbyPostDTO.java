@@ -12,6 +12,16 @@ public class LobbyPostDTO {
 
     private GameMode mode;
 
+    private String title;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
     private boolean isPrivate;
 
     public void setMode(GameMode mode) {

@@ -33,6 +33,8 @@ public class GameGetDTO {
 
     private boolean contestingPhase;
 
+    private String invalidWord;
+
     public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
 
     public boolean getWordContested() { return wordContested; }
@@ -111,4 +113,8 @@ public class GameGetDTO {
     public void setContestingPhase(boolean contestingPhase) { this.contestingPhase = contestingPhase; }
 
     public boolean getContestingPhase() { return contestingPhase; }
+
+    public void setInvalidWord(String invalidWord) { this.invalidWord = invalidWord; }
+
+    public String getInvalidWord() { return invalidWord; }
 }

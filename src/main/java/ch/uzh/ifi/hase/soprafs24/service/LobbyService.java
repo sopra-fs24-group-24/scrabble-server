@@ -66,6 +66,12 @@ public class LobbyService {
         return newLobby;
     }
 
+    public Lobby addPlayertoPrivateLobby(int lobbyPin,Long userId)
+    {
+        Lobby lobby=checkIfLobbyExistsByPin(lobbyPin);
+        return addPlayertoLobby(lobby.getId(), userId);
+    }
+
     public Lobby addPlayertoLobby(Long lobbyId, Long userId) {
         User foundUser = checkIfPlayerExists(userId);
         Lobby lobby = checkIfLobbyExistsById(lobbyId);
@@ -131,6 +137,13 @@ public class LobbyService {
          return foundLobby.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                  String.format("Lobby with Lobby-ID %d does not exist!", id)));
      }
+
+    public Lobby checkIfLobbyExistsByPin(int pin)
+    {
+        Optional<Lobby> foundLobby = lobbyRepository.findLobbyByPin(pin);
+        return foundLobby.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                String.format("Private lobby with PIN %d does not exist!", pin)));
+    }
 
     private int createUniquePin() {
         boolean isUniquePin;

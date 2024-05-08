@@ -68,15 +68,17 @@ public class LobbyController {
     @ResponseBody
     public LobbyGetDTO joinLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) {
         Long userId = requestBody.get("userId");
-
-        Lobby lobby=lobbyService.getLobby(lobbyId);
-
-        if(lobby.getIsPrivate()&&lobby.getPin()!=requestBody.get("pin"))
-        {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, String.format("Forbidden!"));
-        }
-
         Lobby joinedLobby = lobbyService.addPlayertoLobby(lobbyId, userId);
+        return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
+    }
+
+    @PutMapping("/privatelobbies/{lobbyPin}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public LobbyGetDTO joinPrivateLobby(@PathVariable int lobbyPin, @RequestBody Map<String, Long> requestBody) {
+        Long userId = requestBody.get("userId");
+        Lobby lobby=lobbyService.checkIfLobbyExistsByPin(lobbyPin);
+        Lobby joinedLobby = lobbyService.addPlayertoLobby(lobby.getId(), userId);
         return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
     }
 
