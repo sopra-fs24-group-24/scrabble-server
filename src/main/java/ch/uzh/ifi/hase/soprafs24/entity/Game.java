@@ -62,6 +62,10 @@ public class Game implements Serializable{
     @Column
     private String invalidWord;
 
+    @Column
+    @ElementCollection
+    private List<String> wordsToBeContested;
+
     public void setPlayers(List<User> players) {
         this.players = players;
     }
@@ -201,6 +205,10 @@ public class Game implements Serializable{
     public void setInvalidWord(String invalidWord) { this.invalidWord = invalidWord; }
 
     public String getInvalidWord() { return invalidWord; }
+
+    public void setWordsToBeContested(List<String> wordsToBeContested) { this.wordsToBeContested = wordsToBeContested; }
+
+    public List<String> getWordsToBeContested() { return wordsToBeContested; }
 
     public void initialiseGame(List<User> players)
     {

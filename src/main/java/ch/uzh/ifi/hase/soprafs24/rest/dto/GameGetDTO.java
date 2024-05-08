@@ -35,6 +35,8 @@ public class GameGetDTO {
 
     private String invalidWord;
 
+    private List<String> wordsToBeContested;
+
     public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
 
     public boolean getWordContested() { return wordContested; }
@@ -56,7 +58,15 @@ public class GameGetDTO {
     }
 
     public void setPlayers(List<User> players) {
-        this.players = players;
+        List<User> updatedUsers = new ArrayList<User>();
+        for (User player : players){
+            User user = new User();
+            user.setId(player.getId());
+            user.setUsername(player.getUsername());
+            user.setStatus(player.getStatus());
+            updatedUsers.add(user);
+        }
+        this.players = updatedUsers;
     }
 
     public List<User> getPlayers() {
@@ -117,4 +127,8 @@ public class GameGetDTO {
     public void setInvalidWord(String invalidWord) { this.invalidWord = invalidWord; }
 
     public String getInvalidWord() { return invalidWord; }
+
+    public void setWordsToBeContested(List<String> wordsToBeContested) { this.wordsToBeContested = wordsToBeContested; }
+
+    public List<String> getWordsToBeContested() { return wordsToBeContested; }
 }

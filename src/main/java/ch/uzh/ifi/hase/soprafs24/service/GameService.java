@@ -124,6 +124,11 @@ public class GameService {
         gameRepository.save(foundGame);
         gameRepository.flush();
 
+        List<String> wordsToBeContested = extractWordsToBeContested(foundGame);
+        foundGame.setWordsToBeContested(wordsToBeContested);
+        gameRepository.save(foundGame);
+        gameRepository.flush();
+
         return foundGame.getPlayfield();
     }
 
@@ -1091,5 +1096,14 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Indicated User not part of this Game!");
         }
+    }
+
+    private List<String> extractWordsToBeContested(Game game) {
+        Map<String, Integer> inputMap = getWordsAndScoreForPlayedTiles(game.getPlayfield(), game.getOldPlayfield(), false, game);
+        List<String> wordsToBeContested = new ArrayList<>();
+        for (String key : inputMap.keySet()) {
+            wordsToBeContested.add(key);
+        }
+        return wordsToBeContested;
     }
 }
