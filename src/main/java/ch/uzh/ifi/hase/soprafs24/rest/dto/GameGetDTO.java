@@ -58,7 +58,15 @@ public class GameGetDTO {
     }
 
     public void setPlayers(List<User> players) {
-        this.players = players;
+        List<User> updatedUsers = new ArrayList<User>();
+        for (User player : players){
+            User user = new User();
+            user.setId(player.getId());
+            user.setUsername(player.getUsername());
+            user.setStatus(player.getStatus());
+            updatedUsers.add(user);
+        }
+        this.players = updatedUsers;
     }
 
     public List<User> getPlayers() {
