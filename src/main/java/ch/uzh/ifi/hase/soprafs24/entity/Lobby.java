@@ -40,7 +40,7 @@ public class Lobby implements Serializable{
     private boolean isPrivate;
 
     @Column(nullable = true)
-    private Long pin;
+    private int pin;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Game gameOfLobby;
@@ -75,16 +75,14 @@ public class Lobby implements Serializable{
         return isPrivate;
     }
 
-    public Long getPin()
+    public void setIsPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
+
+    public int getPin()
     {
         return pin;
     }
 
-    public void setPin(Long pin)
-    {
-        this.pin=pin;
-        this.isPrivate=true;
-    }
+    public void setPin(int pin) { this.pin = pin; }
 
     public int getNumberOfPlayers() { return numberOfPlayers; }
 
