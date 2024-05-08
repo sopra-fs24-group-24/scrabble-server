@@ -35,6 +35,8 @@ public class GameGetDTO {
 
     private String invalidWord;
 
+    private List<String> wordsToBeContested;
+
     public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
 
     public boolean getWordContested() { return wordContested; }
@@ -117,4 +119,8 @@ public class GameGetDTO {
     public void setInvalidWord(String invalidWord) { this.invalidWord = invalidWord; }
 
     public String getInvalidWord() { return invalidWord; }
+
+    public void setWordsToBeContested(List<String> wordsToBeContested) { this.wordsToBeContested = wordsToBeContested; }
+
+    public List<String> getWordsToBeContested() { return wordsToBeContested; }
 }

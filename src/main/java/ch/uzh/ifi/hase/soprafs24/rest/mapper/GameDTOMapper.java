@@ -25,6 +25,7 @@ public interface GameDTOMapper {
     @Mapping(source = "isValid", target = "isValid")
     @Mapping(source = "contestingPhase", target = "contestingPhase")
     @Mapping(source = "invalidWord", target = "invalidWord")
+    @Mapping(source = "wordsToBeContested", target = "wordsToBeContested")
     GameGetDTO convertEntityToGameGetDTO(Game game);
 
     @Mapping(source = "id", target = "id")
