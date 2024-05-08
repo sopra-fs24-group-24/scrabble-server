@@ -218,6 +218,53 @@ public class GameServiceTest {
     }
 
     @Test
+    public void getWordDefinition_OneWord() {
+        when(dictionary.getWordDefinition(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.body()).thenReturn("[{" + '"' + "text" + '"' + ": " + '"' + "<xref>Definition</xref>" + '"' + "}]");
+
+        List<String> words = new ArrayList<>();
+        words.add("Word");
+
+        Map<String, String> definitions = gameService.getDefinition(words);
+
+        assertTrue(definitions.containsKey("Word"));
+        assertEquals("Definition", definitions.get("Word"));
+    }
+
+    @Test
+    public void getWordDefinition_TwoWords() {
+        when(dictionary.getWordDefinition(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.body())
+                .thenReturn("[{" + '"' + "text" + '"' + ": " + '"' + "<xref>Definition1</xref>" + '"' + "}]")
+                .thenReturn("[{" + '"' + "text" + '"' + ": " + '"' + "<xref>Definition2</xref>" + '"' + "}]");
+
+        List<String> words = new ArrayList<>();
+        words.add("Word1");
+        words.add("Word2");
+
+        Map<String, String> definitions = gameService.getDefinition(words);
+
+        assertTrue(definitions.containsKey("Word1"));
+        assertTrue(definitions.containsKey("Word2"));
+        assertEquals("Definition1", definitions.get("Word1"));
+        assertEquals("Definition2", definitions.get("Word2"));
+    }
+
+    @Test
+    public void getWordDefinition_NoDefinition() {
+        when(dictionary.getWordDefinition(Mockito.anyString())).thenReturn(mockResponse);
+        when(mockResponse.body()).thenReturn("[{" + '"' + "citations" + '"' + ": []},{" + '"' + "citations" + '"' + ": []}]");
+
+        List<String> words = new ArrayList<>();
+        words.add("Word");
+
+        Map<String, String> definitions = gameService.getDefinition(words);
+
+        assertTrue(definitions.containsKey("Word"));
+        assertEquals("No definition found.", definitions.get("Word"));
+    }
+
+    @Test
     public void wordContested_wordInvalid_scoresUpdated() {
         List<Score> scores = new ArrayList<>();
         testScore1.setScore(50);

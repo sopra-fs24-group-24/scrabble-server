@@ -289,6 +289,28 @@ public class GameService {
         }
     }
 
+    public Map<String, String> getDefinition(List<String> words) {
+        Map<String, String> definitions = new HashMap<>();
+
+        for (String word : words) {
+            HttpResponse<String> response = dictionary.getWordDefinition(word);
+
+            JsonNode defList = getJSON(response);
+
+            if (defList.size() == 1) {
+                String definition = defList.get(0).get("text").toString()
+                        .replace("<xref>", "")
+                        .replace("</xref>", "");
+                definition = definition.substring(1, definition.length() - 1);
+                definitions.put(word, definition);
+            } else {
+                definitions.put(word, "No definition found.");
+            }
+        }
+
+        return definitions;
+    }
+
     public void validMove(List<Tile> updatedPlayfield, List<Tile> persistedPlayfield) {
         // save the indices of the new tiles in a list
         List<Integer> updatedIndices = new ArrayList<Integer>();
