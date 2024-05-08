@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -57,6 +58,9 @@ public class LobbyService {
         List<User> players = new ArrayList<>();
         players.add(foundUser);
         newLobby.setPlayers(players);
+        if (newLobby.getIsPrivate()) {
+            newLobby.setPin(createUniquePin());
+        }
         newLobby = lobbyRepository.save(newLobby);
         lobbyRepository.flush();
         return newLobby;
@@ -127,6 +131,25 @@ public class LobbyService {
          return foundLobby.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                  String.format("Lobby with Lobby-ID %d does not exist!", id)));
      }
+
+    private int createUniquePin() {
+        boolean isUniquePin;
+        int pin;
+
+        do {
+            isUniquePin = true;
+            Random rand = new Random();
+            pin = rand.nextInt(100000, 999999);
+
+            for (Lobby lobby : lobbyRepository.findAll()) {
+                if (lobby.getPin() == pin) {
+                    isUniquePin = false;
+                }
+            }
+        } while (!isUniquePin);
+
+        return pin;
+    }
 
     /**
      * This is a helper method that will check whether the user,

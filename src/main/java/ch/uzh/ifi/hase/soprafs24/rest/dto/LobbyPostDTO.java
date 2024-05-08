@@ -22,6 +22,8 @@ public class LobbyPostDTO {
         return title;
     }
 
+    private boolean isPrivate;
+
     public void setMode(GameMode mode) {
         this.mode = mode;
     }
@@ -37,4 +39,8 @@ public class LobbyPostDTO {
     public List<Long> getUsersInLobby() { return usersInLobby; }
 
     public void setUsersInLobby(List<Long> usersInLobby) { this.usersInLobby = usersInLobby; }
+
+    public void setIsPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
+
+    public boolean getIsPrivate() { return isPrivate; }
 }

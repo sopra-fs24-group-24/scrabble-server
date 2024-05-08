@@ -35,6 +35,8 @@ public class LobbyGetDTO {
         return title;
     }
 
+    private int pin;
+
     public void setGameOfLobby(GameGetDTO gameOfLobby) {
         this.gameOfLobby = gameOfLobby;
     }
@@ -78,5 +80,9 @@ public class LobbyGetDTO {
     public boolean getGameStarted() { return gameStarted; }
 
     public void setGameStarted(boolean gameStarted) { this.gameStarted = gameStarted; }
+
+    public int getPin() { return pin; }
+
+    public void setPin(int pin) { this.pin = pin; }
 
 }

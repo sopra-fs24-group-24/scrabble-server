@@ -174,7 +174,7 @@ public class GameService {
                 }
                 // word is contested
                 if (wordContested){
-                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), true);
+                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), true, foundGame);
                     foundGame.setWordContested(true);
                     // word is correct - contestation unsuccessful
                     if (!words.isEmpty()) {
@@ -215,7 +215,7 @@ public class GameService {
                 }
                 // word is not contested
                 else{
-                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), false);
+                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), false, foundGame);
 
                     int score = 0;
 
@@ -670,7 +670,7 @@ public class GameService {
         }
     }
 
-    public Map<String, Integer> getWordsAndScoreForPlayedTiles(List<Tile> updatedPlayfield, List<Tile> currentPlayfield, boolean validateWord) {
+    public Map<String, Integer> getWordsAndScoreForPlayedTiles(List<Tile> updatedPlayfield, List<Tile> currentPlayfield, boolean validateWord, Game game) {
         Integer[] dwsArray = {16, 28, 32, 42, 48, 56, 64, 70, 112, 154, 160, 168, 176, 182, 192, 196, 208};
         List<Integer> dws = Arrays.asList(dwsArray);
         Integer[] twsArray = {0, 7, 14, 105, 119, 210, 217, 224};
@@ -802,6 +802,9 @@ public class GameService {
                         words.put(word.toString(), wordScore + (playedTilesScore * (wordMultiplier - 1)));
                     }
                 } else if (!validWord && moreThanOneTile) {
+                    game.setInvalidWord(word.toString());
+                    gameRepository.save(game);
+                    gameRepository.flush();
                     words.clear();
                     return words;
                 }
@@ -912,6 +915,9 @@ public class GameService {
                     words.put(word.toString(), wordScore + (playedTilesScore * (wordMultiplier - 1)));
                 }
             } else if (!validWord && moreThanOneTile) {
+                game.setInvalidWord(word.toString());
+                gameRepository.save(game);
+                gameRepository.flush();
                 words.clear();
                 return words;
             }
