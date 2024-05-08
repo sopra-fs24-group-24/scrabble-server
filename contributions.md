@@ -278,9 +278,19 @@ completed on Monday 1.05.2024
 
 ### *Week 4*
 
-**Create functionality to end game and compute final scores [(issue #76)](https://github.com/sopra-fs24-group-24 scrabble-server/issues/76)**: </br>
+**Create functionality to end game and compute final scores [(issue #76)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/76)**: </br>
 
 **Implement routing from game page to end game screen client [(issue #21)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/21)**: </br>
+
+### *Week 5*
+
+**Change lobby put endpoint to check if player can join with game pin [(issue #84)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/84)** </br>
+
+**Update lobby REST endpoint to remove player from lobby and game [(issue #124)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/124)**: </br>
+
+**Create routing from end game page to main page client [(issue #27)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/27)**: </br>
+
+**Implement pop up window for leave lobby confirmation client [(issue #12)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/12)**: </br>
 
 ## Florian Lanz
 
