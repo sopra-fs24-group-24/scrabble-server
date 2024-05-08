@@ -69,9 +69,26 @@ public class UserControllerTest {
     // then
     mockMvc.perform(getRequest).andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0].name", is(user.getName())))
         .andExpect(jsonPath("$[0].username", is(user.getUsername())))
         .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
+  }
+
+  @Test
+  public void givenUsers_whenGetWithPattern_thenReturnJsonArray() throws Exception {
+      User user = new User();
+      user.setUsername("testUsername");
+      user.setStatus(UserStatus.OFFLINE);
+
+      List<User> foundUsers = Collections.singletonList(user);
+
+      given(userService.searchUser(Mockito.any())).willReturn(foundUsers);
+
+      MockHttpServletRequestBuilder getRequest = get("/users/?pattern=test").contentType(MediaType.APPLICATION_JSON);
+
+      mockMvc.perform(getRequest).andExpect(status().isOk())
+              .andExpect(jsonPath("$", hasSize(1)))
+              .andExpect(jsonPath("$[0].username", is(user.getUsername())))
+              .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
   }
 
   @Test

@@ -11,6 +11,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +42,60 @@ public class UserServiceTest {
     // testUser
     Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
   }
+
+  @Test
+  public void searchUser_OneUserFound() {
+      User secondUser = new User();
+      secondUser.setId(2L);
+      secondUser.setUsername("secondUsername");
+
+      List<User> users = new ArrayList<>();
+      users.add(testUser);
+      users.add(secondUser);
+
+      Mockito.when(userRepository.findAll()).thenReturn(users);
+
+      List<User> foundUsers = userService.searchUser("test");
+
+      assertEquals(1, foundUsers.size());
+      assertEquals(testUser, foundUsers.get(0));
+  }
+
+    @Test
+    public void searchUser_NoUserFound() {
+        User secondUser = new User();
+        secondUser.setId(2L);
+        secondUser.setUsername("secondUsername");
+
+        List<User> users = new ArrayList<>();
+        users.add(testUser);
+        users.add(secondUser);
+
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+
+        List<User> foundUsers = userService.searchUser("notFound");
+
+        assertEquals(0, foundUsers.size());
+    }
+
+    @Test
+    public void searchUser_TwoUsersFound() {
+        User secondUser = new User();
+        secondUser.setId(2L);
+        secondUser.setUsername("secondUsername");
+
+        List<User> users = new ArrayList<>();
+        users.add(testUser);
+        users.add(secondUser);
+
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+
+        List<User> foundUsers = userService.searchUser("username");
+
+        assertEquals(2, foundUsers.size());
+        assertTrue(foundUsers.contains(testUser));
+        assertTrue(foundUsers.contains(secondUser));
+    }
 
   @Test
   public void createUser_validInputs_success() {

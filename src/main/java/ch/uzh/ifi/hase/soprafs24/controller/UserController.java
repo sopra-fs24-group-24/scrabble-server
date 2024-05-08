@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LogoutPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -32,22 +29,27 @@ public class UserController {
   @GetMapping("/users")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserGetDTO> getAllUsers(@RequestParam(required=false) String token) 
+  public List<UserSlimGetDTO> getAllUsers(@RequestParam(required=false) String token, @RequestParam(required = false) String pattern)
   {
     userService.isTokenValid(token);
 
     // fetch all users in the internal representation
-    List<User> users = userService.getUsers();
-    List<UserGetDTO> userGetDTOs = new ArrayList<>();
+    List<User> users;
+
+    if (pattern != null) {
+        users = userService.searchUser(pattern);
+    } else {
+        users = userService.getUsers();
+    }
+
+    List<UserSlimGetDTO> userGetDTOs = new ArrayList<>();
 
     // convert each user to the API representation
     for (User user : users) 
     {
-        // strip critical information
-        user.setPassword("");
-        user.setToken("");
-        userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+        userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserSlimGetDTO(user));
     }
+
     return userGetDTOs;
   }
 

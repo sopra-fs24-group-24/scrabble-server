@@ -42,6 +42,18 @@ public class UserService
 
   public User getUser(Long userId) { return this.userRepository.findById(userId).orElseThrow(); }
 
+  public List<User> searchUser(String pattern) {
+        List<User> users = new ArrayList<>();
+
+        for (User user : this.userRepository.findAll()) {
+            if (user.getUsername().toLowerCase().contains(pattern.toLowerCase())) {
+                users.add(user);
+            }
+        }
+
+        return users;
+  }
+
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
