@@ -333,3 +333,11 @@ completed on Monday 1.05.2024
 **Create REST endpoint to remove a friend [(issue #118)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/118)** </br>
 
 **Create REST enpoint to accept a friend request [(issue #119)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/119)** </br>
+
+### *Week 5*
+
+**Create REST endpoint to get users with RegEx [(issue #105)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/105)** </br>
+
+**Create functionality to get word definition from external API [(issue #109)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/109)** </br>
+
+**Generate and save game pin for private lobbies [(issue #130)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/130)** </br>
