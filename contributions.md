@@ -242,6 +242,42 @@ completed on Monday 1.05.2024
 - implemented clicking on lobbies makes api call to join lobby
 - implemented routing to lobbypage
 
+### *Week 5*
+
+**Add textfield to give lobby custom name when creating [(issue 62)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/62)**: </br>
+completed on Tuesday 7.05.2024
+
+- created input field in create lobby pop up
+- created title attribute in lobby object
+- display lobby title in homepage
+- display lobby title in lobbypage
+
+**create routing from main page to tutorial page and vice versa [(issue 61)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/61)**: </br>
+completed on Tuesday 7.05.2024
+
+- created a button in home page for routing
+- created tutorialpage component
+- implemented routing to tutorialpage
+- created back button in tutorialpage
+
+**create a tutorial page that explains how the game works  [(issue 60)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/60)**: </br>
+completed on Wednesday 8.05.2024
+
+- created tutorial page styling
+- wrote tutorial texts
+
+**create leave game button  [(issue 53)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/53)**: </br>
+completed on Wednesday 8.05.2024
+
+- created leave game button
+- implemented api call to leave game and display error
+
+**implement "pop up window" (now toast notifiction) to display messages in gamepage  [(issue 22)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/22)**: </br>
+completed on Sunday 5.05.2024
+
+- created toast notifications
+- implemented toast notification to show who is playing
+
 ## Michael Kevin Barry
 
 ### *Week 0 and 1*
