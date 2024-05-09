@@ -109,6 +109,40 @@ completed on Wednesday, 01.05.2024
 
 - Implemented contest pop up window in game page
 
+### *Week 5 (02.05.24 - 08.05.24)*
+
+**Create button to join lobby with code [(issue 58)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/58)**:</br>
+completed on Tuesday, 07.05.2024
+
+- Created a button on the main page to join a private lobby with a code
+
+**Create pop up window to enter lobby code [(issue 59)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/59)**:</br>
+completed on Wednesday, 08.05.2024
+
+- Created pop up window on main page to enter lobby code
+
+**Implement routing from profile page to main page [(issue 19)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/19)**:</br>
+completed on Wednesday, 08.05.2024
+
+- Created back-to-main-menu button and implemented routing from profile page to main page
+
+**Implement pop up window to display validity of contested words [(issue 5)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/5)**:</br>
+completed on Wednesday, 08.05.2024
+
+- Implemented multiple functions in Game.tsx
+- Implemented additional function which fetches data from the server once
+- Updated function notifyValidationResult in Game.tsx
+- Added additional attributes to the Game entity in the back-end
+
+**Implement countdown before a game starts [(issue 56)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/56)**:</br>
+completed on Tuesday, 07.05.2024
+
+- Implemented 5 seconds countdown before a game starts in Lobby.tsx 
+
+**Other tasks carried out:**
+- Updated setPlayers method of GameGetDTO and LobbyGetDTO (issues 40 and 48)
+- Added attribute wordsToBeContested in back-end in order to display those words in front-end (issue 4)
+- Bug fixes (issues 24 and 28)
 
 ## Luca Stephan Christl
 
