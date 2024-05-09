@@ -322,11 +322,28 @@ public class GameService {
 
         // search for the new tiles and add them to the list
         for (int index = 0; index < 225; index++) {
+            // both cells are null
             if (updatedPlayfield.get(index) == null && persistedPlayfield.get(index) == null) {
                 continue;
             }
-            if (!updatedPlayfield.get(index).equals(persistedPlayfield.get(index))) {
+            // cell in user's board is null but cell in database's board is not null --> throw error
+            if (updatedPlayfield.get(index) == null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You cannot remove existing tiles");
+            }
+            // cell in database's board is null but cell in user's board is not null --> newly placed tile
+            else if (persistedPlayfield.get(index) == null) {
                 updatedIndices.add(index);
+            }
+            // both cells are not null
+            // IDs of both tiles match --> existing tile
+            else if (updatedPlayfield.get(index).getId().equals(persistedPlayfield.get(index).getId())) {
+                continue;
+            }
+            // IDs of tiles don't match --> user wants to change existing tile --> throw error
+            else{
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You cannot change existing tiles");
             }
         }
 
@@ -398,7 +415,7 @@ public class GameService {
 
                 // check if all newly placed tiles are directly connected with each other or with an existing tile
                 int step = 1;
-                while (updatedPlayfield.get(firstElement+step) != null) {
+                while (firstElement+step <= 224 && updatedPlayfield.get(firstElement+step) != null) {
                     int index = firstElement + step;
                     if (updatedIndices.contains(index) && persistedPlayfield.get(index) == null) {
                         step++;
