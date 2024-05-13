@@ -27,6 +27,16 @@ public class LobbyGetDTO {
 
     private String title;
 
+    private boolean isPrivate;
+
+    public void setIsPrivate(boolean IsPrivate) {
+        isPrivate = IsPrivate;
+    }
+
+    public boolean getIsPrivate(){
+        return isPrivate;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
