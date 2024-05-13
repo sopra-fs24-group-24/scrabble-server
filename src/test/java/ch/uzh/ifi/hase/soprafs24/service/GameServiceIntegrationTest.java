@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -20,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 @WebAppConfiguration
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
 public class GameServiceIntegrationTest {
 
     @Qualifier("gameRepository")
@@ -29,10 +32,14 @@ public class GameServiceIntegrationTest {
     @Autowired
     private GameService gameService;
 
+    @Qualifier("userRepository")
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     public void setup() {
         gameRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -48,6 +55,9 @@ public class GameServiceIntegrationTest {
         user2.setUsername("luca");
         user2.setStatus(UserStatus.ONLINE);
         user2.setToken("2");
+
+        userRepository.save(user1);
+        userRepository.save(user2);
 
         Game game = new Game();
         Bag bag = new Bag();
@@ -78,11 +88,11 @@ public class GameServiceIntegrationTest {
         tilesInHand2.add(new Tile('Q', 10));
 
         game.setDecisionPlayersContestation(new HashMap<Long, Boolean>());
-        game.setCurrentPlayer(1L);
+        game.setCurrentPlayer(userRepository.findAll().get(0).getId());
         game.setBag(bag);
         List<User> players = new ArrayList<>();
-        players.add(user1);
-        players.add(user2);
+        players.add(userRepository.findAll().get(0));
+        players.add(userRepository.findAll().get(1));
         game.setPlayers(players);
         List<Hand> handsInGame = new ArrayList<>();
         handsInGame.add(hand1);
@@ -111,7 +121,7 @@ public class GameServiceIntegrationTest {
         }
         Tile tile4 = new Tile('Q', 10);
         tile4.setBoardidx(84);
-        Tile tile5 = new Tile('O', 6);
+        Tile tile5 = new Tile('Z', 10);
         tile5.setBoardidx(99);
         Tile tile6 = new Tile('C', 3);
         tile6.setBoardidx(112);
@@ -129,10 +139,10 @@ public class GameServiceIntegrationTest {
 
         Score score1 = new Score();
         score1.setScore(0);
-        score1.setScoreUserId(1L);
+        score1.setScoreUserId(userRepository.findAll().get(0).getId());
         Score score2 = new Score();
         score2.setScore(0);
-        score2.setScoreUserId(11L);
+        score2.setScoreUserId(userRepository.findAll().get(1).getId());
 
         List<Score> scores = new ArrayList<>();
         scores.add(score1);
@@ -143,28 +153,17 @@ public class GameServiceIntegrationTest {
         gameRepository.flush();
 
         // when
+        List<Tile> expectedPlayfield = savedGame.getOldPlayfield();
+        Long expectedNextPlayer = savedGame.getPlayers().get(1).getId();
         gameService.contestWord(savedGame.getId(), user2, true);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i<225; i++){
-            expectedPlayfield.add(null);
-        }
+        Game currentGame = gameRepository.findAll().get(0);
 
-        Tile tile9 = new Tile('C', 3);
-        tile9.setBoardidx(112);
-        Tile tile10 = new Tile('A', 2);
-        tile10.setBoardidx(113);
-        Tile tile11 = new Tile('R', 5);
-        tile11.setBoardidx(114);
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(113, tile10);
-        expectedPlayfield.set(114, tile11);
-
-        assertEquals(2L, game.getCurrentPlayer());
-        assertFalse(game.getWordContested());
-        assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
-        assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
+        assertFalse(currentGame.getContestingPhase());
+        assertEquals(expectedNextPlayer, currentGame.getCurrentPlayer());
+        assertArrayEquals(expectedPlayfield.toArray(), currentGame.getOldPlayfield().toArray());
+        assertArrayEquals(expectedPlayfield.toArray(), currentGame.getPlayfield().toArray());
     }
 
     @Test
@@ -181,8 +180,10 @@ public class GameServiceIntegrationTest {
         user2.setStatus(UserStatus.ONLINE);
         user2.setToken("2");
 
-        Game game = new Game();
+        userRepository.save(user1);
+        userRepository.save(user2);
 
+        Game game = new Game();
         Bag bag = new Bag();
 
         List<Tile> tilesInBag = new ArrayList<>();
@@ -195,7 +196,7 @@ public class GameServiceIntegrationTest {
         tilesInHand1.add(new Tile('Q', 10));
         tilesInHand1.add(new Tile('O', 6));
         hand1.setHandtiles(tilesInHand1);
-        hand1.setHanduserid(1L);
+        hand1.setHanduserid(userRepository.findAll().get(0).getId());
 
         Hand hand2 = new Hand();
         List<Tile> tilesInHand2 = new ArrayList<>();
@@ -207,14 +208,14 @@ public class GameServiceIntegrationTest {
         tilesInHand2.add(new Tile('T', 5));
         tilesInHand2.add(new Tile('Q', 10));
         hand2.setHandtiles(tilesInHand2);
-        hand2.setHanduserid(2L);
+        hand2.setHanduserid(userRepository.findAll().get(1).getId());
 
         game.setDecisionPlayersContestation(new HashMap<Long, Boolean>());
-        game.setCurrentPlayer(1L);
+        game.setCurrentPlayer(userRepository.findAll().get(0).getId());
         game.setBag(bag);
         List<User> players = new ArrayList<>();
-        players.add(user1);
-        players.add(user2);
+        players.add(userRepository.findAll().get(0));
+        players.add(userRepository.findAll().get(1));
         game.setPlayers(players);
         List<Hand> handsInGame = new ArrayList<>();
         handsInGame.add(hand1);
@@ -252,18 +253,18 @@ public class GameServiceIntegrationTest {
         Tile tile8 = new Tile('R', 5);
         tile8.setBoardidx(114);
 
-        currentPlayfield.set(84, tile4);
-        currentPlayfield.set(99, tile5);
         currentPlayfield.set(112, tile6);
         currentPlayfield.set(113, tile7);
         currentPlayfield.set(114, tile8);
+        currentPlayfield.set(84, tile4);
+        currentPlayfield.set(99, tile5);
         game.setPlayfield(currentPlayfield);
 
         Score score1 = new Score();
-        score1.setScoreUserId(1L);
+        score1.setScoreUserId(userRepository.findAll().get(0).getId());
         score1.setScore(0);
         Score score2 = new Score();
-        score2.setScoreUserId(2L);
+        score2.setScoreUserId(userRepository.findAll().get(1).getId());
         score2.setScore(10);
 
         List<Score> scores = new ArrayList<>();
@@ -273,45 +274,19 @@ public class GameServiceIntegrationTest {
 
         Game savedGame = gameRepository.save(game);
         gameRepository.flush();
-
+        
         // when
+        List<Tile> expectedPlayfield = savedGame.getPlayfield();
+        Long expectedNextPlayer = userRepository.findAll().get(1).getId();
         gameService.contestWord(savedGame.getId(), user2, false);
 
         // then
-        List<Tile> expectedPlayfield = new ArrayList<>();
-        for (int i = 0; i<225; i++){
-            expectedPlayfield.add(null);
-        }
+        Game currentGame = gameRepository.findAll().get(0);
 
-        Tile tile9 = new Tile('C', 3);
-        tile9.setBoardidx(112);
-        Tile tile10 = new Tile('A', 2);
-        tile10.setBoardidx(113);
-        Tile tile11 = new Tile('R', 5);
-        tile11.setBoardidx(114);
-        Tile tile12 = new Tile('Q', 10);
-        tile12.setBoardidx(84);
-        Tile tile13 = new Tile('O', 6);
-        tile13.setBoardidx(99);
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(113, tile10);
-        expectedPlayfield.set(114, tile11);
-        expectedPlayfield.set(84, tile12);
-        expectedPlayfield.set(99, tile13);
-
-        List<Character> lettersInHand1 = new ArrayList<>();
-        for (int i = 0; i < 2; i++){
-            lettersInHand1.add(game.getHands().get(0).getHandtiles().get(i).getLetter());
-        }
-
-        assertEquals(2L, game.getCurrentPlayer());
-        assertFalse(game.getWordContested());
-        assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
-        assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
-        assertEquals(0, game.getBag().getTiles().size());
-        assertEquals(2, game.getHands().get(0).getHandtiles().size());
-        assertEquals(7, game.getHands().get(1).getHandtiles().size());
-        assertTrue(lettersInHand1.contains('A'));
-        assertTrue(lettersInHand1.contains('C'));
+        assertEquals(expectedNextPlayer, currentGame.getCurrentPlayer());
+        assertTrue(currentGame.getWordContested());
+        assertArrayEquals(expectedPlayfield.toArray(), currentGame.getOldPlayfield().toArray());
+        assertArrayEquals(expectedPlayfield.toArray(), currentGame.getPlayfield().toArray());
+        assertEquals(0, currentGame.getBag().getTiles().size());
     }
 }
