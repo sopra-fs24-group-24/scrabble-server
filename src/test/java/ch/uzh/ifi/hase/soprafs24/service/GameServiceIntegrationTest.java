@@ -274,7 +274,7 @@ public class GameServiceIntegrationTest {
 
         Game savedGame = gameRepository.save(game);
         gameRepository.flush();
-        
+
         // when
         List<Tile> expectedPlayfield = savedGame.getPlayfield();
         Long expectedNextPlayer = userRepository.findAll().get(1).getId();

@@ -66,6 +66,12 @@ public class Game implements Serializable{
     @ElementCollection
     private List<String> wordsToBeContested;
 
+    @Column
+    private Long gameRound;
+
+    @Column
+    private Boolean allPlayersDecided;
+
     public void setPlayers(List<User> players) {
         this.players = players;
     }
@@ -210,13 +216,28 @@ public class Game implements Serializable{
 
     public List<String> getWordsToBeContested() { return wordsToBeContested; }
 
+    public void setGameRound(Long gameRound) { this.gameRound = gameRound; }
+
+    public Long getGameRound() { return gameRound; }
+
+    public void setAllPlayersDecided(Boolean allPlayersDecided) { this.allPlayersDecided = allPlayersDecided; }
+
+    public Boolean getAllPlayersDecided() { return allPlayersDecided; }
+
     public void initialiseGame(List<User> players)
     {
         gameOver=false;
-
         globalSkipCounter=0;
 
+        setGameRound(1L);
         setPlayers(players);
+        int sizeOfGame = getPlayers().size();
+        if (sizeOfGame == 2){
+            setAllPlayersDecided(true);
+        }
+        else{
+            setAllPlayersDecided(false);
+        }
 
         // Initialise playfield:
         List<Tile> playfield = new ArrayList<Tile>();

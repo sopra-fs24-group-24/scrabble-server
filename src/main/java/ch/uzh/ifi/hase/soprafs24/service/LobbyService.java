@@ -96,6 +96,9 @@ public class LobbyService {
         if(game!=null)
         {
             game.removePlayer(foundUser);
+            if (lobby.getNumberOfPlayers() == 1){
+                game.setGameOver(true);
+            }
         }
         if (lobby.getNumberOfPlayers() == 0) 
         {
