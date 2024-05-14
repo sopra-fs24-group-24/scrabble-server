@@ -51,7 +51,8 @@ public class Tile implements Serializable{
             return false;
         }
         Tile other = (Tile) o;
-        if (this.id != other.id){
+        if (!this.id.equals(other.id))
+        {
             return false;
         }
         /*if (this.value != other.value){
