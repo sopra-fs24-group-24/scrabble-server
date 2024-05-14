@@ -121,7 +121,9 @@ public class GameService {
         foundGame.setPlayfield(updatedPlayfield);
         foundGame.setContestingPhase(true);
         foundGame.setWordContested(false);
-        foundGame.setAllPlayersDecided(false);
+        if (foundGame.getPlayers().size() != 2){
+            foundGame.setAllPlayersDecided(false);
+        }
         gameRepository.save(foundGame);
         gameRepository.flush();
 
@@ -170,7 +172,7 @@ public class GameService {
             foundGame.addDecision(user.getId(), playerContestWord);
             // all players have decided whether to contest the word or not
             if (foundGame.getDecisionPlayersContestation().size() == gameSize-1){
-                //foundGame.setAllPlayersDecided(true);
+                foundGame.setAllPlayersDecided(true);
                 boolean wordContested = false;
                 // check if someone wants to contest the word
                 for (boolean value : foundGame.getDecisionPlayersContestation().values()){
@@ -275,7 +277,6 @@ public class GameService {
                 foundGame.setOldPlayfield(saveOldPlayfield);
                 foundGame.setContestingPhase(false);
                 foundGame.setDecisionPlayersContestation(null);
-                foundGame.setAllPlayersDecided(true);
                 makeNextPlayerToCurrentPlayer(gameId);
                 gameRepository.save(foundGame);
                 gameRepository.flush();

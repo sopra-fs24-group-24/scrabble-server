@@ -230,8 +230,14 @@ public class Game implements Serializable{
         globalSkipCounter=0;
 
         setGameRound(1L);
-        setAllPlayersDecided(false);
         setPlayers(players);
+        int sizeOfGame = getPlayers().size();
+        if (sizeOfGame == 2){
+            setAllPlayersDecided(true);
+        }
+        else{
+            setAllPlayersDecided(false);
+        }
 
         // Initialise playfield:
         List<Tile> playfield = new ArrayList<Tile>();
