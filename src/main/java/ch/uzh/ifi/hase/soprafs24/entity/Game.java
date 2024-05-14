@@ -346,6 +346,8 @@ public class Game implements Serializable{
             if(hand.getHanduserid()==userId)
             {
                 bag.putTilesInBag(hand.getHandtiles());
+                hand.setHanduserid(null);
+                hand=null;
                 getHands().remove(hand);
                 return;
             }    

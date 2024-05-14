@@ -1,7 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
@@ -97,6 +99,8 @@ public class LobbyService {
         }
         if (lobby.getNumberOfPlayers() == 0) 
         {
+            game.getBag().getTiles().clear();
+
             lobbyRepository.delete(lobby);
             lobbyRepository.flush();
         }
