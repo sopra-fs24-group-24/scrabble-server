@@ -37,6 +37,10 @@ public class GameGetDTO {
 
     private List<String> wordsToBeContested;
 
+    private Long gameRound;
+
+    private Boolean allPlayersDecided;
+
     public void setWordContested(boolean wordContested) { this.wordContested = wordContested; }
 
     public boolean getWordContested() { return wordContested; }
@@ -131,4 +135,12 @@ public class GameGetDTO {
     public void setWordsToBeContested(List<String> wordsToBeContested) { this.wordsToBeContested = wordsToBeContested; }
 
     public List<String> getWordsToBeContested() { return wordsToBeContested; }
+
+    public void setGameRound(Long gameRound) { this.gameRound = gameRound; }
+
+    public Long getGameRound() { return gameRound; }
+
+    public void setAllPlayersDecided(Boolean allPlayersDecided) { this.allPlayersDecided = allPlayersDecided; }
+
+    public Boolean getAllPlayersDecided() { return allPlayersDecided; }
 }
