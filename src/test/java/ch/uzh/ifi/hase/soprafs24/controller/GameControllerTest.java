@@ -78,7 +78,7 @@ public class GameControllerTest {
 
     // when/then -> do the request + validate the result
     MockHttpServletRequestBuilder getRequest = get("/games/10")
-    .contentType(MediaType.APPLICATION_JSON);
+    .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
     // then
     mockMvc.perform(getRequest)
@@ -111,7 +111,7 @@ public class GameControllerTest {
  
     // when/then -> do the request + validate the result
     MockHttpServletRequestBuilder getRequest = get("/games/11")
-    .contentType(MediaType.APPLICATION_JSON);
+    .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
  
     // then
     mockMvc.perform(getRequest)
@@ -171,7 +171,7 @@ public class GameControllerTest {
       // when
       MockHttpServletRequestBuilder postRequest = post("/moves/words/{gameId}", 1)
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(gamePostDTO));
+              .content(asJsonString(gamePostDTO)).header("token", "4242");
 
       // then
       mockMvc.perform(postRequest).andExpect(status().isCreated())
@@ -209,7 +209,7 @@ public class GameControllerTest {
       // when
       MockHttpServletRequestBuilder postRequest = post("/moves/words/{gameId}", 1)
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(gamePostDTO));
+              .content(asJsonString(gamePostDTO)).header("token", "4242");
 
       // then
       mockMvc.perform(postRequest).andExpect(status().isForbidden())
@@ -247,7 +247,7 @@ public class GameControllerTest {
       // when
       MockHttpServletRequestBuilder postRequest = post("/moves/words/{gameId}", 2)
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(gamePostDTO));
+              .content(asJsonString(gamePostDTO)).header("token", "4242");
 
       // then
       mockMvc.perform(postRequest).andExpect(status().isNotFound())
@@ -300,7 +300,7 @@ public class GameControllerTest {
       // when
       MockHttpServletRequestBuilder postRequest = post("/moves/swaps/{gameId}/{userId}/{handId}", 1, 1, 1)
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(tilesToBeExchanged));
+              .content(asJsonString(tilesToBeExchanged)).header("token", "4242");
 
       // then
       mockMvc.perform(postRequest).andExpect(status().isOk())
@@ -324,7 +324,7 @@ public class GameControllerTest {
       // when
       MockHttpServletRequestBuilder postRequest = post("/moves/swaps/{gameId}/{userId}/{handId}", 1, 1, 1)
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(tilesToBeExchanged));
+              .content(asJsonString(tilesToBeExchanged)).header("token", "4242");
 
       // then
       mockMvc.perform(postRequest).andExpect(status().isNotFound())
@@ -347,7 +347,7 @@ public class GameControllerTest {
         // when
         MockHttpServletRequestBuilder postRequest = post("/moves/swaps/{gameId}/{userId}/{handId}", 1, 1, 1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(tilesToBeExchanged));
+                .content(asJsonString(tilesToBeExchanged)).header("token", "4242");
 
         // then
         mockMvc.perform(postRequest).andExpect(status().isConflict())
@@ -365,7 +365,7 @@ public class GameControllerTest {
       doThrow(response).when(gameService).skipTurn(Mockito.any(), Mockito.any());
 
       MockHttpServletRequestBuilder postRequest = post("/moves/skip/1?token=1")
-              .contentType(MediaType.APPLICATION_JSON);
+              .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
       mockMvc.perform(postRequest)
               .andExpect(status().isNotFound());
@@ -379,7 +379,7 @@ public class GameControllerTest {
         given(userService.isTokenValid(Mockito.any())).willReturn(user);
 
         MockHttpServletRequestBuilder postRequest = post("/moves/skip/1?token=1")
-                .contentType(MediaType.APPLICATION_JSON);
+                .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
         mockMvc.perform(postRequest)
                 .andExpect(status().isOk());
@@ -403,7 +403,7 @@ public class GameControllerTest {
       // when
         MockHttpServletRequestBuilder postRequest = post("/moves/contestations/2?token=1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(playerInput));
+                .content(asJsonString(playerInput)).header("token", "4242");
 
       // then
         mockMvc.perform(postRequest)
@@ -431,7 +431,7 @@ public class GameControllerTest {
       // when
       MockHttpServletRequestBuilder postRequest = post("/moves/contestations/2?token=1")
               .contentType(MediaType.APPLICATION_JSON)
-              .content(asJsonString(playerInput));
+              .content(asJsonString(playerInput)).header("token", "4242");
 
       // then
       mockMvc.perform(postRequest)
