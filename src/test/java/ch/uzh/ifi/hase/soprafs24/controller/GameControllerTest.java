@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -439,7 +440,48 @@ public class GameControllerTest {
               .andExpect(content().string(""));
     }
 
-  /**
+    @Test
+    public void getDefinitions_sucess() throws Exception {
+        Map<String, String> definitions = new HashMap<>();
+        definitions.put("hello", "First definition");
+        definitions.put("hi", "Second definition");
+
+        List<String> words = new ArrayList<>();
+        words.add("hello");
+        words.add("hi");
+
+        given(gameService.getDefinition(words)).willReturn(definitions);
+
+        MockHttpServletRequestBuilder getRequest = get("/definitions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(words))
+                .header("token", "4242");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hello", is("First definition")))
+                .andExpect(jsonPath("$.hi", is("Second definition")));
+    }
+
+    @Test
+    public void getDefinitions_invalidToken() throws Exception {
+        List<String> words = new ArrayList<>();
+        words.add("hello");
+        words.add("hi");
+
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN)).when(userService).isTokenValid(Mockito.any());
+
+        MockHttpServletRequestBuilder getRequest = get("/definitions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(words))
+                .header("token", "4242");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isForbidden());
+    }
+
+
+    /**
    * Helper Method to convert userPostDTO into a JSON string such that the input
    * can be processed
    * Input will look like this: {"name": "Test User", "username": "testUsername"}

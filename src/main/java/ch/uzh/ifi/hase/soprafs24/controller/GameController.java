@@ -85,6 +85,13 @@ public class GameController
         gameService.contestWord(gameId, user, wordContested);
     }
 
+    @GetMapping("/definitions")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, String> getDefinitions(@RequestBody List<String> requestBody, @RequestHeader("token") String token) {
+        userService.isTokenValid(token);
+        return gameService.getDefinition(requestBody);
+    }
+
     // TODO: temporary endpoint for testing purposes: Delete when not needed anymore
     @PostMapping("/quiek")
     @ResponseStatus(HttpStatus.OK)
