@@ -36,7 +36,7 @@ public class GameController
     @GetMapping("/games/{gameId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameGetDTO getGame(@PathVariable("gameId") Long gameId, @RequestParam(required=false) String token)
+    public GameGetDTO getGame(@PathVariable("gameId") Long gameId, @RequestHeader("token") String token)
     {
         User foundUser = userService.isTokenValid(token);
         Game foundGame = gameService.getGameParams(gameId);
@@ -49,7 +49,9 @@ public class GameController
     @PostMapping("moves/words/{gameId}")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public List<Tile> placeWordOnPlayfield(@PathVariable Long gameId, @RequestBody GamePostDTO gamePostDTO) {
+    public List<Tile> placeWordOnPlayfield(@PathVariable Long gameId, @RequestBody GamePostDTO gamePostDTO,@RequestHeader("token") String token) 
+    {
+        userService.isTokenValid(token);
         Game updatedGame = GameDTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
         return gameService.placeTilesOnBoard(updatedGame);
     }
@@ -58,7 +60,9 @@ public class GameController
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<Tile> swapTilesOfPlayer(@PathVariable Long gameId, @PathVariable Long userId,
-                                        @PathVariable Long handId, @RequestBody List<Tile> inputTiles) {
+    @PathVariable Long handId, @RequestBody List<Tile> inputTiles,@RequestHeader("token") String token) 
+    {
+        userService.isTokenValid(token);
         // returns new hand (exchanged tiles + remaining tiles)
         return gameService.swapTiles(gameId, userId, handId, inputTiles);
 
@@ -66,15 +70,16 @@ public class GameController
 
     @PostMapping("moves/skip/{gameId}")
     @ResponseStatus(HttpStatus.OK)
-    public void skipTurn(@PathVariable Long gameId, @RequestParam String token) {
+    public void skipTurn(@PathVariable Long gameId,@RequestHeader("token") String token) 
+    {
         User user = userService.isTokenValid(token);
         gameService.skipTurn(user, gameId);
     }
 
     @PostMapping("moves/contestations/{gameId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void contestWord(@PathVariable Long gameId, @RequestBody Map<String, Boolean> requestBody,
-                            @RequestParam String token){
+    public void contestWord(@PathVariable Long gameId, @RequestBody Map<String, Boolean> requestBody, @RequestHeader("token") String token)
+    {
         User user = userService.isTokenValid(token);
         boolean wordContested = requestBody.get("decisionContesting");
         gameService.contestWord(gameId, user, wordContested);
