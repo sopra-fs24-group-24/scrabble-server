@@ -33,7 +33,9 @@ public class LobbyController {
     @GetMapping("/lobbies")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<LobbyGetDTO> getAllLobbies() {
+    public List<LobbyGetDTO> getAllLobbies(@RequestHeader("token") String token) 
+    {
+        userService.isTokenValid(token);
         List<Lobby> lobbies = lobbyService.getLobbies();
         List<LobbyGetDTO> lobbyGetDTOs = new ArrayList<>();
         for (Lobby lobby : lobbies) {
@@ -47,7 +49,9 @@ public class LobbyController {
     @GetMapping("/lobbies/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO getSpecificLobby(@PathVariable Long lobbyId, @RequestParam(required=false) String token) {
+    public LobbyGetDTO getSpecificLobby(@PathVariable Long lobbyId,@RequestHeader("token") String token) 
+    {
+        userService.isTokenValid(token);
         User foundUser = userService.isTokenValid(token);
         Lobby lobby = lobbyService.getLobby(lobbyId);
         LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
@@ -59,7 +63,9 @@ public class LobbyController {
     @PostMapping("/lobbies")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LobbyGetDTO createLobby(@RequestBody LobbyPostDTO lobbyPostDTO) {
+    public LobbyGetDTO createLobby(@RequestBody LobbyPostDTO lobbyPostDTO,@RequestHeader("token") String token) 
+    {
+        userService.isTokenValid(token);
         // convert API user to internal representation
         Lobby userInput = LobbyDTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
 
@@ -72,7 +78,9 @@ public class LobbyController {
     @PutMapping("/lobbies/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO joinLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) {
+    public LobbyGetDTO joinLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody,@RequestHeader("token") String token) 
+    {
+        userService.isTokenValid(token);
         Long userId = requestBody.get("userId");
         Lobby joinedLobby = lobbyService.addPlayertoLobby(lobbyId, userId);
         LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
@@ -84,7 +92,9 @@ public class LobbyController {
     @PutMapping("/privatelobbies/{lobbyPin}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO joinPrivateLobby(@PathVariable int lobbyPin, @RequestBody Map<String, Long> requestBody) {
+    public LobbyGetDTO joinPrivateLobby(@PathVariable int lobbyPin, @RequestBody Map<String, Long> requestBody,@RequestHeader("token") String token) 
+    {
+        userService.isTokenValid(token);
         Long userId = requestBody.get("userId");
         Lobby lobby = lobbyService.checkIfLobbyExistsByPin(lobbyPin);
         Lobby joinedLobby = lobbyService.addPlayertoLobby(lobby.getId(), userId);
@@ -97,20 +107,18 @@ public class LobbyController {
     @DeleteMapping("/lobbies/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void deleteLobby(@PathVariable("lobbyId") Long lobbyId,@RequestParam(required=false) String token) 
+    public void deleteLobby(@PathVariable("lobbyId") Long lobbyId,@RequestHeader("token") String token) 
     {
         userService.isTokenValid(token);
-        Lobby toKill=lobbyService.checkIfLobbyExistsById(lobbyId); // raises 404 if not
-        toKill=null;
+        lobbyService.deleteLobby(lobbyId);
     }
-
-    
 
     @PutMapping("/lobbies/withdrawal/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void withdrawFromLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) 
+    public void withdrawFromLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody,@RequestHeader("token") String token) 
     {
+        userService.isTokenValid(token);
         Long userId = requestBody.get("userId");
         lobbyService.removePlayerFromLobby(lobbyId, userId);
     }
