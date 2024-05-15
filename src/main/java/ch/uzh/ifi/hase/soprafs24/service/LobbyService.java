@@ -3,10 +3,11 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSlimGetDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Transactional
@@ -72,6 +70,35 @@ public class LobbyService {
     {
         Lobby lobby=checkIfLobbyExistsByPin(lobbyPin);
         return addPlayertoLobby(lobby.getId(), userId);
+    }
+
+    public void transformUsersIntoUsersSlim(LobbyGetDTO lobbyGetDTO, Lobby lobby){
+        List<UserSlimGetDTO> playersSlim = new ArrayList<>();
+        for (User player : lobby.getPlayers()){
+            UserSlimGetDTO newPlayer = new UserSlimGetDTO();
+            newPlayer.setId(player.getId());
+            newPlayer.setUsername(player.getUsername());
+            newPlayer.setStatus(player.getStatus());
+            playersSlim.add(newPlayer);
+        }
+        lobbyGetDTO.setPlayers(playersSlim);
+    }
+
+    public void removeHandsFromOtherPlayers(LobbyGetDTO lobbyGetDTO, Long userId){
+        List<Hand> hand = new ArrayList<>();
+        if (lobbyGetDTO.getGameStarted()){
+            for (Hand currentHand : lobbyGetDTO.getGameOfLobby().getHands()){
+                if (Objects.equals(currentHand.getHanduserid(), userId)){
+                    hand.add(currentHand);
+                }
+            }
+            if (hand.size() != 1){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You can only have access to your own hand");
+            }
+            lobbyGetDTO.getGameOfLobby().setHands(hand);
+        }
+
     }
 
     public Lobby addPlayertoLobby(Long lobbyId, Long userId) {

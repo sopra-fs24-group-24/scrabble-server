@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.LobbyDTOMapper;
@@ -10,7 +11,6 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,9 @@ public class LobbyController {
         List<Lobby> lobbies = lobbyService.getLobbies();
         List<LobbyGetDTO> lobbyGetDTOs = new ArrayList<>();
         for (Lobby lobby : lobbies) {
-            lobbyGetDTOs.add(LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby));
+            LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
+            lobbyService.transformUsersIntoUsersSlim(lobbyGetDTO, lobby);
+            lobbyGetDTOs.add(lobbyGetDTO);
         }
         return lobbyGetDTOs;
     }
@@ -45,9 +47,13 @@ public class LobbyController {
     @GetMapping("/lobbies/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO getSpecificLobby(@PathVariable Long lobbyId) {
+    public LobbyGetDTO getSpecificLobby(@PathVariable Long lobbyId, @RequestParam(required=false) String token) {
+        User foundUser = userService.isTokenValid(token);
         Lobby lobby = lobbyService.getLobby(lobbyId);
-        return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
+        LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
+        lobbyService.removeHandsFromOtherPlayers(lobbyGetDTO, foundUser.getId());
+        lobbyService.transformUsersIntoUsersSlim(lobbyGetDTO, lobby);
+        return lobbyGetDTO;
     }
 
     @PostMapping("/lobbies")
@@ -69,7 +75,10 @@ public class LobbyController {
     public LobbyGetDTO joinLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody) {
         Long userId = requestBody.get("userId");
         Lobby joinedLobby = lobbyService.addPlayertoLobby(lobbyId, userId);
-        return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
+        LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
+        lobbyService.removeHandsFromOtherPlayers(lobbyGetDTO, userId);
+        lobbyService.transformUsersIntoUsersSlim(lobbyGetDTO, joinedLobby);
+        return lobbyGetDTO;
     }
 
     @PutMapping("/privatelobbies/{lobbyPin}")
@@ -77,9 +86,12 @@ public class LobbyController {
     @ResponseBody
     public LobbyGetDTO joinPrivateLobby(@PathVariable int lobbyPin, @RequestBody Map<String, Long> requestBody) {
         Long userId = requestBody.get("userId");
-        Lobby lobby=lobbyService.checkIfLobbyExistsByPin(lobbyPin);
+        Lobby lobby = lobbyService.checkIfLobbyExistsByPin(lobbyPin);
         Lobby joinedLobby = lobbyService.addPlayertoLobby(lobby.getId(), userId);
-        return LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
+        LobbyGetDTO lobbyGetDTO = LobbyDTOMapper.INSTANCE.convertEntityToLobbyGetDTO(joinedLobby);
+        lobbyService.removeHandsFromOtherPlayers(lobbyGetDTO, userId);
+        lobbyService.transformUsersIntoUsersSlim(lobbyGetDTO, joinedLobby);
+        return lobbyGetDTO;
     }
 
     @DeleteMapping("/lobbies/{lobbyId}")

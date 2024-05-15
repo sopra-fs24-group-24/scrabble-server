@@ -1,9 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -170,7 +173,6 @@ public class LobbyServiceTest {
         assertNotNull(createdLobby.getGameOfLobby());
     }
 
-
     @Test
     public void addPlayerToLobby_NonExistentLobby_throwsException() {
         // given
@@ -208,5 +210,237 @@ public class LobbyServiceTest {
 
         // then
         assertThrows(ResponseStatusException.class, () -> lobbyService.addPlayertoLobby(1L, 2L));
+    }
+
+    @Test
+    public void removeHandsFromOtherPlayers_lobbyNotFull_nothingIsDone(){
+        // given
+        LobbyGetDTO testLobbyGetDTO = new LobbyGetDTO();
+        testLobbyGetDTO.setGameStarted(false);
+        Long userId = 1L;
+
+        // when/then
+        assertDoesNotThrow(() -> {lobbyService.removeHandsFromOtherPlayers(testLobbyGetDTO, userId);});
+    }
+
+    @Test
+    public void removeHandsFromOtherPlayers_lobbyFull_success(){
+        // given
+        LobbyGetDTO testLobby = new LobbyGetDTO();
+
+        Hand hand1 = new Hand();
+        hand1.setId(3L);
+        hand1.setHanduserid(1L);
+
+        Tile tile1 = new Tile('K', 3);
+        Tile tile2 = new Tile('J', 4);
+        Tile tile3 = new Tile('A', 1);
+        Tile tile4 = new Tile('A', 1);
+        Tile tile5 = new Tile('E', 1);
+        Tile tile6 = new Tile('E', 1);
+        Tile tile7 = new Tile('N', 2);
+
+        List<Tile> tiles1 = new ArrayList<>();
+        tiles1.add(tile1);
+        tiles1.add(tile2);
+        tiles1.add(tile3);
+        tiles1.add(tile4);
+        tiles1.add(tile5);
+        tiles1.add(tile6);
+        tiles1.add(tile7);
+
+        hand1.setHandtiles(tiles1);
+
+        Hand hand2 = new Hand();
+        hand2.setId(4L);
+        hand2.setHanduserid(2L);
+
+        Tile tile8 = new Tile('M', 3);
+        Tile tile9 = new Tile('I', 2);
+        Tile tile10 = new Tile('A', 1);
+        Tile tile11 = new Tile('O', 3);
+        Tile tile12 = new Tile('E', 1);
+        Tile tile13 = new Tile('L', 1);
+        Tile tile14 = new Tile('C', 2);
+
+        List<Tile> tiles2 = new ArrayList<>();
+        tiles2.add(tile8);
+        tiles2.add(tile9);
+        tiles2.add(tile10);
+        tiles2.add(tile11);
+        tiles2.add(tile12);
+        tiles2.add(tile13);
+        tiles2.add(tile14);
+
+        hand2.setHandtiles(tiles2);
+
+        List<Hand> hands = new ArrayList<>();
+        hands.add(hand1);
+        hands.add(hand2);
+
+        testLobby.setGameStarted(true);
+        GameGetDTO game = new GameGetDTO();
+        game.setHands(hands);
+        testLobby.setGameOfLobby(game);
+
+        Long userId = 1L;
+
+        //when
+        lobbyService.removeHandsFromOtherPlayers(testLobby, userId);
+
+        //then
+        assertEquals(1, testLobby.getGameOfLobby().getHands().size());
+        assertEquals(1L, testLobby.getGameOfLobby().getHands().get(0).getHanduserid());
+        assertEquals(7, testLobby.getGameOfLobby().getHands().get(0).getHandtiles().size());
+        assertArrayEquals(hand1.getHandtiles().toArray(), testLobby.getGameOfLobby().getHands().get(0).getHandtiles().toArray());
+    }
+
+    @Test
+    public void removeHandsFromOtherPlayers_lobbyFull_noHandWithIndicatedUserId_error(){
+        // given
+        LobbyGetDTO testLobby = new LobbyGetDTO();
+
+        Hand hand1 = new Hand();
+        hand1.setId(3L);
+        hand1.setHanduserid(1L);
+
+        Tile tile1 = new Tile('K', 3);
+        Tile tile2 = new Tile('J', 4);
+        Tile tile3 = new Tile('A', 1);
+        Tile tile4 = new Tile('A', 1);
+        Tile tile5 = new Tile('E', 1);
+        Tile tile6 = new Tile('E', 1);
+        Tile tile7 = new Tile('N', 2);
+
+        List<Tile> tiles1 = new ArrayList<>();
+        tiles1.add(tile1);
+        tiles1.add(tile2);
+        tiles1.add(tile3);
+        tiles1.add(tile4);
+        tiles1.add(tile5);
+        tiles1.add(tile6);
+        tiles1.add(tile7);
+
+        hand1.setHandtiles(tiles1);
+
+        Hand hand2 = new Hand();
+        hand2.setId(4L);
+        hand2.setHanduserid(2L);
+
+        Tile tile8 = new Tile('M', 3);
+        Tile tile9 = new Tile('I', 2);
+        Tile tile10 = new Tile('A', 1);
+        Tile tile11 = new Tile('O', 3);
+        Tile tile12 = new Tile('E', 1);
+        Tile tile13 = new Tile('L', 1);
+        Tile tile14 = new Tile('C', 2);
+
+        List<Tile> tiles2 = new ArrayList<>();
+        tiles2.add(tile8);
+        tiles2.add(tile9);
+        tiles2.add(tile10);
+        tiles2.add(tile11);
+        tiles2.add(tile12);
+        tiles2.add(tile13);
+        tiles2.add(tile14);
+
+        hand2.setHandtiles(tiles2);
+
+        List<Hand> hands = new ArrayList<>();
+        hands.add(hand1);
+        hands.add(hand2);
+
+        testLobby.setGameStarted(true);
+        GameGetDTO game = new GameGetDTO();
+        game.setHands(hands);
+        testLobby.setGameOfLobby(game);
+
+        Long userId = 5L;
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> lobbyService.removeHandsFromOtherPlayers(testLobby, userId));
+    }
+
+    @Test
+    public void transformUsersIntoUsersSlim_Success(){
+        // given
+        LobbyGetDTO testLobbyGetDTO = new LobbyGetDTO();
+
+        Lobby testLobby = new Lobby();
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        user1.setToken("1");
+        user1.setStatus(UserStatus.ONLINE);
+        user1.setPassword("1");
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("luca");
+        user2.setToken("2");
+        user2.setStatus(UserStatus.ONLINE);
+        user2.setPassword("2");
+
+        User user3 = new User();
+        user3.setId(3L);
+        user3.setUsername("elena");
+        user3.setToken("3");
+        user3.setStatus(UserStatus.ONLINE);
+        user3.setPassword("3");
+
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user3);
+        testLobby.setPlayers(players);
+
+        // when
+        lobbyService.transformUsersIntoUsersSlim(testLobbyGetDTO, testLobby);
+        List<String> expectedFields = new ArrayList<>();
+        expectedFields.add("id");
+        expectedFields.add("username");
+        expectedFields.add("status");
+
+        User expectedUser = new User();
+        expectedUser.setStatus(UserStatus.ONLINE);
+
+        // then
+        assertEquals(3, testLobbyGetDTO.getPlayers().size());
+        assertEquals(3, testLobbyGetDTO.getPlayers().get(0).getClass().getDeclaredFields().length);
+        assertEquals(3, testLobbyGetDTO.getPlayers().get(1).getClass().getDeclaredFields().length);
+        assertEquals(3, testLobbyGetDTO.getPlayers().get(2).getClass().getDeclaredFields().length);
+
+        List<String> fieldsPlayer1 = new ArrayList<>();
+        for (Field field : testLobbyGetDTO.getPlayers().get(0).getClass().getDeclaredFields()){
+            fieldsPlayer1.add(field.getName());
+        }
+        assertTrue(expectedFields.contains(fieldsPlayer1.get(0)));
+        assertTrue(expectedFields.contains(fieldsPlayer1.get(1)));
+        assertTrue(expectedFields.contains(fieldsPlayer1.get(2)));
+        assertEquals("fabio", testLobbyGetDTO.getPlayers().get(0).getUsername());
+        assertEquals(1L, testLobbyGetDTO.getPlayers().get(0).getId());
+        assertEquals(expectedUser.getStatus(), testLobbyGetDTO.getPlayers().get(0).getStatus());
+
+        List<String> fieldsPlayer2 = new ArrayList<>();
+        for (Field field : testLobbyGetDTO.getPlayers().get(1).getClass().getDeclaredFields()){
+            fieldsPlayer2.add(field.getName());
+        }
+        assertTrue(expectedFields.contains(fieldsPlayer2.get(0)));
+        assertTrue(expectedFields.contains(fieldsPlayer2.get(1)));
+        assertTrue(expectedFields.contains(fieldsPlayer2.get(2)));
+        assertEquals("luca", testLobbyGetDTO.getPlayers().get(1).getUsername());
+        assertEquals(2L, testLobbyGetDTO.getPlayers().get(1).getId());
+        assertEquals(expectedUser.getStatus(), testLobbyGetDTO.getPlayers().get(1).getStatus());
+
+        List<String> fieldsPlayer3 = new ArrayList<>();
+        for (Field field : testLobbyGetDTO.getPlayers().get(2).getClass().getDeclaredFields()){
+            fieldsPlayer3.add(field.getName());
+        }
+        assertTrue(expectedFields.contains(fieldsPlayer3.get(0)));
+        assertTrue(expectedFields.contains(fieldsPlayer3.get(1)));
+        assertTrue(expectedFields.contains(fieldsPlayer3.get(2)));
+        assertEquals("elena", testLobbyGetDTO.getPlayers().get(2).getUsername());
+        assertEquals(3L, testLobbyGetDTO.getPlayers().get(2).getId());
+        assertEquals(expectedUser.getStatus(), testLobbyGetDTO.getPlayers().get(2).getStatus());
     }
 }

@@ -4,10 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 import ch.uzh.ifi.hase.soprafs24.entity.Hand;
 import ch.uzh.ifi.hase.soprafs24.entity.Score;
 import ch.uzh.ifi.hase.soprafs24.entity.Tile;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
-import org.springframework.lang.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameGetDTO {

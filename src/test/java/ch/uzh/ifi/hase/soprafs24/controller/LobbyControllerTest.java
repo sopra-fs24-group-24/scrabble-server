@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -80,10 +81,15 @@ public class LobbyControllerTest {
         players.add((long) 3);
         lobby.setUsersInLobby(players);
 
+        User user = new User();
+        user.setId(1L);
+        user.setToken("1");
+
         given(lobbyService.getLobby(2L)).willReturn(lobby);
+        given(userService.isTokenValid("1")).willReturn(user);
 
         // when
-        MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}", 2L)
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}?token=1", 2L)
                 .contentType(MediaType.APPLICATION_JSON);
 
         // then
@@ -288,7 +294,7 @@ public class LobbyControllerTest {
     }
 
     @Test
-    public void deleteNonExistantLobby() throws Exception 
+    public void deleteNonExistentLobby() throws Exception
     {
         Lobby lobby=new Lobby();
         lobby.setId(1L);
