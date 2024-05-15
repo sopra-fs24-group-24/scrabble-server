@@ -50,8 +50,7 @@ public class GameControllerTest {
   ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
-  public void getGame_validInputs() throws Exception 
-  {
+  public void getGame_validInputs() throws Exception {
     // given
     Game game = new Game();
 
@@ -61,67 +60,64 @@ public class GameControllerTest {
         playfield.add(null);
     }
 
-    game.setId(1L);
+    game.setId(10L);
     game.setMode(GameMode.CLASSIC);
-    game.setCurrentPlayer(0L);
+    game.setCurrentPlayer(1L);
     game.setPlayfield(playfield);
-
-
     
     GameGetDTO gameGetDTO = new GameGetDTO();
-    gameGetDTO.setId(1L);
-    gameGetDTO.setCurrentPlayer(0L);
+    gameGetDTO.setId(20L);
+    gameGetDTO.setCurrentPlayer(1L);
     gameGetDTO.setPlayfield(playfield);
+
+    User testUser = new User();
+    testUser.setId(1L);
     
     given(gameService.getGameParams(Mockito.any())).willReturn(game);
+    given(userService.isTokenValid(Mockito.any())).willReturn(testUser);
 
-// when/then -> do the request + validate the result
-MockHttpServletRequestBuilder getRequest = get("/games/1")
-.contentType(MediaType.APPLICATION_JSON)
-.content(asJsonString(gameGetDTO));
+    // when/then -> do the request + validate the result
+    MockHttpServletRequestBuilder getRequest = get("/games/10")
+    .contentType(MediaType.APPLICATION_JSON);
 
-// TODO: given(userService.isTokenValid(Mockito.any())).willReturn(user);
-
-
-// then
-mockMvc.perform(getRequest)
-.andExpect(status().isOk())
-.andExpect(jsonPath("$.id", is(game.getId().intValue())))
-.andExpect(jsonPath("$.currentPlayer", is(game.getCurrentPlayer().intValue())))
-.andExpect(jsonPath("$.mode", is(game.getMode().toString())));
+    // then
+    mockMvc.perform(getRequest)
+    .andExpect(status().isOk())
+    .andExpect(jsonPath("$.id", is(game.getId().intValue())))
+    .andExpect(jsonPath("$.currentPlayer", is(game.getCurrentPlayer().intValue())))
+    .andExpect(jsonPath("$.mode", is(game.getMode().toString())));
   }
 
   @Test
-  public void getGame_nonExistant() throws Exception 
-  {
+  public void getGame_nonExistent() throws Exception {
      // given
      Game game = new Game();
 
-     game.setId(1L);
+     game.setId(10L);
      game.setMode(GameMode.CLASSIC);
-     game.setCurrentPlayer(0L);
- 
-     
+     game.setCurrentPlayer(1L);
+
      GameGetDTO gameGetDTO = new GameGetDTO();
-     gameGetDTO.setId(1L);
-     gameGetDTO.setCurrentPlayer(0L);
+     gameGetDTO.setId(10L);
+     gameGetDTO.setCurrentPlayer(1L);
+
+     User testUser = new User();
+     testUser.setId(1L);
      
      ResponseStatusException e=new ResponseStatusException(HttpStatus.NOT_FOUND);
 
      given(gameService.getGameParams(Mockito.any())).willThrow(e);
+     given(userService.isTokenValid(Mockito.any())).willReturn(testUser);
  
- // when/then -> do the request + validate the result
- MockHttpServletRequestBuilder getRequest = get("/games/1")
- .contentType(MediaType.APPLICATION_JSON)
- .content(asJsonString(gameGetDTO));
+    // when/then -> do the request + validate the result
+    MockHttpServletRequestBuilder getRequest = get("/games/11")
+    .contentType(MediaType.APPLICATION_JSON);
  
- // TODO: given(userService.isTokenValid(Mockito.any())).willReturn(user);
- 
- 
- // then
- mockMvc.perform(getRequest)
- .andExpect(status().isNotFound());
-  }
+    // then
+    mockMvc.perform(getRequest)
+    .andExpect(status().isNotFound())
+    .andExpect(content().string(""));;
+    }
 
   @Test
   public void placeTilesOnPlayfield_validInput_thenUpdatedPlayfieldIsReturned() throws Exception {

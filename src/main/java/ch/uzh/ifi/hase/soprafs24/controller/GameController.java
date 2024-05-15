@@ -38,9 +38,11 @@ public class GameController
     @ResponseBody
     public GameGetDTO getGame(@PathVariable("gameId") Long gameId, @RequestParam(required=false) String token)
     {
-        userService.isTokenValid(token);
-        
-        GameGetDTO gameGetDTO = GameDTOMapper.INSTANCE.convertEntityToGameGetDTO(gameService.getGameParams(gameId));
+        User foundUser = userService.isTokenValid(token);
+        Game foundGame = gameService.getGameParams(gameId);
+        GameGetDTO gameGetDTO = GameDTOMapper.INSTANCE.convertEntityToGameGetDTO(foundGame);
+        gameService.transformUsersIntoUsersSlim(gameGetDTO, foundGame);
+        gameService.removeHandsFromOtherPlayers(gameGetDTO, foundUser.getId());
         return gameGetDTO;
     }
 

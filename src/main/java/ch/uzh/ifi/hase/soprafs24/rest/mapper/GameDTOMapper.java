@@ -18,7 +18,6 @@ public interface GameDTOMapper {
     @Mapping(source = "playfield", target = "playfield")
     @Mapping(source = "scores", target = "scores")
     @Mapping(source = "hands", target = "hands")
-    @Mapping(source= "players", target="players")
     @Mapping(source = "mode", target = "mode")
     @Mapping(source = "wordContested", target = "wordContested")
     @Mapping(source = "gameOver", target = "gameOver")

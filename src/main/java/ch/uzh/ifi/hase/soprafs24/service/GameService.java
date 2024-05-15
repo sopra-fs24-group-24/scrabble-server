@@ -10,6 +10,8 @@ import ch.uzh.ifi.hase.soprafs24.repository.BagRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSlimGetDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -104,6 +106,32 @@ public class GameService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The game with id %s does not exist!", gameId));
         }
+    }
+
+    public void removeHandsFromOtherPlayers(GameGetDTO game, Long userId){
+        List<Hand> hand = new ArrayList<>();
+        for (Hand currentHand : game.getHands()){
+            if (Objects.equals(currentHand.getHanduserid(), userId)){
+                hand.add(currentHand);
+            }
+        }
+        if (hand.size() != 1){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You can only have access to your own hand");
+        }
+        game.setHands(hand);
+    }
+
+    public void transformUsersIntoUsersSlim(GameGetDTO gameGetDTO, Game game){
+        List<UserSlimGetDTO> playersSlim = new ArrayList<>();
+        for (User player : game.getPlayers()){
+            UserSlimGetDTO newPlayer = new UserSlimGetDTO();
+            newPlayer.setId(player.getId());
+            newPlayer.setUsername(player.getUsername());
+            newPlayer.setStatus(player.getStatus());
+            playersSlim.add(newPlayer);
+        }
+        gameGetDTO.setPlayers(playersSlim);
     }
 
     public List<Tile> placeTilesOnBoard(Game game) {
