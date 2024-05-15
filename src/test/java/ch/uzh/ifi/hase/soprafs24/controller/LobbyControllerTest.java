@@ -55,7 +55,7 @@ public class LobbyControllerTest {
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/lobbies")
-                .contentType(MediaType.APPLICATION_JSON);
+                .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isOk())
@@ -85,12 +85,17 @@ public class LobbyControllerTest {
         user.setId(1L);
         user.setToken("1");
 
+        User user2 = new User();
+        user2.setId(3L);
+        user2.setToken("3");
+
         given(lobbyService.getLobby(2L)).willReturn(lobby);
-        given(userService.isTokenValid("1")).willReturn(user);
+        given(userService.isTokenValid("4242")).willReturn(user);
+   
 
         // when
-        MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}?token=1", 2L)
-                .contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}", 2L)
+                .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isOk())
@@ -111,7 +116,7 @@ public class LobbyControllerTest {
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/lobbies/{lobbyId}", lobbyId)
-                .contentType(MediaType.APPLICATION_JSON);
+                .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isNotFound())
@@ -139,7 +144,7 @@ public class LobbyControllerTest {
         // when
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(lobbyPostDTO));
+                .content(asJsonString(lobbyPostDTO)).header("token", "4242");
 
         // then
         mockMvc.perform(postRequest).andExpect(status().isCreated())
@@ -173,7 +178,7 @@ public class LobbyControllerTest {
         // when
         MockHttpServletRequestBuilder postRequest = post("/lobbies")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(lobbyPostDTO));
+                .content(asJsonString(lobbyPostDTO)).header("token", "4242");
 
         // then
         mockMvc.perform(postRequest).andExpect(status().isConflict())
@@ -203,7 +208,7 @@ public class LobbyControllerTest {
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", lobbyId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(userId));
+                .content(asJsonString(userId)).header("token", "4242");
 
         // then
         mockMvc.perform(putRequest).andExpect(status().isOk())
@@ -230,7 +235,7 @@ public class LobbyControllerTest {
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", lobbyId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(userId));
+                .content(asJsonString(userId)).header("token", "4242");
 
         // then
         mockMvc.perform(putRequest).andExpect(status().isNotFound())
@@ -250,7 +255,7 @@ public class LobbyControllerTest {
         // when
         MockHttpServletRequestBuilder putRequest = put("/lobbies/{lobbyId}", lobbyId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(userId));
+                .content(asJsonString(userId)).header("token", "4242");
 
         // then
         mockMvc.perform(putRequest).andExpect(status().isConflict())
@@ -286,7 +291,7 @@ public class LobbyControllerTest {
         // when
         MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/{lobbyId}", lobby.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(lobby));
+                .content(asJsonString(lobby)).header("token", "4242");
 
         // then
         mockMvc.perform(deleteRequest).andExpect(status().isOk())
@@ -301,14 +306,23 @@ public class LobbyControllerTest {
         lobby.setNumberOfPlayers(1);
         lobby.setLobbySize(1);
 
+        User user=new User();
+        user.setId(42L);
+
+        List<Long> users=new ArrayList<Long>();
+        users.add(user.getId());
+
+        lobby.setUsersInLobby(users);
+
         ResponseStatusException e=new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         given(lobbyService.checkIfLobbyExistsById(1L)).willThrow(e);
+        given(userService.isTokenValid(Mockito.any())).willReturn(user);
 
         // when
-        MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/{lobbyId}", lobby.getId())
+        MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/{lobbyId}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(lobby));
+                .content(asJsonString(lobby)).header("token", "4242");
 
         // then
         mockMvc.perform(deleteRequest).andExpect(status().isNotFound())
