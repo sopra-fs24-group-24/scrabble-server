@@ -358,6 +358,46 @@ completed on Sunday 5.05.2024
 - created toast notifications
 - implemented toast notification to show who is playing
 
+### *Week 6*
+
+**Filter lobbies so that private, full or lobbies with a game running arent displayed [(issue 66)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/66)**: </br>
+completed on Monday 13.05.2024
+
+- created filter for private, full and running lobbies
+
+**Adjust design of game page for smaller screens [(issue 65)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/65)**: </br>
+completed on Monday 13.05.2024
+
+- fixed bug where scoreboard got cut off
+
+**added checkbox to make lobbies private [(issue 57)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/57)**: </br>
+completed on Thursday 8.05.2024
+
+- added checkbox and attribute postdto for lobby
+
+**Create search bar in profile page and search button [(issue 42)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/42)**: </br>
+completed on Wednesday 15.05.2024
+
+- created search field
+- created a search button with a svg
+- implemented functionality to make api call when clicking on button
+
+**Create box in profile to display search results [(issue 43)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/43)**: </br>
+completed on Wednesday 15.05.2024
+
+- created mapping from response to players
+- added styling 
+- made the list scrollable
+- added custom scrollbar
+
+**Create routing between different profiles [(issue 44)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/44)**: </br>
+completed on Wednesday 15.05.2024
+
+- made the results of searching clickable
+- implemented redirecting to other profiles
+- added back to my profile button when viewing other profiles
+
+
 ## Michael Kevin Barry
 
 ### *Week 0 and 1*
