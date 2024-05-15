@@ -29,6 +29,8 @@ public class LobbyGetDTO {
 
     private boolean isPrivate;
 
+    private int pin;
+
     public void setIsPrivate(boolean IsPrivate) {
         isPrivate = IsPrivate;
     }
@@ -45,7 +47,6 @@ public class LobbyGetDTO {
         return title;
     }
 
-    private int pin;
 
     public void setGameOfLobby(GameGetDTO gameOfLobby) {
         this.gameOfLobby = gameOfLobby;
