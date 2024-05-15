@@ -144,6 +144,52 @@ completed on Tuesday, 07.05.2024
 - Added attribute wordsToBeContested in back-end in order to display those words in front-end (issue 4)
 - Bug fixes (issues 24 and 28)
 
+### *Week 6 (09.05.24 - 15.05.24)*
+
+**Implement functionality so that when all but one player left the game, 
+the remaining player is correctly displayed on the gameover-screen [(issue 70)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/70)**:</br>
+completed on Tuesday, 14.05.2024
+
+- Changed return statement of Gameover-Component
+- Changed function of Game-Component which fetches data from server each second
+
+**Implement Pop-Up Window which informs the last player that all other players
+have left the game early [(issue 71)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/71)**:</br>
+completed on Tuesday, 14.05.2024
+
+- Created useEffect in Gameover-Component which checks if all but one Player left the game early
+- Changed return statement of the Gameover-Component
+- Created corresponding scss file
+
+**Create functionality to end game if only one player remains in the game [(issue 126)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/126)**:</br>
+completed on Tuesday, 14.05.2024
+
+- Created functionality in LobbyService to end game if only one player remains in the game
+
+**Only send information users are allowed to see [(issue 140)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/140)**:</br>
+completed on Wednesday, 15.05.2024
+
+- Implemented Methods in GameService and implemented corresponding tests
+- Implemented Methods in LobbyService and implemented corresponding tests
+
+**Create confirm message pop-up window when leaving the game [(issue 55)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/55)**:</br>
+completed on Tuesday, 14.05.2024
+
+- Extended return statement of Game-Component
+
+**Remove timer for contesting in frontend [(issue 64)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/64)**:</br>
+completed on Wednesday, 15.05.2024
+
+- Removed timers of contesting pop-up
+- Added Waiting-Pop-Up
+- Added attributes to the Game entity in back-end
+- Added functionalities to the button of the Contest-Pop-Up
+- Implemented function in Game-Component which fetches data from the server once
+
+**Other tasks carried out:**
+- Bug fixes (issue 28 - server)
+- Fixed IntegrationTests of Contest-Function (issue 31)
+
 ## Luca Stephan Christl
 
 ### *Week 1*
