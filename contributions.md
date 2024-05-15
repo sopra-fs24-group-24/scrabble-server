@@ -511,3 +511,13 @@ completed on Wednesday 15.05.2024
 **Create functionality to get word definition from external API [(issue #109)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/109)** </br>
 
 **Generate and save game pin for private lobbies [(issue #130)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/130)** </br>
+
+### *Week 6*
+
+**Create button to remove friend [(issue #50)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/50)** </br>
+
+**Remove players from lobby when closing window [(issue #63)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/63)** </br>
+
+**Create guards for lobby, game and profile [(issue #67)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/67) [(issue #68)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/68) [(issue #69)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/69)** </br>
+
+**Create REST endpoint to get word information [(issue #108)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/108)** </br>
