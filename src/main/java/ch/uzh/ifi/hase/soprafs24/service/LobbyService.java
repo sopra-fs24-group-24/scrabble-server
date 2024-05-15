@@ -112,6 +112,17 @@ public class LobbyService {
         throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
     }
 
+    public void deleteLobby(Long lobbyId)
+    {
+        Lobby lobby = checkIfLobbyExistsById(lobbyId);
+        List<User> players=lobby.getPlayers();
+
+        for (User user : players) 
+        {
+            removePlayerFromLobby(lobbyId, user.getId());    
+        }
+    }
+
     public void removePlayerFromLobby(Long lobbyId, Long userId) {
         User foundUser = checkIfPlayerExists(userId);
         Lobby lobby = checkIfLobbyExistsById(lobbyId);
