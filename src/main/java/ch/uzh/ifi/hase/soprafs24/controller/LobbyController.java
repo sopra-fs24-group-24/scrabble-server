@@ -110,6 +110,7 @@ public class LobbyController {
     public void deleteLobby(@PathVariable("lobbyId") Long lobbyId,@RequestHeader("token") String token) 
     {
         userService.isTokenValid(token);
+        lobbyService.checkIfLobbyExistsById(lobbyId);
         lobbyService.deleteLobby(lobbyId);
     }
 
