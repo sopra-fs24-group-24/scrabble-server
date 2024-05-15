@@ -362,6 +362,20 @@ completed on Sunday 5.05.2024
 
 **Implement pop up window for leave lobby confirmation client [(issue #12)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/12)**: </br>
 
+### *Week 6*
+
+**Authenticate all interactions with game controller [(issue #138)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/138)** </br>
+
+**Updated/fixed tests for #138 [(issue #138)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/138)** </br>
+
+**Authenticate all interactions with lobby controller [(issue #137)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/137)**: </br>
+
+**Updated/fixed tests for #137 [(issue #137)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/137)** </br>
+
+**Delete game and lobby after leaving end game screen [(issue #145)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/145)**: </br>
+
+**Redesign/Improvement of issue 77 [(issue #77)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/77)**: </br>
+
 ## Florian Lanz
 
 ### *Week 1*
