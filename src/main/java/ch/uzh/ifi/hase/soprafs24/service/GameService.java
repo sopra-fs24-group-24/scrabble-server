@@ -736,6 +736,10 @@ public class GameService {
                 int userScore = score.getScore();
 
                 if (game.getCurrentPlayer().equals(userID)) {
+                    for (String word: words.keySet()) {
+                        score.setScore(userScore + words.get(word));
+                        userScore = score.getScore();
+                    }
                     score.setScore(userScore + 20);
                 } else if (contested.get(userID)) {
                     if (userScore >= 20) {
