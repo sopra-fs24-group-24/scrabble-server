@@ -359,47 +359,4 @@ public class Game implements Serializable{
 
         return this;
     }
-
-    public void removeHand(Long userId)
-    {
-        for (Hand hand : getHands()) 
-        {
-            if(hand.getHanduserid()==userId)
-            {
-                bag.putTilesInBag(hand.getHandtiles());
-                hand.setHanduserid(null);
-                hand=null;
-                getHands().remove(hand);
-                return;
-            }    
-        }
-    }
-/*
-    public Game removePlayer(User user)
-    {
-        // if current player, switch to next before removing
-        if(getCurrentPlayer()==user.getId())
-        {
-            User nextPlayer = getNextPlayer();
-            setCurrentPlayer(nextPlayer.getId());
-        }
-
-
-
-        index = 0;
-        for (User player : getPlayers()){
-            if (Objects.equals(player.getId(), user.getId())){
-                break;
-            }
-            index++;
-        }
-        getPlayers().remove(index);
-
-        // remove hand
-        //removeHand(user.getId());
-        //this.players.remove(user);
-        return this;
-    }*/
-
-   
 }

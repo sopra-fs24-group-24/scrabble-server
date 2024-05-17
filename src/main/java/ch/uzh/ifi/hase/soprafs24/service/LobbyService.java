@@ -149,9 +149,6 @@ public class LobbyService {
         }
         if (lobby.getNumberOfPlayers() == 0) 
         {
-            if(game!=null)
-                game.getBag().getTiles().clear();
-
             lobbyRepository.delete(lobby);
             lobbyRepository.flush();
         }
