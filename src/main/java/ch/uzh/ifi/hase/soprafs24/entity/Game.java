@@ -342,7 +342,13 @@ public class Game implements Serializable{
                     }
                     else
                     {
-                        score.setScore(score.getScore()-getTotalTileValue(hand));
+                        int newScore = score.getScore()-getTotalTileValue(hand);
+                        if (newScore < 0){
+                            score.setScore(0);
+                        }
+                        else{
+                            score.setScore(newScore);
+                        }
                     }
                 }
             }
