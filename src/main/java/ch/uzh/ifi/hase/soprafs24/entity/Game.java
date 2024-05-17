@@ -374,7 +374,7 @@ public class Game implements Serializable{
             }    
         }
     }
-
+/*
     public Game removePlayer(User user)
     {
         // if current player, switch to next before removing
@@ -383,13 +383,23 @@ public class Game implements Serializable{
             User nextPlayer = getNextPlayer();
             setCurrentPlayer(nextPlayer.getId());
         }
-    
-        // remove hand
-        removeHand(user.getId());
 
-        this.players.remove(user);
+
+
+        index = 0;
+        for (User player : getPlayers()){
+            if (Objects.equals(player.getId(), user.getId())){
+                break;
+            }
+            index++;
+        }
+        getPlayers().remove(index);
+
+        // remove hand
+        //removeHand(user.getId());
+        //this.players.remove(user);
         return this;
-    }
+    }*/
 
    
 }

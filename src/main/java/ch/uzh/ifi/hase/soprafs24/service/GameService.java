@@ -1102,7 +1102,7 @@ public class GameService {
      * found game or else throw an error.
      *
      * @param gameId
-     * @throws org.springframework.web.server.ResponseStatusException
+     * @throws ResponseStatusException
      * @see Game
      */
 
@@ -1118,7 +1118,7 @@ public class GameService {
      * or else throw an error.
      *
      * @param board
-     * @throws org.springframework.web.server.ResponseStatusException
+     * @throws ResponseStatusException
      * @see Tile
      */
     private void checkIfBoardValid(List<Tile> board) {
@@ -1135,7 +1135,7 @@ public class GameService {
      * part of the game, the method does nothing
      * or else throw an error.
      * @param game
-     * @throws org.springframework.web.server.ResponseStatusException
+     * @throws ResponseStatusException
      * @see Game
      */
     private void checkIfUserPartOfGame(Game game, Long userId) {

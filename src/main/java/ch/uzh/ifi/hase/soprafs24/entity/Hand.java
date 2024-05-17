@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -59,7 +60,8 @@ public class Hand implements Serializable{
     }
 
     public void removeTilesFromHand(List<Tile> tiles) {
-        for (Tile tile : tiles) {
+        List<Tile> tempList = new ArrayList<>(tiles);
+        for (Tile tile : tempList) {
             removeTile(tile);
         }
     }

@@ -1,10 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.entity.Game;
-import ch.uzh.ifi.hase.soprafs24.entity.Hand;
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSlimGetDTO;
@@ -29,15 +28,25 @@ public class LobbyService {
     private final LobbyRepository lobbyRepository;
 
     @Autowired
+    private final HandRepository handRepository;
+
+    @Autowired
+    private final ScoreRepository scoreRepository;
+
+    @Autowired
     private final UserService userService;
 
     @Autowired
     private final UserRepository userRepository;
 
     public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
-                        @Qualifier("userRepository") UserRepository userRepository) {
+                        @Qualifier("userRepository") UserRepository userRepository,
+                        @Qualifier("handRepository") HandRepository handRepository,
+                        @Qualifier("scoreRepository") ScoreRepository scoreRepository) {
         this.lobbyRepository = lobbyRepository;
         this.userRepository = userRepository;
+        this.handRepository = handRepository;
+        this.scoreRepository = scoreRepository;
         this.userService = new UserService(userRepository);
     }
 
@@ -133,7 +142,7 @@ public class LobbyService {
 
         if(game!=null)
         {
-            game.removePlayer(foundUser);
+            game = removePlayer(game, foundUser);
             if (lobby.getNumberOfPlayers() == 1){
                 game.setGameOver(true);
             }
@@ -146,6 +155,53 @@ public class LobbyService {
             lobbyRepository.delete(lobby);
             lobbyRepository.flush();
         }
+    }
+
+    public Game removePlayer(Game game, User user){
+        if(game.getCurrentPlayer()==user.getId())
+        {
+            User nextPlayer = game.getNextPlayer();
+            game.setCurrentPlayer(nextPlayer.getId());
+        }
+
+        int index = 0;
+        Long idHand = 0L;
+        for (Hand hand : game.getHands()) {
+            if (Objects.equals(hand.getHanduserid(), user.getId())){
+                game.getBag().putTilesInBag(hand.getHandtiles());
+                hand.removeTilesFromHand(hand.getHandtiles());
+                idHand = hand.getId();
+                break;
+            }
+            index++;
+        }
+        game.getHands().remove(index);
+        handRepository.delete(handRepository.findById(idHand).orElseThrow());
+        handRepository.flush();
+
+        index = 0;
+        Long idScore = 0L;
+        for (Score score : game.getScores()){
+            if (Objects.equals(score.getScoreUserId(), user.getId())){
+                idScore = score.getId();
+                break;
+            }
+            index++;
+        }
+        game.getScores().remove(index);
+        scoreRepository.delete(scoreRepository.findById(idScore).orElseThrow());
+        scoreRepository.flush();
+
+        index = 0;
+        for (User player : game.getPlayers()){
+            if (Objects.equals(player.getId(), user.getId())){
+                break;
+            }
+            index++;
+        }
+        game.getPlayers().remove(index);
+
+        return game;
     }
 
     /**
