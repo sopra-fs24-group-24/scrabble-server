@@ -91,40 +91,4 @@ public class GameController
         userService.isTokenValid(token);
         return gameService.getDefinition(requestBody);
     }
-
-    // TODO: temporary endpoint for testing purposes: Delete when not needed anymore
-    @PostMapping("/quiek")
-    @ResponseStatus(HttpStatus.OK)
-    public Lobby startGame() 
-    {
-        Lobby lobby=new Lobby();
-        lobby.setId(1L);
-        lobby.setNumberOfPlayers(2);
-
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("Anna");
-        user.setPassword("1234");
-        userService.createUser(user);
-
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setUsername("Bert");
-        user2.setPassword("1234");
-        userService.createUser(user2);
-
-        Game game= new Game();
-
-        List<User> players=new ArrayList<User>();
-        players.add(user);
-        players.add(user2);
-        lobby.setPlayers(players);
-
-        game.initialiseGame(lobby.getPlayers());
-
-        lobby.setGameOfLobby(game);
-
-        return lobby;
-    }
-
 }

@@ -51,6 +51,8 @@ public class Tile implements Serializable{
             return false;
         }
         Tile other = (Tile) o;
+        return Objects.equals(this.id, other.id);
+/*
         if (!this.id.equals(other.id))
         {
             return false;
@@ -58,7 +60,8 @@ public class Tile implements Serializable{
         /*if (this.value != other.value){
             return false;
         }*/
-        return true;
+        //return true;
+
     }
 
     @Override

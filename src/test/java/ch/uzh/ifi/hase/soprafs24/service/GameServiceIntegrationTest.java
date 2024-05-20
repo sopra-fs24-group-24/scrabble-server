@@ -98,7 +98,8 @@ public class GameServiceIntegrationTest {
         handsInGame.add(hand1);
         handsInGame.add(hand2);
         game.setHands(handsInGame);
-        game.setWordContested(true);
+        game.setWordContested(false);
+        game.setGameRound(2L);
 
         List<Tile> oldPlayfield = new ArrayList<>();
         for (int i = 0; i<225; i++){
@@ -221,7 +222,8 @@ public class GameServiceIntegrationTest {
         handsInGame.add(hand1);
         handsInGame.add(hand2);
         game.setHands(handsInGame);
-        game.setWordContested(true);
+        game.setWordContested(false);
+        game.setGameRound(2L);
 
         List<Tile> oldPlayfield = new ArrayList<>();
         for (int i = 0; i<225; i++){
@@ -282,9 +284,8 @@ public class GameServiceIntegrationTest {
 
         // then
         Game currentGame = gameRepository.findAll().get(0);
-
         assertEquals(expectedNextPlayer, currentGame.getCurrentPlayer());
-        assertTrue(currentGame.getWordContested());
+        assertFalse(currentGame.getWordContested());
         assertArrayEquals(expectedPlayfield.toArray(), currentGame.getOldPlayfield().toArray());
         assertArrayEquals(expectedPlayfield.toArray(), currentGame.getPlayfield().toArray());
         assertEquals(0, currentGame.getBag().getTiles().size());

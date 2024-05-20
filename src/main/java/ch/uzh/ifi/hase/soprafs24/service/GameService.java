@@ -244,7 +244,6 @@ public class GameService {
                     }
                     // word is false - contestation successful
                     else{
-                        //TODO: change score function
                         changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
                         foundGame.setPlayfield(foundGame.getOldPlayfield());
                         foundGame.setIsValid(false);
@@ -449,10 +448,12 @@ public class GameService {
 
                 // check if all newly placed tiles are directly connected with each other or with an existing tile
                 int step = 1;
+                int checkedTiles = 1;
                 while (firstElement+step <= 224 && updatedPlayfield.get(firstElement+step) != null) {
                     int index = firstElement + step;
                     if (updatedIndices.contains(index) && persistedPlayfield.get(index) == null) {
                         step++;
+                        checkedTiles++;
                     }
                     else if (persistedPlayfield.get(index) instanceof Tile && !updatedIndices.contains(index)) {
                         newWordConnectedToExistingTile = true;
@@ -462,6 +463,11 @@ public class GameService {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                                 "You cannot overwrite an existing tile");
                     }
+                }
+
+                if (checkedTiles != updatedIndices.size()){
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "You have to place horizontally connected tiles");
                 }
 
                 // check for already existing tiles at top/below the horizontal word
@@ -547,10 +553,12 @@ public class GameService {
 
                 // check if all newly placed tiles are connected to each other or to existing tiles
                 int step = 1;
+                int checkedTiles = 1;
                 while (firstElement + step*15 <= 224 && updatedPlayfield.get(firstElement + step*15) != null) {
                     int index = firstElement + 15 * step;
                     if (updatedIndices.contains(index) && persistedPlayfield.get(index) == null) {
                         step++;
+                        checkedTiles++;
                     }
                     else if (persistedPlayfield.get(index) instanceof Tile && !updatedIndices.contains(index)) {
                         newWordConnectedToExistingTile = true;
@@ -560,6 +568,11 @@ public class GameService {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                                 "You cannot overwrite an existing tile");
                     }
+                }
+
+                if (checkedTiles != updatedIndices.size()){
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "You have to place vertically connected tiles");
                 }
 
                 // check for already existing tiles to the right/left of the vertical word

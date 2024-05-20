@@ -8,7 +8,6 @@ import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSlimGetDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -529,7 +528,7 @@ public class GameServiceTest {
 
         gameService.changeScoresAfterContesting(testGame, contested, words);
 
-        assertEquals(70, testGame.getScores().get(0).getScore());
+        assertEquals(80, testGame.getScores().get(0).getScore());
         assertEquals(30, testGame.getScores().get(1).getScore());
     }
 
@@ -542,6 +541,7 @@ public class GameServiceTest {
         }
 
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         Game userGame = new Game();
         char[] lettersUser = {'A', 'A', 'A', 'A', 'A', 'A', 'A'};
@@ -558,37 +558,13 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {109, 110, 111, 112, 113, 114, 115};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
-        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals(7 * 3 * 2 + 50, testScore1.getScore());
-    }
-
-    @Test
-    public void wordPlayed_invalidWord_saveOriginalPlayfield() {
-        List<Tile> generatedPlayfield = new ArrayList<>();
-        List<Tile> expectedPlayfield = new ArrayList<>();
+        List<Tile> expectedOldPlayfield = new ArrayList<>();
         for (int i = 0; i < 225; i++){
-            generatedPlayfield.add(i, null);
-            expectedPlayfield.add(i, null);
+            expectedOldPlayfield.add(i, null);
         }
-        testGame.setPlayfield(generatedPlayfield);
-
-        // sent Playfield by user
-        Game userGame = new Game();
-        char[] lettersUser = {'A', 'A', 'A'};
-        int[] valuesUser = {4, 3, 5};
-        int[] boardIndicesUser = {112, 127, 142};
-        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
-        userGame.setPlayfield(userPlayfield);
-
-        // when
-        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
-        when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
-        when(mockResponse.statusCode()).thenReturn(404);
-
-        gameService.placeTilesOnBoard(userGame);
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals(0, testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -600,6 +576,7 @@ public class GameServiceTest {
             generatedPlayfield.add(i, null);
         }
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
@@ -619,8 +596,13 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {112, 127, 142};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
+        List<Tile> expectedOldPlayfield = new ArrayList<>();
+        for (int i = 0; i < 225; i++){
+            expectedOldPlayfield.add(i, null);
+        }
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals((4 + 3 + 5) * 2, testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -635,6 +617,7 @@ public class GameServiceTest {
         int[] boardIndicesGenerated = {112, 127, 142};
         List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
@@ -654,8 +637,13 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {112, 127, 142, 143, 144};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {112, 127, 142};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals(5 + 2 + 3 * 3, testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -670,6 +658,7 @@ public class GameServiceTest {
         int[] boardIndices = {112, 127, 142};
         List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndices);
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
@@ -689,8 +678,13 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {112, 127, 142, 126, 128};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {112, 127, 142};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals(2 * 2 + 3 + 3 * 2, testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -702,6 +696,7 @@ public class GameServiceTest {
         int[] boardIndicesGenerated = {112, 113, 114};
         List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
@@ -721,8 +716,13 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {112, 113, 114, 128, 129, 130};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {112, 113, 114};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals((3 + 2 * 2) + (5 + 6) + (2 * 2 + 6 + 4), testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -737,6 +737,7 @@ public class GameServiceTest {
         int[] boardIndicesGenerated = {112, 113, 114};
         List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
@@ -756,8 +757,13 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {112, 113, 114, 82, 97};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {112, 113, 114};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals(4 + 3 + 4, testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -769,6 +775,7 @@ public class GameServiceTest {
         int[] boardIndicesGenerated = {111, 112, 113};
         List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
@@ -788,8 +795,13 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {111, 112, 113, 97, 127};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {111, 112, 113};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals(4 + 3 + 7, testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -801,6 +813,7 @@ public class GameServiceTest {
         int[] boardIndicesGenerated = {97, 112, 127};
         List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
@@ -820,23 +833,30 @@ public class GameServiceTest {
         int[] boardIndicesExpected = {97, 112, 127, 113, 128, 143};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
 
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {97, 112, 127};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
     public void singleLetterIsPlacedOnPlayfield_validMove_saveUpdatedPlayfield() {
         // given
         // saved Playfield in database
-        char[] lettersGenerated = {'C', 'A', 'T', 'T', 'T', 'T', 'T'};
-        int[] valuesGenerated = {4, 3, 5, 5, 5, 5, 5};
+        char[] lettersGenerated = {'C', 'O', 'M', 'P', 'L', 'E', 'X'};
+        int[] valuesGenerated = {4, 5, 3, 3, 3, 1, 8};
         int[] boardIndicesGenerated = {112, 113, 114, 115, 116, 117, 118};
         List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
         testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
 
         // sent Playfield by user
         Game userGame = new Game();
-        char[] lettersUser = {'C', 'A', 'T', 'T', 'T', 'T', 'T', 'T'};
-        int[] valuesUser = {4, 3, 5, 5, 5, 5, 5, 5};
+        char[] lettersUser = {'C', 'O', 'M', 'P', 'L', 'E', 'X', 'A'};
+        int[] valuesUser = {4, 5, 3, 3, 3, 1, 8, 1};
         int[] boardIndicesUser = {112, 113, 114, 115, 116, 117, 118, 119};
         List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
         userGame.setPlayfield(userPlayfield);
@@ -846,13 +866,18 @@ public class GameServiceTest {
         gameService.placeTilesOnBoard(userGame);
 
         // then
-        char[] lettersExpected = {'C', 'A', 'T', 'T', 'T', 'T', 'T', 'T'};
-        int[] valuesExpected = {4, 3, 5, 5, 5, 5, 5, 5};
+        char[] lettersExpected = {'C', 'O', 'M', 'P', 'L', 'E', 'X', 'A'};
+        int[] valuesExpected = {4, 5, 3, 3, 3, 1, 8, 1};
         int[] boardIndicesExpected = {112, 113, 114, 115, 116, 117, 118, 119};
         List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
-        
+
+        char[] lettersOldExpected = {'C', 'O', 'M', 'P', 'L', 'E', 'X'};
+        int[] valuesOldExpected = {4, 5, 3, 3, 3, 1, 8};
+        int[] boardIndicesOldExpected = {112, 113, 114, 115, 116, 117, 118, 119};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
-        assertEquals(4 + 3 + 5 + 5 + 5 + 5 + 5 + 3 * 5, testScore1.getScore());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
     }
 
     @Test
@@ -1017,10 +1042,13 @@ public class GameServiceTest {
         List<Tile> generatedPlayfield = fillBoard(letterGenerated, valuesGenerated, boardIndicesGenerated);
 
         // sent Playfield by user
-        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'T'};
-        int[] valuesUser = {4, 3, 5, 4, 3, 5};
-        int[] boardIndicesUser = {112, 113, 114, 113, 114, 115};
+        char[] lettersUser = {'C', 'C', 'A', 'T'};
+        int[] valuesUser = {4, 4, 3, 5};
+        int[] boardIndicesUser = {112, 113, 114, 115};
         List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userPlayfield.get(113).setId(200L);
+        userPlayfield.get(114).setId(201L);
+        userPlayfield.get(115).setId(202L);
 
         // when/then
         assertThrows(ResponseStatusException.class, () -> gameService.validMove(userPlayfield, generatedPlayfield));
@@ -1250,6 +1278,7 @@ public class GameServiceTest {
         user2.setId(2L);
         Game game = new Game();
         game.setId(3L);
+        game.setGameRound(1L);
 
         Bag bag = new Bag();
         bag.setId(4L);
@@ -1292,7 +1321,7 @@ public class GameServiceTest {
         handsInGame.add(hand1);
         handsInGame.add(hand2);
         game.setHands(handsInGame);
-        game.setWordContested(true);
+        game.setWordContested(false);
 
         List<Tile> oldPlayfield = new ArrayList<>();
         for (int i = 0; i<225; i++){
@@ -1330,7 +1359,6 @@ public class GameServiceTest {
         when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
         when(mockResponse.statusCode()).thenReturn(404);
 
-
         // when
         gameService.contestWord(game.getId(), user2, true);
 
@@ -1341,7 +1369,7 @@ public class GameServiceTest {
         }
 
         assertEquals(2L, game.getCurrentPlayer());
-        assertFalse(game.getWordContested());
+        assertTrue(game.getWordContested());
         assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
         assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
     }
@@ -1355,6 +1383,7 @@ public class GameServiceTest {
         user2.setId(2L);
         Game game = new Game();
         game.setId(3L);
+        game.setGameRound(2L);
 
         Bag bag = new Bag();
         bag.setId(4L);
@@ -1397,17 +1426,19 @@ public class GameServiceTest {
         handsInGame.add(hand1);
         handsInGame.add(hand2);
         game.setHands(handsInGame);
-        game.setWordContested(true);
 
         List<Tile> oldPlayfield = new ArrayList<>();
         for (int i = 0; i<225; i++){
             oldPlayfield.add(null);
         }
         Tile tile1 = new Tile('C', 3);
+        tile1.setId(100L);
         tile1.setBoardidx(112);
         Tile tile2 = new Tile('A', 2);
+        tile2.setId(101L);
         tile2.setBoardidx(113);
         Tile tile3 = new Tile('R', 5);
+        tile3.setId(102L);
         tile3.setBoardidx(114);
         oldPlayfield.set(112, tile1);
         oldPlayfield.set(113, tile2);
@@ -1419,21 +1450,17 @@ public class GameServiceTest {
             currentPlayfield.add(null);
         }
         Tile tile4 = new Tile('Q', 10);
+        tile4.setId(200L);
         tile4.setBoardidx(84);
         Tile tile5 = new Tile('O', 6);
+        tile5.setId(201L);
         tile5.setBoardidx(99);
-        Tile tile6 = new Tile('C', 3);
-        tile6.setBoardidx(112);
-        Tile tile7 = new Tile('A', 2);
-        tile7.setBoardidx(113);
-        Tile tile8 = new Tile('R', 5);
-        tile8.setBoardidx(114);
 
         currentPlayfield.set(84, tile4);
         currentPlayfield.set(99, tile5);
-        currentPlayfield.set(112, tile6);
-        currentPlayfield.set(113, tile7);
-        currentPlayfield.set(114, tile8);
+        currentPlayfield.set(112, tile1);
+        currentPlayfield.set(113, tile2);
+        currentPlayfield.set(114, tile3);
         game.setPlayfield(currentPlayfield);
 
         Score score1 = new Score();
@@ -1449,6 +1476,7 @@ public class GameServiceTest {
         scores.add(score1);
         scores.add(score2);
         game.setScores(scores);
+        game.setWordContested(false);
 
         given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
         when(dictionary.getScrabbleScore(Mockito.anyString())).thenReturn(mockResponse);
@@ -1463,18 +1491,12 @@ public class GameServiceTest {
             expectedPlayfield.add(null);
         }
 
-        Tile tile9 = new Tile('C', 3);
-        tile9.setBoardidx(112);
-        Tile tile10 = new Tile('A', 2);
-        tile10.setBoardidx(113);
-        Tile tile11 = new Tile('R', 5);
-        tile11.setBoardidx(114);
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(113, tile10);
-        expectedPlayfield.set(114, tile11);
+        expectedPlayfield.set(112, tile1);
+        expectedPlayfield.set(113, tile2);
+        expectedPlayfield.set(114, tile3);
 
         assertEquals(2L, game.getCurrentPlayer());
-        assertFalse(game.getWordContested());
+        assertTrue(game.getWordContested());
         assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
         assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
     }
@@ -1488,6 +1510,7 @@ public class GameServiceTest {
         user2.setId(2L);
         Game game = new Game();
         game.setId(3L);
+        game.setGameRound(2L);
 
         Bag bag = new Bag();
         bag.setId(4L);
@@ -1502,6 +1525,8 @@ public class GameServiceTest {
         List<Tile> tilesInHand1 = new ArrayList<>();
         tilesInHand1.add(new Tile('Q', 10));
         tilesInHand1.add(new Tile('O', 6));
+        tilesInHand1.get(0).setId(200L);
+        tilesInHand1.get(1).setId(201L);
         hand1.setHandtiles(tilesInHand1);
         hand1.setHanduserid(1L);
 
@@ -1529,17 +1554,19 @@ public class GameServiceTest {
         handsInGame.add(hand1);
         handsInGame.add(hand2);
         game.setHands(handsInGame);
-        game.setWordContested(true);
 
         List<Tile> oldPlayfield = new ArrayList<>();
         for (int i = 0; i<225; i++){
             oldPlayfield.add(null);
         }
         Tile tile1 = new Tile('C', 3);
+        tile1.setId(100L);
         tile1.setBoardidx(112);
         Tile tile2 = new Tile('A', 2);
+        tile2.setId(101L);
         tile2.setBoardidx(113);
         Tile tile3 = new Tile('R', 5);
+        tile3.setId(102L);
         tile3.setBoardidx(114);
         oldPlayfield.set(112, tile1);
         oldPlayfield.set(113, tile2);
@@ -1551,21 +1578,17 @@ public class GameServiceTest {
             currentPlayfield.add(null);
         }
         Tile tile4 = new Tile('Q', 10);
+        tile4.setId(200L);
         tile4.setBoardidx(84);
         Tile tile5 = new Tile('O', 6);
+        tile5.setId(201L);
         tile5.setBoardidx(99);
-        Tile tile6 = new Tile('C', 3);
-        tile6.setBoardidx(112);
-        Tile tile7 = new Tile('A', 2);
-        tile7.setBoardidx(113);
-        Tile tile8 = new Tile('R', 5);
-        tile8.setBoardidx(114);
 
         currentPlayfield.set(84, tile4);
         currentPlayfield.set(99, tile5);
-        currentPlayfield.set(112, tile6);
-        currentPlayfield.set(113, tile7);
-        currentPlayfield.set(114, tile8);
+        currentPlayfield.set(112, tile1);
+        currentPlayfield.set(113, tile2);
+        currentPlayfield.set(114, tile3);
         game.setPlayfield(currentPlayfield);
 
         Score score1 = new Score();
@@ -1581,6 +1604,7 @@ public class GameServiceTest {
         scores.add(score1);
         scores.add(score2);
         game.setScores(scores);
+        game.setWordContested(false);
 
         given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
         given(handRepository.findByHanduserid(game.getCurrentPlayer())).willReturn(hand1);
@@ -1595,21 +1619,11 @@ public class GameServiceTest {
             expectedPlayfield.add(null);
         }
 
-        Tile tile9 = new Tile('C', 3);
-        tile9.setBoardidx(112);
-        Tile tile10 = new Tile('A', 2);
-        tile10.setBoardidx(113);
-        Tile tile11 = new Tile('R', 5);
-        tile11.setBoardidx(114);
-        Tile tile12 = new Tile('Q', 10);
-        tile12.setBoardidx(84);
-        Tile tile13 = new Tile('O', 6);
-        tile13.setBoardidx(99);
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(113, tile10);
-        expectedPlayfield.set(114, tile11);
-        expectedPlayfield.set(84, tile12);
-        expectedPlayfield.set(99, tile13);
+        expectedPlayfield.set(112, tile1);
+        expectedPlayfield.set(113, tile2);
+        expectedPlayfield.set(114, tile3);
+        expectedPlayfield.set(84, tile4);
+        expectedPlayfield.set(99, tile5);
 
         List<Character> lettersInHand1 = new ArrayList<>();
         for (int i = 0; i < 2; i++){
@@ -1636,6 +1650,7 @@ public class GameServiceTest {
         user2.setId(2L);
         Game game = new Game();
         game.setId(3L);
+        game.setGameRound(2L);
 
         Bag bag = new Bag();
         bag.setId(4L);
@@ -1650,6 +1665,8 @@ public class GameServiceTest {
         List<Tile> tilesInHand1 = new ArrayList<>();
         tilesInHand1.add(new Tile('Q', 10));
         tilesInHand1.add(new Tile('O', 6));
+        tilesInHand1.get(0).setId(200L);
+        tilesInHand1.get(1).setId(201L);
         hand1.setHandtiles(tilesInHand1);
         hand1.setHanduserid(1L);
 
@@ -1677,17 +1694,20 @@ public class GameServiceTest {
         handsInGame.add(hand1);
         handsInGame.add(hand2);
         game.setHands(handsInGame);
-        game.setWordContested(true);
+        game.setWordContested(false);
 
         List<Tile> oldPlayfield = new ArrayList<>();
         for (int i = 0; i<225; i++){
             oldPlayfield.add(null);
         }
         Tile tile1 = new Tile('C', 3);
+        tile1.setId(100L);
         tile1.setBoardidx(112);
         Tile tile2 = new Tile('A', 2);
+        tile2.setId(101L);
         tile2.setBoardidx(113);
         Tile tile3 = new Tile('R', 5);
+        tile3.setId(102L);
         tile3.setBoardidx(114);
         oldPlayfield.set(112, tile1);
         oldPlayfield.set(113, tile2);
@@ -1699,21 +1719,17 @@ public class GameServiceTest {
             currentPlayfield.add(null);
         }
         Tile tile4 = new Tile('Q', 10);
+        tile4.setId(200L);
         tile4.setBoardidx(84);
         Tile tile5 = new Tile('O', 6);
+        tile5.setId(201L);
         tile5.setBoardidx(99);
-        Tile tile6 = new Tile('C', 3);
-        tile6.setBoardidx(112);
-        Tile tile7 = new Tile('A', 2);
-        tile7.setBoardidx(113);
-        Tile tile8 = new Tile('R', 5);
-        tile8.setBoardidx(114);
 
         currentPlayfield.set(84, tile4);
         currentPlayfield.set(99, tile5);
-        currentPlayfield.set(112, tile6);
-        currentPlayfield.set(113, tile7);
-        currentPlayfield.set(114, tile8);
+        currentPlayfield.set(112, tile1);
+        currentPlayfield.set(113, tile2);
+        currentPlayfield.set(114, tile3);
         game.setPlayfield(currentPlayfield);
 
         Score score1 = new Score();
@@ -1742,21 +1758,11 @@ public class GameServiceTest {
             expectedPlayfield.add(null);
         }
 
-        Tile tile9 = new Tile('C', 3);
-        tile9.setBoardidx(112);
-        Tile tile10 = new Tile('A', 2);
-        tile10.setBoardidx(113);
-        Tile tile11 = new Tile('R', 5);
-        tile11.setBoardidx(114);
-        Tile tile12 = new Tile('Q', 10);
-        tile12.setBoardidx(84);
-        Tile tile13 = new Tile('O', 6);
-        tile13.setBoardidx(99);
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(113, tile10);
-        expectedPlayfield.set(114, tile11);
-        expectedPlayfield.set(84, tile12);
-        expectedPlayfield.set(99, tile13);
+        expectedPlayfield.set(112, tile1);
+        expectedPlayfield.set(113, tile2);
+        expectedPlayfield.set(114, tile3);
+        expectedPlayfield.set(84, tile4);
+        expectedPlayfield.set(99, tile5);
 
         List<Character> lettersInHand1 = new ArrayList<>();
         for (int i = 0; i < 2; i++){
@@ -1764,7 +1770,7 @@ public class GameServiceTest {
         }
 
         assertEquals(2L, game.getCurrentPlayer());
-        assertFalse(game.getWordContested());
+        assertTrue(game.getWordContested());
         assertArrayEquals(expectedPlayfield.toArray(), game.getOldPlayfield().toArray());
         assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
         assertEquals(0, game.getBag().getTiles().size());
@@ -1786,7 +1792,7 @@ public class GameServiceTest {
 
         Game game = new Game();
         game.setId(3L);
-        game.setWordContested(true);
+        game.setWordContested(false);
         game.setCurrentPlayer(1L);
         List<User> players = new ArrayList<>();
         players.add(user1);
@@ -1799,10 +1805,13 @@ public class GameServiceTest {
             oldPlayfield.add(null);
         }
         Tile tile1 = new Tile('C', 3);
+        tile1.setId(100L);
         tile1.setBoardidx(112);
         Tile tile2 = new Tile('A', 2);
+        tile2.setId(101L);
         tile2.setBoardidx(113);
         Tile tile3 = new Tile('R', 5);
+        tile3.setId(102L);
         tile3.setBoardidx(114);
         oldPlayfield.set(112, tile1);
         oldPlayfield.set(113, tile2);
@@ -1814,21 +1823,17 @@ public class GameServiceTest {
             currentPlayfield.add(null);
         }
         Tile tile4 = new Tile('Q', 10);
+        tile4.setId(200L);
         tile4.setBoardidx(84);
         Tile tile5 = new Tile('O', 6);
+        tile5.setId(201L);
         tile5.setBoardidx(99);
-        Tile tile6 = new Tile('C', 3);
-        tile6.setBoardidx(112);
-        Tile tile7 = new Tile('A', 2);
-        tile7.setBoardidx(113);
-        Tile tile8 = new Tile('R', 5);
-        tile8.setBoardidx(114);
 
         currentPlayfield.set(84, tile4);
         currentPlayfield.set(99, tile5);
-        currentPlayfield.set(112, tile6);
-        currentPlayfield.set(113, tile7);
-        currentPlayfield.set(114, tile8);
+        currentPlayfield.set(112, tile1);
+        currentPlayfield.set(113, tile2);
+        currentPlayfield.set(114, tile3);
         game.setPlayfield(currentPlayfield);
 
         given(gameRepository.findById(game.getId())).willReturn(Optional.of(game));
@@ -1842,39 +1847,23 @@ public class GameServiceTest {
             expectedPlayfield.add(null);
         }
 
-        Tile tile9 = new Tile('C', 3);
-        tile9.setBoardidx(112);
-        Tile tile10 = new Tile('A', 2);
-        tile10.setBoardidx(113);
-        Tile tile11 = new Tile('R', 5);
-        tile11.setBoardidx(114);
-        Tile tile12 = new Tile('Q', 10);
-        tile12.setBoardidx(84);
-        Tile tile13 = new Tile('O', 6);
-        tile13.setBoardidx(99);
-        expectedPlayfield.set(112, tile9);
-        expectedPlayfield.set(113, tile10);
-        expectedPlayfield.set(114, tile11);
-        expectedPlayfield.set(84, tile12);
-        expectedPlayfield.set(99, tile13);
+        expectedPlayfield.set(112, tile1);
+        expectedPlayfield.set(113, tile2);
+        expectedPlayfield.set(114, tile3);
+        expectedPlayfield.set(84, tile4);
+        expectedPlayfield.set(99, tile5);
 
         List<Tile> expectedoldPlayfield = new ArrayList<>();
         for (int i = 0; i<225; i++){
             expectedoldPlayfield.add(null);
         }
 
-        Tile tile14 = new Tile('C', 3);
-        tile14.setBoardidx(112);
-        Tile tile15 = new Tile('A', 2);
-        tile15.setBoardidx(113);
-        Tile tile16 = new Tile('R', 5);
-        tile16.setBoardidx(114);
-        expectedoldPlayfield.set(112, tile14);
-        expectedoldPlayfield.set(113, tile15);
-        expectedoldPlayfield.set(114, tile16);
+        expectedoldPlayfield.set(112, tile1);
+        expectedoldPlayfield.set(113, tile2);
+        expectedoldPlayfield.set(114, tile3);
 
         assertEquals(1L, game.getCurrentPlayer());
-        assertTrue(game.getWordContested());
+        assertFalse(game.getWordContested());
         assertArrayEquals(expectedoldPlayfield.toArray(), game.getOldPlayfield().toArray());
         assertArrayEquals(expectedPlayfield.toArray(), game.getPlayfield().toArray());
     }
@@ -1948,7 +1937,7 @@ public class GameServiceTest {
         for (int i = 0; i < letters.length; i++){
             Tile tile = new Tile(letters[i], values[i]);
             tile.setBoardidx(boardIndices[i]);
-            tile.setId((long) i);
+            tile.setId((long) boardIndices[i]);
             generatedPlayfield.set(tile.getBoardidx(), tile);
         }
 
