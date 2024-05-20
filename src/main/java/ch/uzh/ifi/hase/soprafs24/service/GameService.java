@@ -483,7 +483,7 @@ public class GameService {
                     }
 
                     if (lastElement != 14) {
-                        if (persistedPlayfield.get(firstElement+1) != null){
+                        if (persistedPlayfield.get(lastElement+1) != null){
                             newWordConnectedToExistingTile = true;
                         }
                     }
@@ -504,7 +504,7 @@ public class GameService {
                     }
 
                     if (lastElement != 224) {
-                        if (persistedPlayfield.get(firstElement+1) != null){
+                        if (persistedPlayfield.get(lastElement+1) != null){
                             newWordConnectedToExistingTile = true;
                         }
                     }
@@ -526,7 +526,7 @@ public class GameService {
                     }
 
                     if ((lastElement+1) % 15 != 0) {
-                        if (persistedPlayfield.get(firstElement+1) != null){
+                        if (persistedPlayfield.get(lastElement+1) != null){
                             newWordConnectedToExistingTile = true;
                         }
                     }
@@ -588,7 +588,7 @@ public class GameService {
                     }
 
                     if (lastElement != 210) {
-                        if (persistedPlayfield.get(firstElement+15) != null){
+                        if (persistedPlayfield.get(lastElement+15) != null){
                             newWordConnectedToExistingTile = true;
                         }
                     }
@@ -600,7 +600,7 @@ public class GameService {
                         }
                     }
                 }
-                // if word is located on row 14, only check for neighbor tiles on row 13
+                // if word is located on column 14, only check for neighbor tiles on column 13
                 else if (column == 14) {
                     if (firstElement != 14) {
                         if (persistedPlayfield.get(firstElement-15) != null){
@@ -609,7 +609,7 @@ public class GameService {
                     }
 
                     if (lastElement != 224) {
-                        if (persistedPlayfield.get(firstElement+15) != null){
+                        if (persistedPlayfield.get(lastElement+15) != null){
                             newWordConnectedToExistingTile = true;
                         }
                     }
@@ -630,7 +630,7 @@ public class GameService {
                     }
 
                     if (lastElement < 210) {
-                        if (persistedPlayfield.get(firstElement+15) != null){
+                        if (persistedPlayfield.get(lastElement+15) != null){
                             newWordConnectedToExistingTile = true;
                         }
                     }

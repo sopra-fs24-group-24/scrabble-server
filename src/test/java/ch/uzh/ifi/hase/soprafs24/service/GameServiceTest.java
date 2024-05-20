@@ -500,7 +500,6 @@ public class GameServiceTest {
         when(gameRepository.findById(Mockito.any())).thenReturn(Optional.of(testGame));
         when(mockResponse.statusCode()).thenReturn(404);
 
-
         gameService.changeScoresAfterContesting(testGame, contested, words);
 
         assertEquals(40, testGame.getScores().get(0).getScore());
@@ -565,6 +564,8 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("AAAAAAA"));
     }
 
     @Test
@@ -603,6 +604,8 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAT"));
     }
 
     @Test
@@ -644,6 +647,8 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("TEA"));
     }
 
     @Test
@@ -685,6 +690,8 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("EAA"));
     }
 
     @Test
@@ -723,6 +730,10 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(3, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("AD"));
+        assertTrue(testGame.getWordsToBeContested().contains("TO"));
+        assertTrue(testGame.getWordsToBeContested().contains("DOG"));
     }
 
     @Test
@@ -764,6 +775,8 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAC"));
     }
 
     @Test
@@ -802,6 +815,8 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAR"));
     }
 
     @Test
@@ -840,6 +855,504 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(3, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAR"));
+        assertTrue(testGame.getWordsToBeContested().contains("AC"));
+        assertTrue(testGame.getWordsToBeContested().contains("TA"));
+    }
+
+    @Test
+    public void newWordIsPlacedHorizontallyOnFirstRow_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'T', 'S', 'U', 'N'};
+        int[] valuesGenerated = {4, 3, 5, 5, 4, 3};
+        int[] boardIndicesGenerated = {1, 16, 31, 4, 19, 34};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'T', 'S', 'U', 'N', 'A', 'R'};
+        int[] valuesUser = {4, 3, 5, 5, 4, 3, 3, 7};
+        int[] boardIndicesUser = {1, 16, 31, 4, 19, 34, 2, 3};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'T', 'S', 'U', 'N', 'A', 'R'};
+        int[] valuesExpected = {4, 3, 5, 5, 4, 3, 3, 7};
+        int[] boardIndicesExpected = {1, 16, 31, 4, 19, 34, 2, 3};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'T', 'S', 'U', 'N'};
+        int[] valuesOldExpected = {4, 3, 5, 5, 4, 3};
+        int[] boardIndicesOldExpected = {1, 16, 31, 4, 19, 34};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CARS"));
+    }
+
+    @Test
+    public void newWordIsPlacedHorizontallyOnFirstRow2_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {15, 16, 17};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesUser = {15, 16, 17, 0, 1, 2};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesExpected = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesExpected = {15, 16, 17, 0, 1, 2};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {15, 16, 17};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(4, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAR"));
+        assertTrue(testGame.getWordsToBeContested().contains("CC"));
+        assertTrue(testGame.getWordsToBeContested().contains("AA"));
+        assertTrue(testGame.getWordsToBeContested().contains("RT"));
+    }
+
+    @Test
+    public void newWordIsPlacedHorizontallyOnFirstRow3_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {27, 28, 29};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesUser = {27, 28, 29, 12, 13, 14};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesExpected = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesExpected = {27, 28, 29, 12, 13, 14};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {27, 28, 29};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(4, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAR"));
+        assertTrue(testGame.getWordsToBeContested().contains("CC"));
+        assertTrue(testGame.getWordsToBeContested().contains("AA"));
+        assertTrue(testGame.getWordsToBeContested().contains("RT"));
+    }
+
+    @Test
+    public void newWordIsPlacedVerticallyOnFirstColumn_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'R', 'S', 'T', 'O', 'N', 'E'};
+        int[] valuesGenerated = {4, 1, 5, 4, 4, 3, 2, 1};
+        int[] boardIndicesGenerated = {30, 31, 32, 75, 76, 77, 78, 79};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'R', 'S', 'T', 'O', 'N', 'E', 'A', 'T'};
+        int[] valuesUser = {4, 1, 5, 4, 4, 3, 2, 1, 1, 4};
+        int[] boardIndicesUser = {30, 31, 32, 75, 76, 77, 78, 79, 45, 60};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'R', 'S', 'T', 'O', 'N', 'E', 'A', 'T'};
+        int[] valuesExpected = {4, 1, 5, 4, 4, 3, 2, 1, 1, 4};
+        int[] boardIndicesExpected = {30, 31, 32, 75, 76, 77, 78, 79, 45, 60};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'R', 'S', 'T', 'O', 'N', 'E'};
+        int[] valuesOldExpected = {4, 1, 5, 4, 4, 3, 2, 1};
+        int[] boardIndicesOldExpected = {30, 31, 32, 75, 76, 77, 78, 79};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CATS"));
+    }
+
+    @Test
+    public void newWordIsPlacedVerticallyOnFirstColumn2_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'S', 'T', 'O', 'N', 'E'};
+        int[] valuesGenerated = {4, 4, 3, 2, 1};
+        int[] boardIndicesGenerated = {45, 46, 47, 48, 49};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'R', 'S', 'T', 'O', 'N', 'E'};
+        int[] valuesUser = {4, 1, 5, 4, 4, 3, 2, 1};
+        int[] boardIndicesUser = {0, 15, 30, 45, 46, 47, 48, 49};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'R', 'S', 'T', 'O', 'N', 'E'};
+        int[] valuesExpected = {4, 1, 5, 4, 4, 3, 2, 1};
+        int[] boardIndicesExpected = {0, 15, 30, 45, 46, 47, 48, 49};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'S', 'T', 'O', 'N', 'E'};
+        int[] valuesOldExpected = {4, 4, 3, 2, 1};
+        int[] boardIndicesOldExpected = {45, 46, 47, 48, 49};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CARS"));
+    }
+
+    @Test
+    public void newWordIsPlacedVerticallyOnFirstColumn3_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'R'};
+        int[] valuesGenerated = {4, 1, 5};
+        int[] boardIndicesGenerated = {180, 181, 182};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'R', 'A', 'T'};
+        int[] valuesUser = {4, 1, 5, 1, 5};
+        int[] boardIndicesUser = {180, 181, 182, 195, 210};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'R', 'A', 'T'};
+        int[] valuesExpected = {4, 1, 5, 1, 5};
+        int[] boardIndicesExpected = {180, 181, 182, 195, 210};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'R'};
+        int[] valuesOldExpected = {4, 1, 5};
+        int[] boardIndicesOldExpected = {180, 181, 182};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAT"));
+    }
+
+    @Test
+    public void newWordIsPlacedHorizontallyOnLastRow_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {195, 196, 197};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesUser = {195, 196, 197, 210, 211, 212};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesExpected = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesExpected = {195, 196, 197, 210, 211, 212};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {195, 196, 197};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(4, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAR"));
+        assertTrue(testGame.getWordsToBeContested().contains("CC"));
+        assertTrue(testGame.getWordsToBeContested().contains("AA"));
+        assertTrue(testGame.getWordsToBeContested().contains("TR"));
+    }
+
+    @Test
+    public void newWordIsPlacedHorizontallyOnLastRow2_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'T'};
+        int[] valuesGenerated = {4, 3, 5};
+        int[] boardIndicesGenerated = {207, 208, 209};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesUser = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesUser = {207, 208, 209, 222, 223, 224};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'T', 'C', 'A', 'R'};
+        int[] valuesExpected = {4, 3, 5, 4, 3, 7};
+        int[] boardIndicesExpected = {207, 208, 209, 222, 223, 224};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'T'};
+        int[] valuesOldExpected = {4, 3, 5};
+        int[] boardIndicesOldExpected = {207, 208, 209};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(4, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAR"));
+        assertTrue(testGame.getWordsToBeContested().contains("CC"));
+        assertTrue(testGame.getWordsToBeContested().contains("AA"));
+        assertTrue(testGame.getWordsToBeContested().contains("TR"));
+    }
+
+    @Test
+    public void newWordIsPlacedHorizontallyOnLastRow3_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesGenerated = {4, 3, 7, 7, 5, 4};
+        int[] boardIndicesGenerated = {182, 197, 212, 185, 200, 215};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'A', 'I', 'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesUser = {3, 3, 4, 3, 7, 7, 5, 4};
+        int[] boardIndicesUser = {213, 214, 182, 197, 212, 185, 200, 215};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'A', 'I', 'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesExpected = {3, 3, 4, 3, 7, 7, 5, 4};
+        int[] boardIndicesExpected = {213, 214, 182, 197, 212, 185, 200, 215};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesOldExpected = {4, 3, 7, 7, 5, 4};
+        int[] boardIndicesOldExpected = {182, 197, 212, 185, 200, 215};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("RAIN"));
+    }
+
+    @Test
+    public void newWordIsPlacedVerticallyOnLastColumn_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesGenerated = {4, 1, 5, 5, 4, 3};
+        int[] boardIndicesGenerated = {132, 133, 134, 177, 178, 179};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'A', 'I', 'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesUser = {1, 2, 4, 1, 5, 5, 4, 3};
+        int[] boardIndicesUser = {149, 164, 132, 133, 134, 177, 178, 179};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'A', 'I', 'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesExpected = {1, 2, 4, 1, 5, 5, 4, 3};
+        int[] boardIndicesExpected = {149, 164, 132, 133, 134, 177, 178, 179};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'R', 'S', 'U', 'N'};
+        int[] valuesOldExpected = {4, 1, 5, 5, 4, 3};
+        int[] boardIndicesOldExpected = {132, 133, 134, 177, 178, 179};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("RAIN"));
+    }
+
+    @Test
+    public void newWordIsPlacedVerticallyOnLastColumn2_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'S', 'U', 'N'};
+        int[] valuesGenerated = {5, 4, 3};
+        int[] boardIndicesGenerated = {57, 58, 59};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'R', 'A', 'I', 'S', 'U', 'N'};
+        int[] valuesUser = {5, 1, 3, 5, 4, 3};
+        int[] boardIndicesUser = {14, 29,44, 57, 58, 59};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'R', 'A', 'I', 'S', 'U', 'N'};
+        int[] valuesExpected = {5, 1, 3, 5, 4, 3};
+        int[] boardIndicesExpected = {14, 29,44, 57, 58, 59};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'S', 'U', 'N'};
+        int[] valuesOldExpected = {5, 4, 3};
+        int[] boardIndicesOldExpected = {57, 58, 59};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("RAIN"));
+    }
+
+    @Test
+    public void newWordIsPlacedVerticallyOnLastColumn3_validMove_saveUpdatedPlayfield() {
+        // given
+        // saved Playfield in database
+        char[] lettersGenerated = {'C', 'A', 'R'};
+        int[] valuesGenerated = {3, 1, 5};
+        int[] boardIndicesGenerated = {178, 193, 208};
+        List<Tile> generatedPlayfield = fillBoard(lettersGenerated, valuesGenerated, boardIndicesGenerated);
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        // sent Playfield by user
+        Game userGame = new Game();
+        char[] lettersUser = {'C', 'A', 'R', 'C', 'A', 'T'};
+        int[] valuesUser = {3, 1, 5, 3, 1, 6};
+        int[] boardIndicesUser = {178, 193, 208, 194, 209, 224};
+        List<Tile> userPlayfield = fillBoard(lettersUser, valuesUser, boardIndicesUser);
+        userGame.setPlayfield(userPlayfield);
+
+        // when
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        gameService.placeTilesOnBoard(userGame);
+
+        // then
+        char[] lettersExpected = {'C', 'A', 'R', 'C', 'A', 'T'};
+        int[] valuesExpected = {3, 1, 5, 3, 1, 6};
+        int[] boardIndicesExpected = {178, 193, 208, 194, 209, 224};
+        List<Tile> expectedPlayfield = fillBoard(lettersExpected, valuesExpected, boardIndicesExpected);
+
+        char[] lettersOldExpected = {'C', 'A', 'R'};
+        int[] valuesOldExpected = {3, 1, 5};
+        int[] boardIndicesOldExpected = {178, 193, 208};
+        List<Tile> expectedOldPlayfield = fillBoard(lettersOldExpected, valuesOldExpected, boardIndicesOldExpected);
+
+        assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
+        assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(3, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("CAT"));
+        assertTrue(testGame.getWordsToBeContested().contains("AC"));
+        assertTrue(testGame.getWordsToBeContested().contains("RA"));
     }
 
     @Test
@@ -878,6 +1391,8 @@ public class GameServiceTest {
 
         assertArrayEquals(expectedPlayfield.toArray(), testGame.getPlayfield().toArray());
         assertArrayEquals(expectedOldPlayfield.toArray(), testGame.getOldPlayfield().toArray());
+        assertEquals(1, testGame.getWordsToBeContested().size());
+        assertTrue(testGame.getWordsToBeContested().contains("COMPLEXA"));
     }
 
     @Test
