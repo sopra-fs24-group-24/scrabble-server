@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class LobbyServiceTest {
 
@@ -83,8 +84,8 @@ public class LobbyServiceTest {
         testLobby.setGameStarted(false);
 
         // when
-        Mockito.when(lobbyRepository.save(Mockito.any())).thenReturn(testLobby);
-        Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
+        Mockito.when(lobbyRepository.save(any())).thenReturn(testLobby);
+        Mockito.when(userRepository.save(any())).thenReturn(testUser);
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(testUser));
         Mockito.when(userRepository.findById(2L)).thenReturn(Optional.ofNullable(testUser2));
         Mockito.when(userRepository.findById(3L)).thenReturn(Optional.ofNullable(testUser3));
@@ -97,7 +98,7 @@ public class LobbyServiceTest {
         Lobby createdLobby = lobbyService.createLobby(testLobby);
 
         // then
-        Mockito.verify(lobbyRepository, Mockito.times(1)).save(Mockito.any());
+        Mockito.verify(lobbyRepository, times(1)).save(any());
 
         assertEquals(testLobby.getId(), createdLobby.getId());
         assertEquals(testLobby.getLobbySize(), createdLobby.getLobbySize());
@@ -114,7 +115,7 @@ public class LobbyServiceTest {
         lobbyService.createLobby(testLobby);
 
         // when
-        Mockito.when(lobbyRepository.findLobbyByUserId(Mockito.any())).thenReturn(Optional.ofNullable(testLobby));
+        Mockito.when(lobbyRepository.findLobbyByUserId(any())).thenReturn(Optional.ofNullable(testLobby));
 
         // then
         assertThrows(ResponseStatusException.class, () -> lobbyService.createLobby(testLobby));
@@ -126,8 +127,8 @@ public class LobbyServiceTest {
         Lobby createdLobby = lobbyService.createLobby(testLobby);
 
         // when
-        Mockito.when(lobbyRepository.findLobbyByUserId(Mockito.any())).thenReturn(Optional.ofNullable(null));
-        Mockito.when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testLobby));
+        Mockito.when(lobbyRepository.findLobbyByUserId(any())).thenReturn(Optional.ofNullable(null));
+        Mockito.when(lobbyRepository.findById(any())).thenReturn(Optional.ofNullable(testLobby));
         lobbyService.addPlayertoLobby(1L, 2L);
 
         // then
@@ -154,8 +155,8 @@ public class LobbyServiceTest {
         Lobby createdLobby = lobbyService.createLobby(testLobby);
 
         // when
-        Mockito.when(lobbyRepository.findLobbyByUserId(Mockito.any())).thenReturn(Optional.ofNullable(null));
-        Mockito.when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testLobby));
+        Mockito.when(lobbyRepository.findLobbyByUserId(any())).thenReturn(Optional.ofNullable(null));
+        Mockito.when(lobbyRepository.findById(any())).thenReturn(Optional.ofNullable(testLobby));
         lobbyService.addPlayertoLobby(1L, 2L);
         lobbyService.addPlayertoLobby(1L, 3L);
         lobbyService.addPlayertoLobby(1L, 4L);
@@ -188,8 +189,8 @@ public class LobbyServiceTest {
         lobbyService.createLobby(testLobby);
 
         // when
-        Mockito.when(lobbyRepository.findLobbyByUserId(Mockito.any())).thenReturn(Optional.ofNullable(null));
-        Mockito.when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(null));
+        Mockito.when(lobbyRepository.findLobbyByUserId(any())).thenReturn(Optional.ofNullable(null));
+        Mockito.when(lobbyRepository.findById(any())).thenReturn(Optional.ofNullable(null));
 
         // then
         assertThrows(ResponseStatusException.class, () -> lobbyService.addPlayertoLobby(3L, 2L));
@@ -201,7 +202,7 @@ public class LobbyServiceTest {
         lobbyService.createLobby(testLobby);
 
         // when
-        Mockito.when(lobbyRepository.findLobbyByUserId(Mockito.any())).thenReturn(Optional.ofNullable(testLobby));
+        Mockito.when(lobbyRepository.findLobbyByUserId(any())).thenReturn(Optional.ofNullable(testLobby));
 
         // then
         assertThrows(ResponseStatusException.class, () -> lobbyService.addPlayertoLobby(1L, 2L));
@@ -214,8 +215,8 @@ public class LobbyServiceTest {
         createdLobby.setNumberOfPlayers(4);
 
         // when
-        Mockito.when(lobbyRepository.findLobbyByUserId(Mockito.any())).thenReturn(Optional.ofNullable(null));
-        Mockito.when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(createdLobby));
+        Mockito.when(lobbyRepository.findLobbyByUserId(any())).thenReturn(Optional.ofNullable(null));
+        Mockito.when(lobbyRepository.findById(any())).thenReturn(Optional.ofNullable(createdLobby));
 
         // then
         assertThrows(ResponseStatusException.class, () -> lobbyService.addPlayertoLobby(1L, 2L));
@@ -472,7 +473,7 @@ public class LobbyServiceTest {
         List<User> players = new ArrayList<>();
         players.add(user1);
         players.add(user2);
-        players.add(user2);
+        players.add(user3);
         game.setPlayers(players);
 
         Hand hand1 = new Hand();
@@ -557,8 +558,8 @@ public class LobbyServiceTest {
         bag.setTiles(tilesInBag);
         game.setBag(bag);
 
-        when(handRepository.findById(Mockito.any())).thenReturn(Optional.of(hand1));
-        when(scoreRepository.findById(Mockito.any())).thenReturn(Optional.of(score1));
+        when(handRepository.findById(any())).thenReturn(Optional.of(hand1));
+        when(scoreRepository.findById(any())).thenReturn(Optional.of(score1));
 
         // when
         lobbyService.removePlayer(game, user1);
@@ -604,5 +605,202 @@ public class LobbyServiceTest {
             assertEquals(30, game.getScores().get(0).getScore());
             assertEquals(20, game.getScores().get(1).getScore());
         }
+    }
+
+    @Test
+    public void removePlayerFromLobby_playerNotInLobby_throwError() {
+        // given
+        Lobby lobby = new Lobby();
+        lobby.setId(5L);
+        List<Long> players = new ArrayList<>();
+        players.add(1L);
+        players.add(2L);
+        players.add(3L);
+        lobby.setUsersInLobby(players);
+        User user4 = new User();
+        user4.setId(4L);
+
+        when(userRepository.findById(any())).thenReturn(Optional.of(user4));
+        when(lobbyRepository.findById(any())).thenReturn(Optional.of(lobby));
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> lobbyService.removePlayerFromLobby(5L, 4L));
+    }
+
+    @Test
+    public void removePlayerFromLobby_playerInLobby_OnlyOnePlayerRemainsInLobby() {
+        // given
+        Lobby lobby = new Lobby();
+        lobby.setId(10L);
+        lobby.setNumberOfPlayers(2);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("luca");
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        List<Long> playersId = new ArrayList<>();
+        playersId.add(1L);
+        playersId.add(2L);
+
+        Game game = new Game();
+        game.setGameOver(false);
+        List<User> playersGame = new ArrayList<>();
+        playersGame.add(user1);
+        playersGame.add(user2);
+        game.setPlayers(playersGame);
+
+        Hand hand1 = new Hand();
+        hand1.setHanduserid(1L);
+        List<Tile> handTiles1 = new ArrayList<>();
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        hand1.setHandtiles(handTiles1);
+        int id = 1;
+        for (int i = 0; i < 7; i++){
+            hand1.getHandtiles().get(i).setId((long) id);
+            id++;
+        }
+
+        Hand hand2 = new Hand();
+        hand2.setHanduserid(2L);
+        List<Tile> handTiles2 = new ArrayList<>();
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        hand2.setHandtiles(handTiles2);
+        for (int i = 0; i < 7; i++){
+            hand2.getHandtiles().get(i).setId((long) id);
+            id++;
+        }
+
+        List<Hand> hands = new ArrayList<>();
+        hands.add(hand1);
+        hands.add(hand2);
+        game.setHands(hands);
+
+        Score score1 = new Score();
+        score1.setScoreUserId(1L);
+        score1.setScore(10);
+
+        Score score2 = new Score();
+        score2.setScoreUserId(2L);
+        score2.setScore(20);
+
+        lobby.setGameOfLobby(game);
+        lobby.setPlayers(players);
+        lobby.setUsersInLobby(playersId);
+
+        List<Score> scores = new ArrayList<>();
+        scores.add(score1);
+        scores.add(score2);
+        game.setScores(scores);
+
+        Bag bag = new Bag();
+        bag.setId(100L);
+        List<Tile> tilesInBag = new ArrayList<>();
+        tilesInBag.add(new Tile('D', 2));
+        tilesInBag.add(new Tile('D', 2));
+        tilesInBag.add(new Tile('D', 2));
+        bag.setTiles(tilesInBag);
+        game.setBag(bag);
+
+        when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user2));
+        when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.of(lobby));
+        when(handRepository.findById(Mockito.any())).thenReturn(Optional.of(hand2));
+        when(scoreRepository.findById(Mockito.any())).thenReturn(Optional.of(score2));
+
+        // when
+        lobbyService.removePlayerFromLobby(lobby.getId(), user2.getId());
+
+        // then
+        assertEquals(1, lobby.getNumberOfPlayers());
+        assertTrue(lobby.getGameOfLobby().getGameOver());
+    }
+
+    @Test
+    public void removePlayerFromLobby_playerInLobby_noPlayerRemainsInLobby() {
+        // given
+        Lobby lobby = new Lobby();
+        lobby.setId(10L);
+        lobby.setNumberOfPlayers(1);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        List<Long> playersId = new ArrayList<>();
+        playersId.add(1L);
+
+        Game game = new Game();
+        List<User> playersGame = new ArrayList<>();
+        playersGame.add(user1);
+        game.setPlayers(playersGame);
+
+        Hand hand1 = new Hand();
+        hand1.setHanduserid(1L);
+        List<Tile> handTiles1 = new ArrayList<>();
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        hand1.setHandtiles(handTiles1);
+        int id = 1;
+        for (int i = 0; i < 7; i++){
+            hand1.getHandtiles().get(i).setId((long) id);
+            id++;
+        }
+
+        List<Hand> hands = new ArrayList<>();
+        hands.add(hand1);
+        game.setHands(hands);
+
+        Score score1 = new Score();
+        score1.setScoreUserId(1L);
+        score1.setScore(10);
+
+        lobby.setGameOfLobby(game);
+        lobby.setPlayers(players);
+        lobby.setUsersInLobby(playersId);
+
+        List<Score> scores = new ArrayList<>();
+        scores.add(score1);
+        game.setScores(scores);
+
+        Bag bag = new Bag();
+        bag.setId(100L);
+        List<Tile> tilesInBag = new ArrayList<>();
+        bag.setTiles(tilesInBag);
+        game.setBag(bag);
+
+        when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user1));
+        when(lobbyRepository.findById(Mockito.any())).thenReturn(Optional.of(lobby));
+        when(handRepository.findById(Mockito.any())).thenReturn(Optional.of(hand1));
+        when(scoreRepository.findById(Mockito.any())).thenReturn(Optional.of(score1));
+
+        // when
+        lobbyService.removePlayerFromLobby(lobby.getId(), user1.getId());
+
+        // then
+        assertEquals(0, lobby.getNumberOfPlayers());
+        verify(lobbyRepository, times(1)).delete(lobby);
+        verify(lobbyRepository, times(1)).flush();
     }
 }
