@@ -2,7 +2,9 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.HandRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.ScoreRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 public class LobbyServiceTest {
 
@@ -28,6 +31,12 @@ public class LobbyServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private HandRepository handRepository;
+
+    @Mock
+    private ScoreRepository scoreRepository;
 
     @InjectMocks
     private LobbyService lobbyService;
@@ -442,5 +451,158 @@ public class LobbyServiceTest {
         assertEquals("elena", testLobbyGetDTO.getPlayers().get(2).getUsername());
         assertEquals(3L, testLobbyGetDTO.getPlayers().get(2).getId());
         assertEquals(expectedUser.getStatus(), testLobbyGetDTO.getPlayers().get(2).getStatus());
+    }
+
+    @Test
+    public void removePlayer_success() {
+        // given
+        Game game = new Game();
+        game.setCurrentPlayer(1L);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("luca");
+        User user3 = new User();
+        user3.setId(3L);
+        user3.setUsername("martin");
+
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user2);
+        game.setPlayers(players);
+
+        Hand hand1 = new Hand();
+        hand1.setHanduserid(1L);
+        List<Tile> handTiles1 = new ArrayList<>();
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        handTiles1.add(new Tile('A', 1));
+        hand1.setHandtiles(handTiles1);
+        int id = 1;
+        for (int i = 0; i < 7; i++){
+            hand1.getHandtiles().get(i).setId((long) id);
+            id++;
+        }
+
+        Hand hand2 = new Hand();
+        hand2.setHanduserid(2L);
+        List<Tile> handTiles2 = new ArrayList<>();
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        handTiles2.add(new Tile('B', 1));
+        hand2.setHandtiles(handTiles2);
+        for (int i = 0; i < 7; i++){
+            hand2.getHandtiles().get(i).setId((long) id);
+            id++;
+        }
+
+        Hand hand3 = new Hand();
+        hand3.setHanduserid(3L);
+        List<Tile> handTiles3 = new ArrayList<>();
+        handTiles3.add(new Tile('C', 1));
+        handTiles3.add(new Tile('C', 1));
+        handTiles3.add(new Tile('C', 1));
+        handTiles3.add(new Tile('C', 1));
+        handTiles3.add(new Tile('C', 1));
+        handTiles3.add(new Tile('C', 1));
+        handTiles3.add(new Tile('C', 1));
+        hand3.setHandtiles(handTiles3);
+        for (int i = 0; i < 7; i++){
+            hand3.getHandtiles().get(i).setId((long) id);
+            id++;
+        }
+
+        List<Hand> hands = new ArrayList<>();
+        hands.add(hand1);
+        hands.add(hand2);
+        hands.add(hand3);
+        game.setHands(hands);
+
+        Score score1 = new Score();
+        score1.setScoreUserId(1L);
+        score1.setScore(10);
+
+        Score score2 = new Score();
+        score2.setScoreUserId(2L);
+        score2.setScore(20);
+
+        Score score3 = new Score();
+        score3.setScoreUserId(3L);
+        score3.setScore(30);
+
+        List<Score> scores = new ArrayList<>();
+        scores.add(score1);
+        scores.add(score2);
+        scores.add(score3);
+        game.setScores(scores);
+
+        Bag bag = new Bag();
+        bag.setId(100L);
+        List<Tile> tilesInBag = new ArrayList<>();
+        tilesInBag.add(new Tile('D', 2));
+        tilesInBag.add(new Tile('D', 2));
+        tilesInBag.add(new Tile('D', 2));
+        bag.setTiles(tilesInBag);
+        game.setBag(bag);
+
+        when(handRepository.findById(Mockito.any())).thenReturn(Optional.of(hand1));
+        when(scoreRepository.findById(Mockito.any())).thenReturn(Optional.of(score1));
+
+        // when
+        lobbyService.removePlayer(game, user1);
+
+        // then
+        List<Long> expectedPlayers = new ArrayList<>();
+        expectedPlayers.add(user2.getId());
+        expectedPlayers.add(user3.getId());
+
+        List<Long> expectedHands = new ArrayList<>();
+        expectedHands.add(hand2.getHanduserid());
+        expectedHands.add(hand3.getHanduserid());
+
+        List<Long> expectedScores = new ArrayList<>();
+        expectedScores.add(score2.getScoreUserId());
+        expectedScores.add(score3.getScoreUserId());
+
+        assertEquals(2, game.getPlayers().size());
+        assertTrue(expectedPlayers.contains(game.getPlayers().get(0).getId()));
+        assertTrue(expectedPlayers.contains(game.getPlayers().get(1).getId()));
+        assertEquals(2, game.getHands().size());
+        assertTrue(expectedHands.contains(game.getHands().get(0).getHanduserid()));
+        assertTrue(expectedHands.contains(game.getHands().get(1).getHanduserid()));
+        assertEquals(2, game.getScores().size());
+        assertTrue(expectedScores.contains(game.getScores().get(0).getScoreUserId()));
+        assertTrue(expectedScores.contains(game.getScores().get(1).getScoreUserId()));
+        assertTrue(expectedPlayers.contains(game.getCurrentPlayer()));
+
+        if (game.getHands().get(0).getHanduserid() == hand2.getHanduserid()){
+            assertArrayEquals(hand2.getHandtiles().toArray(), game.getHands().get(0).getHandtiles().toArray());
+            assertArrayEquals(hand3.getHandtiles().toArray(), game.getHands().get(1).getHandtiles().toArray());
+        }
+        else {
+            assertArrayEquals(hand3.getHandtiles().toArray(), game.getHands().get(0).getHandtiles().toArray());
+            assertArrayEquals(hand2.getHandtiles().toArray(), game.getHands().get(1).getHandtiles().toArray());
+        }
+
+        if (game.getScores().get(0).getScoreUserId() == score2.getScoreUserId()){
+            assertEquals(20, game.getScores().get(0).getScore());
+            assertEquals(30, game.getScores().get(1).getScore());
+        }
+        else{
+            assertEquals(30, game.getScores().get(0).getScore());
+            assertEquals(20, game.getScores().get(1).getScore());
+        }
     }
 }
