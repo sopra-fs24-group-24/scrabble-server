@@ -115,6 +115,30 @@ public class GameServiceTest {
     }
 
     @Test
+    public void getGameData_gameWithIndicatedGameIdExists_returnGameData() {
+        // given
+        testGame.setId(1L);
+
+        // when
+        when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
+
+        // then
+        assertDoesNotThrow(() -> gameService.getGameParams(1L));
+    }
+
+    @Test
+    public void getGameData_gameWithIndicatedGameIdDoesNotExist_throwError() {
+        // given
+        testGame.setId(2L);
+
+        // when
+        when(gameRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // then
+        assertThrows(ResponseStatusException.class, () -> gameService.getGameParams(1L));
+    }
+
+    @Test
     public void skipTurn_2Players_success() {
         User user = testGame.getPlayers().get(0);
         when(gameRepository.findById(1L)).thenReturn(Optional.of(testGame));
@@ -529,6 +553,61 @@ public class GameServiceTest {
 
         assertEquals(80, testGame.getScores().get(0).getScore());
         assertEquals(30, testGame.getScores().get(1).getScore());
+    }
+
+    @Test
+    public void userPlayfieldTooBig_throwError() {
+        // given
+        List<Tile> generatedPlayfield = new ArrayList<>();
+
+        for (int i = 0; i < 225; i++) {
+            generatedPlayfield.add(i, null);
+        }
+
+        testGame.setPlayfield(generatedPlayfield);
+        testGame.setOldPlayfield(generatedPlayfield);
+
+        Game userGame = new Game();
+        List<Tile> userPlayfield = new ArrayList<>();
+        for (int i = 0; i < 227; i++){
+            userPlayfield.add(null);
+        }
+        Tile tile1 = new Tile('A', 1);
+        tile1.setId(225L);
+        tile1.setBoardidx(225);
+        Tile tile2 = new Tile('A', 1);
+        tile2.setId(226L);
+        tile2.setBoardidx(226);
+        userPlayfield.set(225, tile1);
+        userPlayfield.set(226, tile2);
+        userGame.setPlayfield(userPlayfield);
+
+        // when/then
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        assertThrows(ResponseStatusException.class, () -> gameService.placeTilesOnBoard(userGame));
+    }
+
+    @Test
+    public void contestWord_userNotPartOfGame_throwError() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+        User user3 = new User();
+        user3.setId(4L);
+
+
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+
+        testGame.setId(3L);
+        testGame.setPlayers(players);
+
+        // when/then
+        when(gameRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testGame));
+        assertThrows(ResponseStatusException.class, () -> gameService.contestWord(testGame.getId(), user3, true));
     }
 
     @Test

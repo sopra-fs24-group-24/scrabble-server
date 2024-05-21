@@ -136,7 +136,6 @@ public class GameService {
 
     public List<Tile> placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game.getId());
-        checkIfBoardValid(game.getPlayfield());
 
         //TODO: add function to check whether userinput is sent from the correct player
 
@@ -1122,24 +1121,6 @@ public class GameService {
     private Game checkIfGameExists(Long gameId) {
         return gameRepository.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indicated Game not found!"));
-    }
-
-
-    /**
-     * This is a helper method that will check whether a board
-     * has the correct size. The method will return nothing
-     * or else throw an error.
-     *
-     * @param board
-     * @throws ResponseStatusException
-     * @see Tile
-     */
-    private void checkIfBoardValid(List<Tile> board) {
-        // check if board size correct
-        if (board.size() != 225) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Board Dimensions need to be 15x15");
-        }
     }
 
     /**

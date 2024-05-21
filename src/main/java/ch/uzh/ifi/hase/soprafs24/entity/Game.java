@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -120,6 +122,10 @@ public class Game implements Serializable{
             filledfield.add(null);
         }
         for (int i = 0; i<this.playfield.size(); i++){
+            if (this.playfield.get(i)!= null && this.playfield.get(i).getBoardidx() > 224){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Board Dimensions need to be 15x15");
+            }
             if (this.playfield.get(i)!= null){
                 filledfield.set(this.playfield.get(i).getBoardidx(), this.playfield.get(i));
             }
