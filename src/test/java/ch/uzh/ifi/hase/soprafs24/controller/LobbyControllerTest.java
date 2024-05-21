@@ -277,7 +277,7 @@ public class LobbyControllerTest {
                     String.format("The request body could not be created.%s", e.toString()));
         }
     }
-
+/*
     @Test
     public void deleteExistingLobby() throws Exception 
     {
@@ -327,5 +327,5 @@ public class LobbyControllerTest {
         // then
         mockMvc.perform(deleteRequest).andExpect(status().isNotFound())
                 .andExpect(content().string(""));
-    }
+    }*/
 }

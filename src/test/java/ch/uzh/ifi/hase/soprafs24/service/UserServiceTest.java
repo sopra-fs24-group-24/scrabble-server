@@ -449,4 +449,35 @@ public class UserServiceTest {
         // when/then
         assertThrows(ResponseStatusException.class, () -> userService.getFriends(1L, "2"));
     }
+
+    @Test
+    public void isTokenValid_validRequest_returnUser() {
+        // given
+        String token = "1";
+        User user1 = new User();
+        user1.setToken("1");
+        user1.setId(1L);
+        user1.setUsername("fabio");
+
+        when(userRepository.findByToken(token)).thenReturn(user1);
+
+        // when
+        User foundUser = userService.isTokenValid(token);
+
+        // then
+        assertEquals(1L, foundUser.getId());
+        assertEquals("fabio", foundUser.getUsername());
+        assertEquals("1", foundUser.getToken());
+    }
+
+    @Test
+    public void isTokenValid_invalidRequest_throwError() {
+        // given
+        String token = "1";
+
+        when(userRepository.findByToken(token)).thenReturn(null);
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> userService.isTokenValid(token));
+    }
 }
