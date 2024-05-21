@@ -803,4 +803,70 @@ public class LobbyServiceTest {
         verify(lobbyRepository, times(1)).delete(lobby);
         verify(lobbyRepository, times(1)).flush();
     }
+
+    @Test
+    public void checkIfLobbyExistsByPin_lobbyFound_noErrorIsThrown() {
+        // given
+        String pin = "100000";
+        Lobby lobby = new Lobby();
+        lobby.setId(20L);
+        lobby.setPin("100000");
+        List<Long> playersId = new ArrayList<>();
+        playersId.add(10L);
+        playersId.add(11L);
+        lobby.setUsersInLobby(playersId);
+
+        when(lobbyRepository.findLobbyByPin(pin)).thenReturn(Optional.of(lobby));
+
+        assertDoesNotThrow(() -> lobbyService.checkIfLobbyExistsByPin(pin));
+    }
+
+    @Test
+    public void checkIfLobbyExistsByPin_lobbyFound_returnLobby() {
+        // given
+        String pin = "100000";
+        Lobby lobby = new Lobby();
+        lobby.setId(20L);
+        lobby.setPin("100000");
+        List<Long> playersId = new ArrayList<>();
+        playersId.add(10L);
+        playersId.add(11L);
+        lobby.setUsersInLobby(playersId);
+
+        when(lobbyRepository.findLobbyByPin(pin)).thenReturn(Optional.of(lobby));
+
+        // when
+        Lobby foundLobby = lobbyService.checkIfLobbyExistsByPin(pin);
+
+        // then
+        Lobby expectedLobby = new Lobby();
+        expectedLobby.setId(20L);
+        expectedLobby.setPin("100000");
+        List<Long> expectedPlayersId = new ArrayList<>();
+        expectedPlayersId.add(10L);
+        expectedPlayersId.add(11L);
+        expectedLobby.setUsersInLobby(expectedPlayersId);
+
+        assertEquals(expectedLobby.getId(), foundLobby.getId());
+        assertEquals(expectedLobby.getPin(), foundLobby.getPin());
+        assertArrayEquals(expectedLobby.getUsersInLobby().toArray(), foundLobby.getUsersInLobby().toArray());
+    }
+
+    @Test
+    public void checkIfLobbyExistsByPin_lobbyNotFound_throwError() {
+        // given
+        String pin = "100000";
+        Lobby lobby = new Lobby();
+        lobby.setId(20L);
+        lobby.setPin("200000");
+        List<Long> playersId = new ArrayList<>();
+        playersId.add(10L);
+        playersId.add(11L);
+        lobby.setUsersInLobby(playersId);
+
+        when(lobbyRepository.findLobbyByPin(pin)).thenReturn(Optional.empty());
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> lobbyService.checkIfLobbyExistsByPin(pin));
+    }
 }
