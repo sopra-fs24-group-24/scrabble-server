@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 public class UserServiceTest {
 
@@ -376,4 +377,76 @@ public class UserServiceTest {
 
       assertThrows(ResponseStatusException.class, () -> userService.acceptFriendRequest(1L, 2L, true, "testToken"));
   }
+
+  @Test
+  public void getFriends_validRequest_returnFriends() {
+      // given
+      User user1 = new User();
+      user1.setId(1L);
+      user1.setToken("1");
+      user1.setUsername("fabio");
+      User user2 = new User();
+      user2.setId(2L);
+      user2.setUsername("luca");
+      User user3 = new User();
+      user3.setId(3L);
+      user3.setUsername("martin");
+
+      user1.addFriend(2L);
+      user1.addFriend(3L);
+
+      when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+      when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+      when(userRepository.findById(3L)).thenReturn(Optional.of(user3));
+
+      // when
+      List<User> friends = userService.getFriends(user1.getId(), user1.getToken());
+
+      // then
+      List<Long> expectedIDs = new ArrayList<>();
+      expectedIDs.add(2L);
+      expectedIDs.add(3L);
+
+      assertEquals(2, friends.size());
+      assertTrue(expectedIDs.contains(friends.get(0).getId()));
+      assertTrue(expectedIDs.contains(friends.get(1).getId()));
+
+      if (friends.get(0).getId() == user2.getId()){
+          assertEquals(2L, friends.get(0).getId());
+          assertEquals("luca", friends.get(0).getUsername());
+          assertEquals(3L, friends.get(1).getId());
+          assertEquals("martin", friends.get(1).getUsername());
+      }
+      else{
+          assertEquals(2L, friends.get(1).getId());
+          assertEquals("luca", friends.get(1).getUsername());
+          assertEquals(3L, friends.get(0).getId());
+          assertEquals("martin", friends.get(0).getUsername());
+      }
+  }
+
+    @Test
+    public void getFriends_invalidRequest_throwError() {
+        // given
+        Long id = 1L;
+        String token = "1";
+
+        when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> userService.getFriends(id, token));
+    }
+
+    @Test
+    public void getFriends_invalidRequest2_throwError() {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setToken("1");
+
+        when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user1));
+
+        // when/then
+        assertThrows(ResponseStatusException.class, () -> userService.getFriends(1L, "2"));
+    }
 }

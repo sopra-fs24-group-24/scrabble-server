@@ -77,11 +77,12 @@ public class LobbyService {
         return newLobby;
     }
 
+    /*
     public Lobby addPlayertoPrivateLobby(String lobbyPin,Long userId)
     {
         Lobby lobby=checkIfLobbyExistsByPin(lobbyPin);
         return addPlayertoLobby(lobby.getId(), userId);
-    }
+    }*/
 
     public void transformUsersIntoUsersSlim(LobbyGetDTO lobbyGetDTO, Lobby lobby){
         List<UserSlimGetDTO> playersSlim = new ArrayList<>();
@@ -122,7 +123,7 @@ public class LobbyService {
         String errorMessage = "Lobby is already full!";
         throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
     }
-
+/*
     public void deleteLobby(Long lobbyId)
     {
         Lobby lobby = checkIfLobbyExistsById(lobbyId);
@@ -132,7 +133,7 @@ public class LobbyService {
         {
             removePlayerFromLobby(lobbyId, user.getId());    
         }
-    }
+    }*/
 
     public void removePlayerFromLobby(Long lobbyId, Long userId) {
         User foundUser = checkIfPlayerExists(userId);

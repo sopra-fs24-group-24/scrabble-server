@@ -106,6 +106,7 @@ public class LobbyController {
         return lobbyGetDTO;
     }
 
+    /*
     @DeleteMapping("/lobbies/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -114,7 +115,7 @@ public class LobbyController {
         userService.isTokenValid(token);
         lobbyService.checkIfLobbyExistsById(lobbyId);
         lobbyService.deleteLobby(lobbyId);
-    }
+    }*/
 
     @PutMapping("/lobbies/withdrawal/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
