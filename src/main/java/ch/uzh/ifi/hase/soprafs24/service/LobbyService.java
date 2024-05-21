@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 @Service
@@ -67,7 +68,8 @@ public class LobbyService {
         List<User> players = new ArrayList<>();
         players.add(foundUser);
         newLobby.setPlayers(players);
-        if (newLobby.getIsPrivate()) {
+        if (newLobby.getIsPrivate()) 
+        {
             newLobby.setPin(createUniquePin());
         }
         newLobby = lobbyRepository.save(newLobby);
@@ -75,7 +77,7 @@ public class LobbyService {
         return newLobby;
     }
 
-    public Lobby addPlayertoPrivateLobby(int lobbyPin,Long userId)
+    public Lobby addPlayertoPrivateLobby(String lobbyPin,Long userId)
     {
         Lobby lobby=checkIfLobbyExistsByPin(lobbyPin);
         return addPlayertoLobby(lobby.getId(), userId);
@@ -237,30 +239,35 @@ public class LobbyService {
                  String.format("Lobby with Lobby-ID %d does not exist!", id)));
      }
 
-    public Lobby checkIfLobbyExistsByPin(int pin)
+    public Lobby checkIfLobbyExistsByPin(String pin)
     {
         Optional<Lobby> foundLobby = lobbyRepository.findLobbyByPin(pin);
         return foundLobby.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                String.format("Private lobby with PIN %d does not exist!", pin)));
+                String.format("Private lobby with PIN %s does not exist!", pin)));
     }
 
-    private int createUniquePin() {
-        boolean isUniquePin;
-        int pin;
+    private String createUniquePin()
+    {
+        final String chrs = "0123456789abcdefghijklmnopqrstuvwxyz-_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-        do {
-            isUniquePin = true;
-            Random rand = new Random();
-            pin = rand.nextInt(100000, 999999);
+        SecureRandom secureRandom=null;
+        try
+        {
+         secureRandom = SecureRandom.getInstanceStrong();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
 
-            for (Lobby lobby : lobbyRepository.findAll()) {
-                if (lobby.getPin() == pin) {
-                    isUniquePin = false;
-                }
-            }
-        } while (!isUniquePin);
 
-        return pin;
+        final String customTag = secureRandom
+        .ints(6, 0, chrs.length()) // 9 is the length of the string you want
+        .mapToObj(i -> chrs.charAt(i))
+        .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+        .toString();
+
+        return customTag;
     }
 
     /**

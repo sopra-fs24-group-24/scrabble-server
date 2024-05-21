@@ -29,7 +29,7 @@ public class LobbyGetDTO {
 
     private boolean isPrivate;
 
-    private int pin;
+    private String pin;
 
     public void setIsPrivate(boolean IsPrivate) {
         isPrivate = IsPrivate;
@@ -92,8 +92,8 @@ public class LobbyGetDTO {
 
     public void setGameStarted(boolean gameStarted) { this.gameStarted = gameStarted; }
 
-    public int getPin() { return pin; }
+    public String getPin() { return pin; }
 
-    public void setPin(int pin) { this.pin = pin; }
+    public void setPin(String pin) { this.pin = pin; }
 
 }

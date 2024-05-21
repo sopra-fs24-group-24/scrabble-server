@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface LobbyRepository extends JpaRepository<Lobby, Long> {
    @Query("SELECT l FROM Lobby l JOIN l.usersInLobby ul WHERE :UserId IN (ul)")
    Optional<Lobby> findLobbyByUserId(Long UserId);
-   Optional<Lobby> findLobbyByPin(int pin);
+   Optional<Lobby> findLobbyByPin(String pin);
 }

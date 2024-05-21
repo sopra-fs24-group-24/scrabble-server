@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,8 @@ public class LobbyController {
     @PutMapping("/privatelobbies/{lobbyPin}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO joinPrivateLobby(@PathVariable int lobbyPin, @RequestBody Map<String, Long> requestBody,@RequestHeader("token") String token) 
+    
+    public LobbyGetDTO joinPrivateLobby(@PathVariable String lobbyPin, @RequestBody Map<String, Long> requestBody,@RequestHeader("token") String token) 
     {
         userService.isTokenValid(token);
         Long userId = requestBody.get("userId");
