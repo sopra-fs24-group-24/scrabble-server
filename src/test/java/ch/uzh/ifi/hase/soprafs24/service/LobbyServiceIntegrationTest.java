@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.Tile;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,10 +13,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +45,9 @@ public class LobbyServiceIntegrationTest {
     @Qualifier("gameRepository")
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private GameService gameService;
 
     @Qualifier("handRepository")
     @Autowired
@@ -383,4 +389,256 @@ public class LobbyServiceIntegrationTest {
             assertEquals(createdUser2.getId(), userRepository.findAll().get(0).getId());
         }
     }
+
+    @Test
+    @Transactional
+    public void placeTilesAndNotContestWord() {
+        // check that no lobby or game is saved in database
+        assertTrue(gameRepository.findAll().isEmpty());
+        assertTrue(lobbyRepository.findAll().isEmpty());
+        assertTrue(handRepository.findAll().isEmpty());
+        assertTrue(scoreRepository.findAll().isEmpty());
+        assertTrue(tileRepository.findAll().isEmpty());
+        assertTrue(userRepository.findAll().isEmpty());
+
+        User testUser = new User();
+        testUser.setUsername("fabio");
+        testUser.setPassword("1");
+
+        User testUser2 = new User();
+        testUser2.setUsername("manuel");
+        testUser2.setPassword("2");
+
+        User createdUser = userService.createUser(testUser);
+        User createdUser2 = userService.createUser(testUser2);
+
+        Lobby testLobby = new Lobby();
+        List<Long> players = new ArrayList<Long>();
+        players.add(createdUser.getId());
+        testLobby.setUsersInLobby(players);
+        testLobby.setLobbySize(2);
+        Lobby createdLobby = lobbyService.createLobby(testLobby);
+        Lobby updatedLobby = lobbyService.addPlayertoLobby(createdLobby.getId(), createdUser2.getId());
+        Game game = updatedLobby.getGameOfLobby();
+
+        // check that created lobby and game are saved in database
+        assertEquals(1, lobbyRepository.findAll().size());
+        assertNotNull(lobbyRepository.findAll().get(0).getGameOfLobby());
+        assertEquals(1, gameRepository.findAll().size());
+        assertEquals(game.getId(), gameRepository.findAll().get(0).getId());
+
+        // create Game which Player sends
+        List<Tile> updatedPlayfield = new ArrayList<>();
+        for (int i = 0; i < 225; i++){
+            updatedPlayfield.add(null);
+        }
+
+        List<Tile> oldHand = new ArrayList<>();
+        Long currentPlayersID = game.getCurrentPlayer();
+        int index = 110;
+        for (int i = 0; i < 7; i++){
+            if (currentPlayersID == game.getHands().get(0).getHanduserid()){
+                Tile placedTile = game.getHands().get(0).getHandtiles().get(i);
+                placedTile.setBoardidx(index);
+                updatedPlayfield.set(index, placedTile);
+                oldHand.add(game.getHands().get(0).getHandtiles().get(i));
+            }
+            else{
+                Tile placedTile = game.getHands().get(1).getHandtiles().get(i);
+                placedTile.setBoardidx(index);
+                updatedPlayfield.set(index, placedTile);
+                oldHand.add(game.getHands().get(1).getHandtiles().get(i));
+            }
+            index++;
+        }
+        Game userGame = new Game();
+        userGame.setPlayfield(updatedPlayfield);
+        userGame.setId(game.getId());
+
+
+        gameService.placeTilesOnBoard(userGame);
+
+        Game updatedGame = gameRepository.findAll().get(0);
+
+        // word is placed on playfield
+        assertEquals(oldHand.get(0), updatedGame.getPlayfield().get(110));
+        assertEquals(oldHand.get(1), updatedGame.getPlayfield().get(111));
+        assertEquals(oldHand.get(2), updatedGame.getPlayfield().get(112));
+        assertEquals(oldHand.get(3), updatedGame.getPlayfield().get(113));
+        assertEquals(oldHand.get(4), updatedGame.getPlayfield().get(114));
+        assertEquals(oldHand.get(5), updatedGame.getPlayfield().get(115));
+        assertEquals(oldHand.get(6), updatedGame.getPlayfield().get(116));
+        assertTrue(updatedGame.getOldPlayfield().stream().allMatch(java.util.Objects::isNull));
+        assertEquals(86, updatedGame.getBag().getTiles().size());
+
+        if (currentPlayersID == createdUser.getId()){
+            gameService.contestWord(updatedGame.getId(), createdUser2, false);
+        }
+        else{
+            gameService.contestWord(updatedGame.getId(), createdUser, false);
+        }
+        Game savedGame = gameRepository.findAll().get(0);
+        assertEquals(oldHand.get(0), savedGame.getPlayfield().get(110));
+        assertEquals(oldHand.get(1), savedGame.getPlayfield().get(111));
+        assertEquals(oldHand.get(2), savedGame.getPlayfield().get(112));
+        assertEquals(oldHand.get(3), savedGame.getPlayfield().get(113));
+        assertEquals(oldHand.get(4), savedGame.getPlayfield().get(114));
+        assertEquals(oldHand.get(5), savedGame.getPlayfield().get(115));
+        assertEquals(oldHand.get(6), savedGame.getPlayfield().get(116));
+        assertArrayEquals(savedGame.getPlayfield().toArray(), savedGame.getOldPlayfield().toArray());
+        assertEquals(79, savedGame.getBag().getTiles().size());
+        // check that player received new tiles
+        if (currentPlayersID == savedGame.getHands().get(0).getHanduserid()){
+            assertFalse(Arrays.equals(oldHand.toArray(), savedGame.getHands().get(0).getHandtiles().toArray()));
+        }
+        else{
+            assertFalse(Arrays.equals(oldHand.toArray(), savedGame.getHands().get(1).getHandtiles().toArray()));
+        }
+
+        lobbyService.removePlayerFromLobby(updatedLobby.getId(), createdUser.getId());
+        lobbyService.removePlayerFromLobby(updatedLobby.getId(), createdUser2.getId());
+
+        // check that lobby and game are deleted
+        assertTrue(gameRepository.findAll().isEmpty());
+        assertTrue(lobbyRepository.findAll().isEmpty());
+        assertTrue(handRepository.findAll().isEmpty());
+        assertTrue(scoreRepository.findAll().isEmpty());
+        assertTrue(tileRepository.findAll().isEmpty());
+
+        // check that users are not deleted
+        assertEquals(2, userRepository.findAll().size());
+        if (userRepository.findAll().get(0).getId() == createdUser.getId()){
+            assertEquals(createdUser.getId(), userRepository.findAll().get(0).getId());
+            assertEquals(createdUser2.getId(), userRepository.findAll().get(1).getId());
+        }
+        else{
+            assertEquals(createdUser.getId(), userRepository.findAll().get(1).getId());
+            assertEquals(createdUser2.getId(), userRepository.findAll().get(0).getId());
+        }
+    }
+
+    /*
+    @Test
+    @Transactional
+    public void placeTilesAndContestWord() {
+        // check that no lobby or game is saved in database
+        assertTrue(gameRepository.findAll().isEmpty());
+        assertTrue(lobbyRepository.findAll().isEmpty());
+        assertTrue(handRepository.findAll().isEmpty());
+        assertTrue(scoreRepository.findAll().isEmpty());
+        assertTrue(tileRepository.findAll().isEmpty());
+        assertTrue(userRepository.findAll().isEmpty());
+
+        User testUser = new User();
+        testUser.setUsername("fabio");
+        testUser.setPassword("1");
+
+        User testUser2 = new User();
+        testUser2.setUsername("manuel");
+        testUser2.setPassword("2");
+
+        User createdUser = userService.createUser(testUser);
+        User createdUser2 = userService.createUser(testUser2);
+
+        Lobby testLobby = new Lobby();
+        List<Long> players = new ArrayList<Long>();
+        players.add(createdUser.getId());
+        testLobby.setUsersInLobby(players);
+        testLobby.setLobbySize(2);
+        Lobby createdLobby = lobbyService.createLobby(testLobby);
+        Lobby updatedLobby = lobbyService.addPlayertoLobby(createdLobby.getId(), createdUser2.getId());
+        Game game = updatedLobby.getGameOfLobby();
+
+        // check that created lobby and game are saved in database
+        assertEquals(1, lobbyRepository.findAll().size());
+        assertNotNull(lobbyRepository.findAll().get(0).getGameOfLobby());
+        assertEquals(1, gameRepository.findAll().size());
+        assertEquals(game.getId(), gameRepository.findAll().get(0).getId());
+
+        // create Game which Player sends
+        List<Tile> updatedPlayfield = new ArrayList<>();
+        for (int i = 0; i < 225; i++){
+            updatedPlayfield.add(null);
+        }
+
+        List<Tile> oldHand = new ArrayList<>();
+        Long currentPlayersID = game.getCurrentPlayer();
+        int index = 110;
+        for (int i = 0; i < 7; i++){
+            if (currentPlayersID == game.getHands().get(0).getHanduserid()){
+                Tile placedTile = game.getHands().get(0).getHandtiles().get(i);
+                placedTile.setBoardidx(index);
+                updatedPlayfield.set(index, placedTile);
+                oldHand.add(game.getHands().get(0).getHandtiles().get(i));
+            }
+            else{
+                Tile placedTile = game.getHands().get(1).getHandtiles().get(i);
+                placedTile.setBoardidx(index);
+                updatedPlayfield.set(index, placedTile);
+                oldHand.add(game.getHands().get(1).getHandtiles().get(i));
+            }
+            index++;
+        }
+        Game userGame = new Game();
+        userGame.setPlayfield(updatedPlayfield);
+        userGame.setId(game.getId());
+
+
+        gameService.placeTilesOnBoard(userGame);
+
+        Game updatedGame = gameRepository.findAll().get(0);
+
+        // word is placed on playfield
+        assertEquals(oldHand.get(0), updatedGame.getPlayfield().get(110));
+        assertEquals(oldHand.get(1), updatedGame.getPlayfield().get(111));
+        assertEquals(oldHand.get(2), updatedGame.getPlayfield().get(112));
+        assertEquals(oldHand.get(3), updatedGame.getPlayfield().get(113));
+        assertEquals(oldHand.get(4), updatedGame.getPlayfield().get(114));
+        assertEquals(oldHand.get(5), updatedGame.getPlayfield().get(115));
+        assertEquals(oldHand.get(6), updatedGame.getPlayfield().get(116));
+        assertTrue(updatedGame.getOldPlayfield().stream().allMatch(java.util.Objects::isNull));
+        assertEquals(86, updatedGame.getBag().getTiles().size());
+
+        if (currentPlayersID == createdUser.getId()){
+            gameService.contestWord(updatedGame.getId(), createdUser2, true);
+        }
+        else{
+            gameService.contestWord(updatedGame.getId(), createdUser, true);
+        }
+
+        Game savedGame = gameRepository.findAll().get(0);
+
+        if (savedGame.getBag().getTiles().size() == 86){
+            // Contestation was successful since the size of the bag is the same as before of the function call contestWord()
+            assertTrue(savedGame.getOldPlayfield().stream().allMatch(java.util.Objects::isNull));
+            assertArrayEquals(savedGame.getOldPlayfield().toArray(), savedGame.getPlayfield().toArray());
+            assertEquals(86, savedGame.getBag().getTiles().size());
+            // check that player didn't receive new tiles
+            if (currentPlayersID == savedGame.getHands().get(0).getHanduserid()){
+                assertArrayEquals(oldHand.toArray(), savedGame.getHands().get(0).getHandtiles().toArray());
+            }
+            else{
+                assertArrayEquals(oldHand.toArray(), savedGame.getHands().get(1).getHandtiles().toArray());
+            }
+        }
+        else{
+            // Contestation was not successful
+            assertEquals(oldHand.get(0), savedGame.getPlayfield().get(110));
+            assertEquals(oldHand.get(1), savedGame.getPlayfield().get(111));
+            assertEquals(oldHand.get(2), savedGame.getPlayfield().get(112));
+            assertEquals(oldHand.get(3), savedGame.getPlayfield().get(113));
+            assertEquals(oldHand.get(4), savedGame.getPlayfield().get(114));
+            assertEquals(oldHand.get(5), savedGame.getPlayfield().get(115));
+            assertEquals(oldHand.get(6), savedGame.getPlayfield().get(116));
+            assertArrayEquals(savedGame.getPlayfield().toArray(), savedGame.getOldPlayfield().toArray());
+            assertEquals(79, savedGame.getBag().getTiles().size());
+            // check that player received new tiles
+            if (currentPlayersID == savedGame.getHands().get(0).getHanduserid()){
+                assertFalse(Arrays.equals(oldHand.toArray(), savedGame.getHands().get(0).getHandtiles().toArray()));
+            }
+            else{
+                assertFalse(Arrays.equals(oldHand.toArray(), savedGame.getHands().get(1).getHandtiles().toArray()));
+            }
+        }
+    }*/
 }

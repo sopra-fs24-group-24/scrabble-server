@@ -452,12 +452,12 @@ public class GameControllerTest {
 
         given(gameService.getDefinition(words)).willReturn(definitions);
 
-        MockHttpServletRequestBuilder getRequest = get("/definitions")
+        MockHttpServletRequestBuilder postRequest = post("/definitions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(words))
                 .header("token", "4242");
 
-        mockMvc.perform(getRequest)
+        mockMvc.perform(postRequest)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.hello", is("First definition")))
                 .andExpect(jsonPath("$.hi", is("Second definition")));
@@ -471,12 +471,12 @@ public class GameControllerTest {
 
         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN)).when(userService).isTokenValid(Mockito.any());
 
-        MockHttpServletRequestBuilder getRequest = get("/definitions")
+        MockHttpServletRequestBuilder postRequest = post("/definitions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(words))
                 .header("token", "4242");
 
-        mockMvc.perform(getRequest)
+        mockMvc.perform(postRequest)
                 .andExpect(status().isForbidden());
     }
 

@@ -188,76 +188,32 @@ public class GameService {
             currentPlayer.put(user.getId(), playerContestWord);
             foundGame.setDecisionPlayersContestation(currentPlayer);
         }
-        else if (foundGame.getDecisionPlayersContestation() != null){
+        else if (foundGame.getDecisionPlayersContestation() != null) {
             // check if player already contested
-            if (foundGame.getDecisionPlayersContestation().containsKey(user.getId())){
+            if (foundGame.getDecisionPlayersContestation().containsKey(user.getId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                         "A player can only contest once!");
             }
             foundGame.addDecision(user.getId(), playerContestWord);
-            // all players have decided whether to contest the word or not
-            if (foundGame.getDecisionPlayersContestation().size() == gameSize-1){
-                foundGame.setAllPlayersDecided(true);
-                boolean wordContested = false;
-                // check if someone wants to contest the word
-                for (boolean value : foundGame.getDecisionPlayersContestation().values()){
-                    if (value){
-                        wordContested = true;
-                        break;
-                    }
+        }
+        // all players have decided whether to contest the word or not
+        if (foundGame.getDecisionPlayersContestation().size() == gameSize-1){
+            foundGame.setAllPlayersDecided(true);
+            boolean wordContested = false;
+            // check if someone wants to contest the word
+            for (boolean value : foundGame.getDecisionPlayersContestation().values()){
+                if (value){
+                    wordContested = true;
+                    break;
                 }
-                // word is contested
-                if (wordContested){
-                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), true, foundGame);
-                    foundGame.setWordContested(true);
-                    // word is correct - contestation unsuccessful
-                    if (!words.isEmpty()) {
-                        changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
-
-                        List<Integer> playedTilesIndices = getChangedIndexesOfGame(foundGame.getOldPlayfield(), foundGame.getPlayfield());
-                        List<Tile> tiles = new ArrayList<>();
-
-                        for (int playedTileIndex : playedTilesIndices) {
-                            tiles.add(foundGame.getPlayfield().get(playedTileIndex));
-                        }
-
-                        Hand currentPlayerHand = handRepository.findByHanduserid(foundGame.getCurrentPlayer());
-                        currentPlayerHand.removeTilesFromHand(tiles);
-
-                        List<Tile> newTiles;
-                        Bag bag = foundGame.getBag();
-
-                        if (bag.tilesleft() < tiles.size()) {
-                            newTiles = bag.getSomeTiles(bag.tilesleft());
-                        } else {
-                            newTiles = foundGame.getBag().getSomeTiles(tiles.size());
-                        }
-
-                        currentPlayerHand.putTilesInHand(newTiles);
-
-                        foundGame.setContestingPhase(false);
-                        foundGame.setOldPlayfield(foundGame.getPlayfield());
-                        foundGame.setIsValid(true);
-                    }
-                    // word is false - contestation successful
-                    else{
-                        changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
-                        foundGame.setPlayfield(foundGame.getOldPlayfield());
-                        foundGame.setIsValid(false);
-                    }
-                }
-                // word is not contested
-                else{
-                    Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), false, foundGame);
-
-                    int score = 0;
-
-                    for (int wordScore : words.values()) {
-                        score += wordScore;
-                    }
-
-                    Score playerScore = scoreRepository.findByScoreUserId(foundGame.getCurrentPlayer());
-                    playerScore.setScore(playerScore.getScore() + score);
+            }
+            // word is contested
+            if (wordContested){
+                Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), true, foundGame);
+                foundGame.setWordContested(true);
+                // word is correct - contestation unsuccessful
+                if (!words.isEmpty()) {
+                    changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
 
                     List<Integer> playedTilesIndices = getChangedIndexesOfGame(foundGame.getOldPlayfield(), foundGame.getPlayfield());
                     List<Tile> tiles = new ArrayList<>();
@@ -279,32 +235,76 @@ public class GameService {
                     }
 
                     currentPlayerHand.putTilesInHand(newTiles);
+
+                    foundGame.setContestingPhase(false);
                     foundGame.setOldPlayfield(foundGame.getPlayfield());
+                    foundGame.setIsValid(true);
                 }
-
-                List<Tile> saveOldPlayfield = new ArrayList<>();
-                for (int i = 0; i < 225; i++){
-                    saveOldPlayfield.add(foundGame.getOldPlayfield().get(i));
+                // word is false - contestation successful
+                else{
+                    changeScoresAfterContesting(foundGame, foundGame.getDecisionPlayersContestation(), words);
+                    foundGame.setPlayfield(foundGame.getOldPlayfield());
+                    foundGame.setIsValid(false);
                 }
-
-                List<Tile> tempPlayfield = new ArrayList<>();
-                for (int i = 0; i < 225; i++){
-                    tempPlayfield.add(null);
-                }
-
-                foundGame.setOldPlayfield(tempPlayfield);
-                gameRepository.save(foundGame);
-                gameRepository.flush();
-
-                Long currentGameRound = foundGame.getGameRound();
-                foundGame.setGameRound(Long.sum(currentGameRound, 1L));
-                foundGame.setOldPlayfield(saveOldPlayfield);
-                foundGame.setContestingPhase(false);
-                foundGame.setDecisionPlayersContestation(null);
-                makeNextPlayerToCurrentPlayer(gameId);
-                gameRepository.save(foundGame);
-                gameRepository.flush();
             }
+            // word is not contested
+            else{
+                Map<String, Integer> words = getWordsAndScoreForPlayedTiles(foundGame.getPlayfield(), foundGame.getOldPlayfield(), false, foundGame);
+
+                int score = 0;
+
+                for (int wordScore : words.values()) {
+                    score += wordScore;
+                }
+
+                Score playerScore = scoreRepository.findByScoreUserId(foundGame.getCurrentPlayer());
+                playerScore.setScore(playerScore.getScore() + score);
+
+                List<Integer> playedTilesIndices = getChangedIndexesOfGame(foundGame.getOldPlayfield(), foundGame.getPlayfield());
+                List<Tile> tiles = new ArrayList<>();
+
+                for (int playedTileIndex : playedTilesIndices) {
+                    tiles.add(foundGame.getPlayfield().get(playedTileIndex));
+                }
+
+                Hand currentPlayerHand = handRepository.findByHanduserid(foundGame.getCurrentPlayer());
+                currentPlayerHand.removeTilesFromHand(tiles);
+
+                List<Tile> newTiles;
+                Bag bag = foundGame.getBag();
+
+                if (bag.tilesleft() < tiles.size()) {
+                    newTiles = bag.getSomeTiles(bag.tilesleft());
+                } else {
+                    newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+                }
+
+                currentPlayerHand.putTilesInHand(newTiles);
+                foundGame.setOldPlayfield(foundGame.getPlayfield());
+            }
+
+            List<Tile> saveOldPlayfield = new ArrayList<>();
+            for (int i = 0; i < 225; i++){
+                saveOldPlayfield.add(foundGame.getOldPlayfield().get(i));
+            }
+
+            List<Tile> tempPlayfield = new ArrayList<>();
+            for (int i = 0; i < 225; i++){
+                tempPlayfield.add(null);
+            }
+
+            foundGame.setOldPlayfield(tempPlayfield);
+            gameRepository.save(foundGame);
+            gameRepository.flush();
+
+            Long currentGameRound = foundGame.getGameRound();
+            foundGame.setGameRound(Long.sum(currentGameRound, 1L));
+            foundGame.setOldPlayfield(saveOldPlayfield);
+            foundGame.setContestingPhase(false);
+            foundGame.setDecisionPlayersContestation(new HashMap<>());
+            makeNextPlayerToCurrentPlayer(gameId);
+            gameRepository.save(foundGame);
+            gameRepository.flush();
         }
     }
 
