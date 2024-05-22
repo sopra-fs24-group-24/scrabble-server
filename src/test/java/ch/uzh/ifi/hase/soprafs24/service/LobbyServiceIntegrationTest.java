@@ -1,10 +1,10 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,22 @@ public class LobbyServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
+
+    @Qualifier("gameRepository")
+    @Autowired
+    private GameRepository gameRepository;
+
+    @Qualifier("handRepository")
+    @Autowired
+    private HandRepository handRepository;
+
+    @Qualifier("scoreRepository")
+    @Autowired
+    private ScoreRepository scoreRepository;
+
+    @Qualifier("TileRepository")
+    @Autowired
+    private TileRepository tileRepository;
 
     @BeforeEach
     public void setup() {
@@ -275,5 +291,96 @@ public class LobbyServiceIntegrationTest {
         // then
         assertThrows(ResponseStatusException.class, () -> lobbyService.addPlayertoLobby(updatedLobby.getId(), createdUser2.getId()));
 
+    }
+
+    @Test
+    public void deleteLobbyAndGame_success() {
+        // check that no lobby or game is saved in database
+        assertTrue(gameRepository.findAll().isEmpty());
+        assertTrue(lobbyRepository.findAll().isEmpty());
+        assertTrue(handRepository.findAll().isEmpty());
+        assertTrue(scoreRepository.findAll().isEmpty());
+        assertTrue(tileRepository.findAll().isEmpty());
+        assertTrue(userRepository.findAll().isEmpty());
+
+        User testUser = new User();
+        testUser.setUsername("fabio");
+        testUser.setPassword("1");
+
+        User testUser2 = new User();
+        testUser2.setUsername("manuel");
+        testUser2.setPassword("2");
+
+        User createdUser = userService.createUser(testUser);
+        User createdUser2 = userService.createUser(testUser2);
+
+        Lobby testLobby = new Lobby();
+        List<Long> players = new ArrayList<Long>();
+        players.add(createdUser.getId());
+        testLobby.setUsersInLobby(players);
+        testLobby.setLobbySize(2);
+        Lobby createdLobby = lobbyService.createLobby(testLobby);
+        Lobby updatedLobby = lobbyService.addPlayertoLobby(createdLobby.getId(), createdUser2.getId());
+        Game game = updatedLobby.getGameOfLobby();
+
+        // check that created lobby and game are saved in database
+        assertEquals(1, lobbyRepository.findAll().size());
+        assertNotNull(lobbyRepository.findAll().get(0).getGameOfLobby());
+        assertEquals(1, gameRepository.findAll().size());
+        assertEquals(game.getId(), gameRepository.findAll().get(0).getId());
+        assertEquals(100, tileRepository.findAll().size());
+        assertEquals(2, handRepository.findAll().size());
+        if (handRepository.findAll().get(0).getHanduserid() == game.getPlayers().get(0).getId()){
+            assertEquals(game.getPlayers().get(0).getId(), handRepository.findAll().get(0).getHanduserid());
+            assertEquals(game.getPlayers().get(1).getId(), handRepository.findAll().get(1).getHanduserid());
+        }
+        else{
+            assertEquals(game.getPlayers().get(1).getId(), handRepository.findAll().get(0).getHanduserid());
+            assertEquals(game.getPlayers().get(0).getId(), handRepository.findAll().get(1).getHanduserid());
+        }
+        assertEquals(2, scoreRepository.findAll().size());
+        if (scoreRepository.findAll().get(0).getScoreUserId() == game.getPlayers().get(0).getId()){
+            assertEquals(game.getPlayers().get(0).getId(), scoreRepository.findAll().get(0).getScoreUserId());
+            assertEquals(game.getPlayers().get(1).getId(), scoreRepository.findAll().get(1).getScoreUserId());
+        }
+        else{
+            assertEquals(game.getPlayers().get(1).getId(), scoreRepository.findAll().get(0).getScoreUserId());
+            assertEquals(game.getPlayers().get(0).getId(), scoreRepository.findAll().get(1).getScoreUserId());
+        }
+
+        // One player leaves game - since one player remains in game, the lobby and game should not be deleted
+        lobbyService.removePlayerFromLobby(updatedLobby.getId(), createdUser2.getId());
+
+        // check that lobby and game are still saved in database, but Score and Hand Object of leaving player are deleted
+        assertEquals(1, lobbyRepository.findAll().size());
+        assertNotNull(lobbyRepository.findAll().get(0).getGameOfLobby());
+        assertEquals(1, gameRepository.findAll().size());
+        assertEquals(game.getId(), gameRepository.findAll().get(0).getId());
+        assertEquals(1, handRepository.findAll().size());
+        assertEquals(createdUser.getId(), handRepository.findAll().get(0).getHanduserid());
+        assertEquals(1, scoreRepository.findAll().size());
+        assertEquals(createdUser.getId(), scoreRepository.findAll().get(0).getScoreUserId());
+        assertEquals(100, tileRepository.findAll().size());
+
+        // Last player leaves game - lobby and game should be deleted
+        lobbyService.removePlayerFromLobby(updatedLobby.getId(), createdUser.getId());
+
+        // check that lobby and game are deleted
+        assertTrue(gameRepository.findAll().isEmpty());
+        assertTrue(lobbyRepository.findAll().isEmpty());
+        assertTrue(handRepository.findAll().isEmpty());
+        assertTrue(scoreRepository.findAll().isEmpty());
+        assertTrue(tileRepository.findAll().isEmpty());
+
+        // check that users are not deleted
+        assertEquals(2, userRepository.findAll().size());
+        if (userRepository.findAll().get(0).getId() == createdUser.getId()){
+            assertEquals(createdUser.getId(), userRepository.findAll().get(0).getId());
+            assertEquals(createdUser2.getId(), userRepository.findAll().get(1).getId());
+        }
+        else{
+            assertEquals(createdUser.getId(), userRepository.findAll().get(1).getId());
+            assertEquals(createdUser2.getId(), userRepository.findAll().get(0).getId());
+        }
     }
 }
