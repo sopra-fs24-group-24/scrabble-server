@@ -161,7 +161,7 @@ public class UserService
     userRepository.findById(user.getId()).get().setStatus(UserStatus.OFFLINE);
   }
 
-  private void authenticateUser(Long id, String token) {
+  public void authenticateUser(Long id, String token) {
     Optional<User> userById = userRepository.findById(id);
 
     if (userById.isEmpty()) {

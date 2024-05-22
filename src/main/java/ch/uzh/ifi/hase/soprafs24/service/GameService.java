@@ -137,8 +137,6 @@ public class GameService {
     public List<Tile> placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game.getId());
 
-        //TODO: add function to check whether userinput is sent from the correct player
-
         List<Tile> updatedPlayfield = game.getPlayfield();
         List<Tile> persistedPlayfield = foundGame.getPlayfield();
 

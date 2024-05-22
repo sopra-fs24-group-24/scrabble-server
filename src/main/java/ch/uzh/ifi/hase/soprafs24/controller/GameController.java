@@ -53,6 +53,7 @@ public class GameController
     {
         userService.isTokenValid(token);
         Game updatedGame = GameDTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
+        userService.authenticateUser(updatedGame.getCurrentPlayer(), token);
         return gameService.placeTilesOnBoard(updatedGame);
     }
 
@@ -63,6 +64,7 @@ public class GameController
     @PathVariable Long handId, @RequestBody List<Tile> inputTiles,@RequestHeader("token") String token) 
     {
         userService.isTokenValid(token);
+        userService.authenticateUser(userId, token);
         // returns new hand (exchanged tiles + remaining tiles)
         return gameService.swapTiles(gameId, userId, handId, inputTiles);
 
