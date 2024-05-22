@@ -190,6 +190,10 @@ completed on Wednesday, 15.05.2024
 - Bug fixes (issue 28 - server)
 - Fixed IntegrationTests of Contest-Function (issue 31)
 
+### *Week 7 (16.05.24 - 23.05.24)*
+
+**This week the Joker "skip continuous progress" was used.**
+
 ## Luca Stephan Christl
 
 ### *Week 1*
