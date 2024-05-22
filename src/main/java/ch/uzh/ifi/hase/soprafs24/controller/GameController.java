@@ -87,9 +87,9 @@ public class GameController
         gameService.contestWord(gameId, user, wordContested);
     }
 
-    @GetMapping("/definitions")
+    @PostMapping("/definitions")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, String> getDefinitions(@RequestBody List<String> requestBody, @RequestHeader("token") String token) {
+    public Map<String, String> getDefinitions(@RequestBody  List<String> requestBody, @RequestHeader("token") String token) {
         userService.isTokenValid(token);
         return gameService.getDefinition(requestBody);
     }
