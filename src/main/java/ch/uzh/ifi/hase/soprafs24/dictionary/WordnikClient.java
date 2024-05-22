@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.dictionary;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,7 +14,8 @@ import java.net.http.HttpResponse;
 @Service("dictionary")
 public class WordnikClient implements Dictionary{
 
-    private static final String API_KEY = "5bnrdw90wu3xdr5kjx69iq53f4m2gi2ua1inzs9yol07vfgc8";
+    @Value("${wordnik.api.key}")
+    private String API_KEY;
     private static final String BASE_URL = "https://api.wordnik.com/v4/word.json/";
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final HttpResponse.BodyHandler<String> bodyHandler = HttpResponse.BodyHandlers.ofString();
