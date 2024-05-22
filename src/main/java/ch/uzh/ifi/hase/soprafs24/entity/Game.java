@@ -234,7 +234,7 @@ public class Game implements Serializable{
     {
         gameOver=false;
         globalSkipCounter=0;
-
+        setDecisionPlayersContestation(new HashMap<>());
         setGameRound(1L);
         setPlayers(players);
         int sizeOfGame = getPlayers().size();
