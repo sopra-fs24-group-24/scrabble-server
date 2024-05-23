@@ -2,12 +2,15 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,6 +25,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,6 +40,12 @@ public class LobbyControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @Mock
+    private LobbyRepository lobbyRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Test
     public void givenLobbies_whenGetLobbies_thenReturnJsonArray() throws Exception {
@@ -261,6 +271,64 @@ public class LobbyControllerTest {
         mockMvc.perform(putRequest).andExpect(status().isConflict())
                 .andExpect(content().string(""));
     }
+/*
+    @Test
+    public void addPlayerToPrivateLobby_validInputs_PlayerAddedToPrivateLobby() throws Exception{
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("luca");
+        User user3 = new User();
+        user3.setId(3L);
+        user3.setUsername("martin");
+        user3.setToken("3");
+
+        // old Lobby
+        Lobby lobby = new Lobby();
+        Long lobbyId = 6L;
+        lobby.setId(lobbyId);
+        lobby.setLobbySize(4);
+        lobby.setNumberOfPlayers(3);
+        List<Long> playersID = new ArrayList<Long>();
+        playersID.add(user1.getId());
+        playersID.add(user2.getId());
+        playersID.add(user3.getId());
+        lobby.setUsersInLobby(playersID);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user3);
+        lobby.setPlayers(players);
+        lobby.setGameStarted(false);
+        lobby.setIsPrivate(true);
+        lobby.setPin("100000");
+
+        given(userRepository.findByToken(Mockito.any())).willReturn(user3);
+        given(lobbyRepository.findLobbyByPin(Mockito.any())).willReturn(Optional.of(lobby));
+        given(lobbyService.addPlayertoLobby(Mockito.any(), Mockito.any())).willReturn(lobby);
+
+        // add new player to Lobby
+        Map<String, Long> userId = new HashMap<>();
+        userId.put("userId", user3.getId());
+
+        // when
+        MockHttpServletRequestBuilder putRequest = put("/privatelobbies/6")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userId)).header("token", user3.getId());
+
+        // then
+        mockMvc.perform(putRequest).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
+                .andExpect(jsonPath("$.numberOfPlayers", is(lobby.getNumberOfPlayers())))
+                .andExpect(jsonPath("$.lobbySize", is(lobby.getLobbySize())))
+                .andExpect(jsonPath("$.usersInLobby", containsInAnyOrder(lobby.getUsersInLobby().get(0).intValue(), lobby.getUsersInLobby().get(1).intValue())))
+                .andExpect(jsonPath("$.usersInLobby").value(hasSize(2)))
+                .andExpect(jsonPath("$.gameStarted", is(lobby.getGameStarted())));
+
+    }*/
 
     /**
      * Helper Method to convert userPostDTO into a JSON string such that the input

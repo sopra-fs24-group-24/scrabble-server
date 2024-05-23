@@ -365,7 +365,7 @@ public class GameControllerTest {
       given(userService.isTokenValid(Mockito.any())).willReturn(user);
       doThrow(response).when(gameService).skipTurn(Mockito.any(), Mockito.any());
 
-      MockHttpServletRequestBuilder postRequest = post("/moves/skip/1?token=1")
+      MockHttpServletRequestBuilder postRequest = post("/moves/skip/1")
               .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
       mockMvc.perform(postRequest)
