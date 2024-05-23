@@ -401,6 +401,31 @@ completed on Wednesday 15.05.2024
 - implemented redirecting to other profiles
 - added back to my profile button when viewing other profiles
 
+### *Week 7*
+
+**Create box with received friend requests [(issue 51)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/51)**: </br>
+completed on Sunday 19.05.2024
+
+- Created box where friendrequests are displayed
+- created buttons to accept and decline friendrequests
+
+**Create box to display friendslist [(issue 52)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/52)**: </br>
+completed on Sunday 19.05.2024
+
+- Created box where you can see friend and their online status
+- Created routing to friends profile pages
+
+**Create box or pop up window to display word information [(issue 46)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/46)**: </br>
+completed on Wednesday 22.05.2024
+
+- Created notification to display word definitions after unsuccessful contesting
+- created function to make the call to our endpoint to get the definitions
+
+**Created README.md for Server and Client**: </br>
+completed on Tuesday 21.05.2024
+
+- Created README.md for client with screenshots
+- Created README.md for server
 
 ## Michael Kevin Barry
 
