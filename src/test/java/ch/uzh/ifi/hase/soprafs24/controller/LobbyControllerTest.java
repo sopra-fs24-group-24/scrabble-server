@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
@@ -25,7 +24,6 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -40,9 +38,6 @@ public class LobbyControllerTest {
 
     @MockBean
     private UserService userService;
-
-    @Mock
-    private LobbyRepository lobbyRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -163,6 +158,7 @@ public class LobbyControllerTest {
                 .andExpect(jsonPath("$.lobbySize", is(lobby.getLobbySize())))
                 .andExpect(jsonPath("$.usersInLobby", contains(lobby.getUsersInLobby().get(0).intValue())))
                 .andExpect(jsonPath("$.usersInLobby").value(hasSize(1)))
+                .andExpect(jsonPath("$.gameOfLobby").isEmpty())
                 .andExpect(jsonPath("$.gameStarted", is(lobby.getGameStarted())));
 
     }
@@ -227,9 +223,8 @@ public class LobbyControllerTest {
                 .andExpect(jsonPath("$.lobbySize", is(lobby.getLobbySize())))
                 .andExpect(jsonPath("$.usersInLobby", containsInAnyOrder(lobby.getUsersInLobby().get(0).intValue(), lobby.getUsersInLobby().get(1).intValue())))
                 .andExpect(jsonPath("$.usersInLobby").value(hasSize(2)))
+                .andExpect(jsonPath("$.gameOfLobby").isEmpty())
                 .andExpect(jsonPath("$.gameStarted", is(lobby.getGameStarted())));
-
-
     }
 
     @Test
@@ -346,6 +341,130 @@ public class LobbyControllerTest {
                 .andExpect(jsonPath("$.players").value(hasSize(3)))
                 .andExpect(jsonPath("$.gameOfLobby").isEmpty())
                 .andExpect(jsonPath("$.gameStarted", is(newLobby.getGameStarted())));
+    }
+
+    @Test
+    public void addPlayerToPrivateLobby_invalidInputs_PlayerAddedToPrivateLobby() throws Exception{
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("luca");
+        User user3 = new User();
+        user3.setId(3L);
+        user3.setUsername("martin");
+        user3.setToken("3");
+
+        given(userService.isTokenValid(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.FORBIDDEN));
+
+        // add new player to Lobby
+        Map<String, Long> userId = new HashMap<>();
+        userId.put("userId", user3.getId());
+
+        // when
+        MockHttpServletRequestBuilder putRequest = put("/privatelobbies/6")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userId)).header("token", user3.getId());
+
+        // then
+        mockMvc.perform(putRequest).andExpect(status().isForbidden())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    public void removePlayerFromLobby_validInputs_playerRemovedFromLobby() throws Exception {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("luca");
+        User user3 = new User();
+        user3.setId(3L);
+        user3.setUsername("martin");
+        user3.setToken("3");
+
+        Lobby newLobby = new Lobby();
+        newLobby.setId(6L);
+        newLobby.setLobbySize(4);
+        newLobby.setNumberOfPlayers(3);
+        List<Long> playersID = new ArrayList<Long>();
+        playersID.add(user1.getId());
+        playersID.add(user2.getId());
+        playersID.add(user3.getId());
+        newLobby.setUsersInLobby(playersID);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user3);
+        newLobby.setPlayers(players);
+        newLobby.setGameStarted(false);
+        newLobby.setGameOfLobby(null);
+
+        given(userRepository.findByToken(Mockito.any())).willReturn(user3);
+
+        // remove player from Lobby
+        Map<String, Long> userId = new HashMap<>();
+        userId.put("userId", user3.getId());
+
+        // when
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/withdrawal/6")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userId)).header("token", user3.getId());
+
+        // then
+        mockMvc.perform(putRequest).andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    public void removePlayerFromLobby_invalidInputs_playerRemovedFromLobby() throws Exception {
+        // given
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("fabio");
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setUsername("luca");
+        User user3 = new User();
+        user3.setId(3L);
+        user3.setUsername("martin");
+        user3.setToken("3");
+
+        Lobby newLobby = new Lobby();
+        newLobby.setId(6L);
+        newLobby.setLobbySize(4);
+        newLobby.setNumberOfPlayers(3);
+        List<Long> playersID = new ArrayList<Long>();
+        playersID.add(user1.getId());
+        playersID.add(user2.getId());
+        playersID.add(user3.getId());
+        newLobby.setUsersInLobby(playersID);
+        List<User> players = new ArrayList<>();
+        players.add(user1);
+        players.add(user2);
+        players.add(user3);
+        newLobby.setPlayers(players);
+        newLobby.setGameStarted(false);
+        newLobby.setGameOfLobby(null);
+
+        given(userService.isTokenValid(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.FORBIDDEN));
+
+        // remove player from Lobby
+        Map<String, Long> userId = new HashMap<>();
+        userId.put("userId", user3.getId());
+
+        // when
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/withdrawal/6")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userId)).header("token", user3.getId());
+
+        // then
+        mockMvc.perform(putRequest).andExpect(status().isForbidden())
+                .andExpect(content().string(""));
     }
 
     /**

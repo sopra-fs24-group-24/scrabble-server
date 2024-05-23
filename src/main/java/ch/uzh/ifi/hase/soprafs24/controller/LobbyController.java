@@ -118,8 +118,7 @@ public class LobbyController {
     }*/
 
     @PutMapping("/lobbies/withdrawal/{lobbyId}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void withdrawFromLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody,@RequestHeader("token") String token) 
     {
         userService.isTokenValid(token);
