@@ -229,14 +229,15 @@ public class GameService {
 
                     List<Tile> newTiles;
                     Bag bag = foundGame.getBag();
-
-                    if (bag.tilesleft() < tiles.size()) {
-                        newTiles = bag.getSomeTiles(bag.tilesleft());
-                    } else {
-                        newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+                    int numberOfTilesInBag = bag.tilesleft();
+                    if (numberOfTilesInBag > 0){
+                        if (numberOfTilesInBag < tiles.size()) {
+                            newTiles = bag.getSomeTiles(bag.tilesleft());
+                        } else {
+                            newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+                        }
+                        currentPlayerHand.putTilesInHand(newTiles);
                     }
-
-                    currentPlayerHand.putTilesInHand(newTiles);
 
                     foundGame.setContestingPhase(false);
                     foundGame.setOldPlayfield(foundGame.getPlayfield());
@@ -274,14 +275,16 @@ public class GameService {
 
                 List<Tile> newTiles;
                 Bag bag = foundGame.getBag();
-
-                if (bag.tilesleft() < tiles.size()) {
-                    newTiles = bag.getSomeTiles(bag.tilesleft());
-                } else {
-                    newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+                int numberOfTilesInBag = bag.tilesleft();
+                if (numberOfTilesInBag > 0){
+                    if (numberOfTilesInBag < tiles.size()) {
+                        newTiles = bag.getSomeTiles(bag.tilesleft());
+                    } else {
+                        newTiles = foundGame.getBag().getSomeTiles(tiles.size());
+                    }
+                    currentPlayerHand.putTilesInHand(newTiles);
                 }
 
-                currentPlayerHand.putTilesInHand(newTiles);
                 foundGame.setOldPlayfield(foundGame.getPlayfield());
             }
 
@@ -305,6 +308,15 @@ public class GameService {
             foundGame.setContestingPhase(false);
             foundGame.setDecisionPlayersContestation(new HashMap<>());
             makeNextPlayerToCurrentPlayer(gameId);
+            // if the bag and 1 hand is empty, the game ends
+            if (foundGame.getBag().tilesleft() == 0){
+                for (Hand hand : foundGame.getHands()){
+                    if (hand.getHandtiles().isEmpty()){
+                        foundGame.initialiseGameOver();
+                        break;
+                    }
+                }
+            }
             gameRepository.save(foundGame);
             gameRepository.flush();
         }
