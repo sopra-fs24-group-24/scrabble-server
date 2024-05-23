@@ -137,6 +137,8 @@ public class GameService {
     public List<Tile> placeTilesOnBoard(Game game) {
         Game foundGame = checkIfGameExists(game.getId());
 
+        foundGame.setGlobalSkipCounter(0);
+
         List<Tile> updatedPlayfield = game.getPlayfield();
         List<Tile> persistedPlayfield = foundGame.getPlayfield();
 
