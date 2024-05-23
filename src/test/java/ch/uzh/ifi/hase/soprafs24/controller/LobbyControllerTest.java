@@ -271,7 +271,7 @@ public class LobbyControllerTest {
         mockMvc.perform(putRequest).andExpect(status().isConflict())
                 .andExpect(content().string(""));
     }
-/*
+
     @Test
     public void addPlayerToPrivateLobby_validInputs_PlayerAddedToPrivateLobby() throws Exception{
         // given
@@ -287,28 +287,45 @@ public class LobbyControllerTest {
         user3.setToken("3");
 
         // old Lobby
-        Lobby lobby = new Lobby();
-        Long lobbyId = 6L;
-        lobby.setId(lobbyId);
-        lobby.setLobbySize(4);
-        lobby.setNumberOfPlayers(3);
+        Lobby oldLobby = new Lobby();
+        oldLobby.setId(6L);
+        oldLobby.setLobbySize(4);
+        oldLobby.setNumberOfPlayers(2);
+        List<Long> playersIdOld = new ArrayList<Long>();
+        playersIdOld.add(user1.getId());
+        playersIdOld.add(user2.getId());
+        oldLobby.setUsersInLobby(playersIdOld);
+        List<User> playersOld = new ArrayList<>();
+        playersOld.add(user1);
+        playersOld.add(user2);
+        oldLobby.setPlayers(playersOld);
+        oldLobby.setGameStarted(false);
+        oldLobby.setIsPrivate(true);
+        oldLobby.setPin("100000");
+
+        // new Lobby
+        Lobby newLobby = new Lobby();
+        newLobby.setId(6L);
+        newLobby.setLobbySize(4);
+        newLobby.setNumberOfPlayers(3);
         List<Long> playersID = new ArrayList<Long>();
         playersID.add(user1.getId());
         playersID.add(user2.getId());
         playersID.add(user3.getId());
-        lobby.setUsersInLobby(playersID);
+        newLobby.setUsersInLobby(playersID);
         List<User> players = new ArrayList<>();
         players.add(user1);
         players.add(user2);
         players.add(user3);
-        lobby.setPlayers(players);
-        lobby.setGameStarted(false);
-        lobby.setIsPrivate(true);
-        lobby.setPin("100000");
+        newLobby.setPlayers(players);
+        newLobby.setGameStarted(false);
+        newLobby.setGameOfLobby(null);
+        newLobby.setIsPrivate(true);
+        newLobby.setPin("100000");
 
         given(userRepository.findByToken(Mockito.any())).willReturn(user3);
-        given(lobbyRepository.findLobbyByPin(Mockito.any())).willReturn(Optional.of(lobby));
-        given(lobbyService.addPlayertoLobby(Mockito.any(), Mockito.any())).willReturn(lobby);
+        given(lobbyService.checkIfLobbyExistsByPin(Mockito.any())).willReturn(oldLobby);
+        given(lobbyService.addPlayertoLobby(Mockito.any(), Mockito.any())).willReturn(newLobby);
 
         // add new player to Lobby
         Map<String, Long> userId = new HashMap<>();
@@ -321,14 +338,15 @@ public class LobbyControllerTest {
 
         // then
         mockMvc.perform(putRequest).andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
-                .andExpect(jsonPath("$.numberOfPlayers", is(lobby.getNumberOfPlayers())))
-                .andExpect(jsonPath("$.lobbySize", is(lobby.getLobbySize())))
-                .andExpect(jsonPath("$.usersInLobby", containsInAnyOrder(lobby.getUsersInLobby().get(0).intValue(), lobby.getUsersInLobby().get(1).intValue())))
-                .andExpect(jsonPath("$.usersInLobby").value(hasSize(2)))
-                .andExpect(jsonPath("$.gameStarted", is(lobby.getGameStarted())));
-
-    }*/
+                .andExpect(jsonPath("$.id", is(newLobby.getId().intValue())))
+                .andExpect(jsonPath("$.numberOfPlayers", is(newLobby.getNumberOfPlayers())))
+                .andExpect(jsonPath("$.lobbySize", is(newLobby.getLobbySize())))
+                .andExpect(jsonPath("$.usersInLobby", containsInAnyOrder(newLobby.getUsersInLobby().get(0).intValue(), newLobby.getUsersInLobby().get(1).intValue(), newLobby.getUsersInLobby().get(2).intValue())))
+                .andExpect(jsonPath("$.usersInLobby").value(hasSize(3)))
+                .andExpect(jsonPath("$.players").value(hasSize(3)))
+                .andExpect(jsonPath("$.gameOfLobby").isEmpty())
+                .andExpect(jsonPath("$.gameStarted", is(newLobby.getGameStarted())));
+    }
 
     /**
      * Helper Method to convert userPostDTO into a JSON string such that the input
