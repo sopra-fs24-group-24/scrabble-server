@@ -74,7 +74,8 @@ public class UserController {
     userService.updateUser(userInput, id);
   }
 
-  @RequestMapping("/users/{userId}")
+  @GetMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public User getUser(@PathVariable("userId") Long userId,@RequestParam(required=false) String token) 
   {

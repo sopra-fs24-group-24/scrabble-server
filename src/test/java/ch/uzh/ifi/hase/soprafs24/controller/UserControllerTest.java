@@ -23,8 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
@@ -459,6 +458,67 @@ mockMvc.perform(getRequest)
 
       mockMvc.perform(postRequest)
               .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void getFriends_validRequest_friendsListSent() throws Exception {
+      // given
+      User user1 = new User();
+      user1.setId(1L);
+      user1.setUsername("fabio");
+      user1.setToken("1");
+      User user2 = new User();
+      user2.setId(2L);
+      user2.setUsername("luca");
+      User user3 = new User();
+      user3.setId(3L);
+      user3.setUsername("martin");
+
+      List<User> friends = new ArrayList<>();
+      friends.add(user2);
+      friends.add(user3);
+
+      given(userService.getFriends(Mockito.any(), Mockito.any())).willReturn(friends);
+
+      // when
+      MockHttpServletRequestBuilder getRequest = get("/friends/1?token=1");
+
+      // then
+      mockMvc.perform(getRequest).andExpect(status().isOk())
+              .andExpect(jsonPath("$", hasSize(2)))
+              .andExpect(jsonPath("$[0].id", anyOf(is(user2.getId().intValue()), is(user3.getId().intValue()))))
+              .andExpect(jsonPath("$[0].username", anyOf(is(user2.getUsername()), is(user3.getUsername()))))
+              .andExpect(jsonPath("$[1].id", anyOf(is(user2.getId().intValue()), is(user3.getId().intValue()))))
+              .andExpect(jsonPath("$[1].username", anyOf(is(user2.getUsername()), is(user3.getUsername()))))
+              .andExpect(jsonPath("$[0].password", is("")))
+              .andExpect(jsonPath("$[1].password", is("")))
+              .andExpect(jsonPath("$[0].token", is("")))
+              .andExpect(jsonPath("$[1].token", is("")));
+  }
+
+  @Test
+  public void getInformationFromOtherUser_validRequest_userInformationSent() throws Exception {
+      // given
+      User user1 = new User();
+      user1.setId(1L);
+      user1.setUsername("fabio");
+      user1.setToken("1");
+      User user2 = new User();
+      user2.setId(2L);
+      user2.setUsername("luca");
+
+      given(userService.isTokenValid(Mockito.any())).willReturn(user1);
+      given(userService.getUserParams(Mockito.any())).willReturn(user2);
+
+      // when
+      MockHttpServletRequestBuilder getRequest = get("/users/2?token=1");
+
+      // then
+      mockMvc.perform(getRequest).andExpect(status().isOk())
+              .andExpect(jsonPath("$.id", is(user2.getId().intValue())))
+              .andExpect(jsonPath("$.username", is(user2.getUsername())))
+              .andExpect(jsonPath("$.password", is("")))
+              .andExpect(jsonPath("$.token", is("")));
   }
 
   /**
