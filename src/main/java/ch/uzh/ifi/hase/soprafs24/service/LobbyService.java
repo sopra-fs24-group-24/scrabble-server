@@ -77,13 +77,6 @@ public class LobbyService {
         return newLobby;
     }
 
-    /*
-    public Lobby addPlayertoPrivateLobby(String lobbyPin,Long userId)
-    {
-        Lobby lobby=checkIfLobbyExistsByPin(lobbyPin);
-        return addPlayertoLobby(lobby.getId(), userId);
-    }*/
-
     public void transformUsersIntoUsersSlim(LobbyGetDTO lobbyGetDTO, Lobby lobby){
         List<UserSlimGetDTO> playersSlim = new ArrayList<>();
         for (User player : lobby.getPlayers()){
@@ -123,17 +116,6 @@ public class LobbyService {
         String errorMessage = "Lobby is already full!";
         throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
     }
-/*
-    public void deleteLobby(Long lobbyId)
-    {
-        Lobby lobby = checkIfLobbyExistsById(lobbyId);
-        List<User> players=lobby.getPlayers();
-
-        for (User user : players) 
-        {
-            removePlayerFromLobby(lobbyId, user.getId());    
-        }
-    }*/
 
     public void removePlayerFromLobby(Long lobbyId, Long userId) {
         User foundUser = checkIfPlayerExists(userId);
@@ -294,11 +276,10 @@ public class LobbyService {
     }
 
     /**
-     * This is a helper method that will check whether the user,
-     * which wants to withdraw from a lobby, is indeed in the
-     * specified lobby. If the user is in the specified lobby,
-     * the truth value true is returned, otherwise an error
-     * message is shown.
+     * This is a helper method that will check whether the user
+     * exists in the database. If a user with the indicated userId
+     * exists in the database, this user is returned, otherwise an error
+     * is thrown.
      *
      * @param userId
      * @throws org.springframework.web.server.ResponseStatusException

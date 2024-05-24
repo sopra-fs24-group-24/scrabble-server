@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameMode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyPostDTO {

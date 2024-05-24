@@ -891,7 +891,6 @@ public class GameService {
                     }
                 }
 
-                //TODO: Change when implementing constesting
                 boolean validWord;
                 if (validateWord){
                     validWord = validateWord(word.toString());
@@ -1004,7 +1003,6 @@ public class GameService {
                 }
             }
 
-            //TODO: Change when implementing constesting
             boolean validWord;
             if (validateWord){
                 validWord = validateWord(word.toString());

@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 

@@ -2,8 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 
-import ch.uzh.ifi.hase.soprafs24.repository.BagRepository;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
