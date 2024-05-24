@@ -106,17 +106,6 @@ public class LobbyController {
         return lobbyGetDTO;
     }
 
-    /*
-    @DeleteMapping("/lobbies/{lobbyId}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public void deleteLobby(@PathVariable("lobbyId") Long lobbyId,@RequestHeader("token") String token) 
-    {
-        userService.isTokenValid(token);
-        lobbyService.checkIfLobbyExistsById(lobbyId);
-        lobbyService.deleteLobby(lobbyId);
-    }*/
-
     @PutMapping("/lobbies/withdrawal/{lobbyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void withdrawFromLobby(@PathVariable Long lobbyId, @RequestBody Map<String, Long> requestBody,@RequestHeader("token") String token) 
