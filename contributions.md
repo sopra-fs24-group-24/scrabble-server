@@ -194,6 +194,12 @@ completed on Wednesday, 15.05.2024
 
 **This week the Joker "skip continuous progress" was used.**
 
+Make sure upon deleting a game, all deletes are properly cascaded [(issue 149)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/149) </br>
+
+Fix score calculation so that scores are never < 0 [(issue 150)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/150) </br>
+
+Other tasks carried out: updated / created tests and bug fixes
+
 ## Luca Stephan Christl
 
 ### *Week 1*

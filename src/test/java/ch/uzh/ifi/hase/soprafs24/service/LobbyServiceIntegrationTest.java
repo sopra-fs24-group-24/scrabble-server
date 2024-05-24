@@ -516,7 +516,7 @@ public class LobbyServiceIntegrationTest {
             assertEquals(createdUser2.getId(), userRepository.findAll().get(0).getId());
         }
     }
-    
+
     @Test
     @Transactional
     public void placeTilesAndContestWord() {
