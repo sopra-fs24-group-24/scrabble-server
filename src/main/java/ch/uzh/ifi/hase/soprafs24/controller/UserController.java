@@ -68,7 +68,6 @@ public class UserController {
 
   @PutMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @ResponseBody
   public void updateUser(@PathVariable("userId") Long id, @RequestBody UserPutDTO userPutDTO) {
     User userInput = DTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
     userService.updateUser(userInput, id);
@@ -112,7 +111,6 @@ public class UserController {
 
   @PostMapping("/logout")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @ResponseBody
   public void logoutUser(@RequestBody LogoutPostDTO logoutPostDTO) {
       User userInput = DTOMapper.INSTANCE.convertLogoutPostDTOToEntity(logoutPostDTO);
 

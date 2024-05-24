@@ -69,7 +69,7 @@ public class GameController
     }
 
     @PostMapping("moves/skip/{gameId}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void skipTurn(@PathVariable Long gameId,@RequestHeader("token") String token) 
     {
         User user = userService.isTokenValid(token);

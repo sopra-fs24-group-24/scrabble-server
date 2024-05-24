@@ -383,7 +383,7 @@ public class GameControllerTest {
                 .contentType(MediaType.APPLICATION_JSON).header("token", "4242");
 
         mockMvc.perform(postRequest)
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
