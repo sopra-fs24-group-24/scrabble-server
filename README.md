@@ -1,4 +1,4 @@
-# SoPra RESTful Service Template FS24
+# Scrabble - Online Version of the Popular Boardgame
 ## Introduction
 This Project is part of the module Software Engineering Praktikum (Sopra) at University Zurich. The goal is to make a Scrabble clone to play online with friends. Scrabble is a word game in which two to four players score points by placing tiles, each bearing a single letter, onto a game board divided into a 15×15 grid of squares. The tiles must form words that, in crossword fashion, read left to right in rows or downward in columns and are included in a standard dictionary or lexicon. The motivation for the project stems from the group members passion for the game and interest in developing an online version to play as a party game with custom rules that fit their expectations. This is the <b>Server</b> part of the Project. The Client part can be found [here](https://github.com/sopra-fs24-group-24/scrabble-client).
 
