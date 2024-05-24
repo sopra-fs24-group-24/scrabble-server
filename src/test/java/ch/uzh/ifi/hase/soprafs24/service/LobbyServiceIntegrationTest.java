@@ -516,8 +516,7 @@ public class LobbyServiceIntegrationTest {
             assertEquals(createdUser2.getId(), userRepository.findAll().get(0).getId());
         }
     }
-
-    /*
+    
     @Test
     @Transactional
     public void placeTilesAndContestWord() {
@@ -561,10 +560,12 @@ public class LobbyServiceIntegrationTest {
             updatedPlayfield.add(null);
         }
 
+        List<Tile> completeOldHand1 = new ArrayList<>(game.getHands().get(0).getHandtiles());
+        List<Tile> completeOldHand2 = new ArrayList<>(game.getHands().get(1).getHandtiles());
         List<Tile> oldHand = new ArrayList<>();
         Long currentPlayersID = game.getCurrentPlayer();
-        int index = 110;
-        for (int i = 0; i < 7; i++){
+        int index = 112;
+        for (int i = 0; i < 2; i++){
             if (currentPlayersID == game.getHands().get(0).getHanduserid()){
                 Tile placedTile = game.getHands().get(0).getHandtiles().get(i);
                 placedTile.setBoardidx(index);
@@ -589,13 +590,8 @@ public class LobbyServiceIntegrationTest {
         Game updatedGame = gameRepository.findAll().get(0);
 
         // word is placed on playfield
-        assertEquals(oldHand.get(0), updatedGame.getPlayfield().get(110));
-        assertEquals(oldHand.get(1), updatedGame.getPlayfield().get(111));
-        assertEquals(oldHand.get(2), updatedGame.getPlayfield().get(112));
-        assertEquals(oldHand.get(3), updatedGame.getPlayfield().get(113));
-        assertEquals(oldHand.get(4), updatedGame.getPlayfield().get(114));
-        assertEquals(oldHand.get(5), updatedGame.getPlayfield().get(115));
-        assertEquals(oldHand.get(6), updatedGame.getPlayfield().get(116));
+        assertEquals(oldHand.get(0), updatedGame.getPlayfield().get(112));
+        assertEquals(oldHand.get(1), updatedGame.getPlayfield().get(113));
         assertTrue(updatedGame.getOldPlayfield().stream().allMatch(java.util.Objects::isNull));
         assertEquals(86, updatedGame.getBag().getTiles().size());
 
@@ -615,30 +611,25 @@ public class LobbyServiceIntegrationTest {
             assertEquals(86, savedGame.getBag().getTiles().size());
             // check that player didn't receive new tiles
             if (currentPlayersID == savedGame.getHands().get(0).getHanduserid()){
-                assertArrayEquals(oldHand.toArray(), savedGame.getHands().get(0).getHandtiles().toArray());
+                assertArrayEquals(completeOldHand1.toArray(), savedGame.getHands().get(0).getHandtiles().toArray());
             }
             else{
-                assertArrayEquals(oldHand.toArray(), savedGame.getHands().get(1).getHandtiles().toArray());
+                assertArrayEquals(completeOldHand2.toArray(), savedGame.getHands().get(1).getHandtiles().toArray());
             }
         }
         else{
             // Contestation was not successful
-            assertEquals(oldHand.get(0), savedGame.getPlayfield().get(110));
-            assertEquals(oldHand.get(1), savedGame.getPlayfield().get(111));
-            assertEquals(oldHand.get(2), savedGame.getPlayfield().get(112));
-            assertEquals(oldHand.get(3), savedGame.getPlayfield().get(113));
-            assertEquals(oldHand.get(4), savedGame.getPlayfield().get(114));
-            assertEquals(oldHand.get(5), savedGame.getPlayfield().get(115));
-            assertEquals(oldHand.get(6), savedGame.getPlayfield().get(116));
+            assertEquals(oldHand.get(0), savedGame.getPlayfield().get(112));
+            assertEquals(oldHand.get(1), savedGame.getPlayfield().get(113));
             assertArrayEquals(savedGame.getPlayfield().toArray(), savedGame.getOldPlayfield().toArray());
-            assertEquals(79, savedGame.getBag().getTiles().size());
+            assertEquals(84, savedGame.getBag().getTiles().size());
             // check that player received new tiles
             if (currentPlayersID == savedGame.getHands().get(0).getHanduserid()){
-                assertFalse(Arrays.equals(oldHand.toArray(), savedGame.getHands().get(0).getHandtiles().toArray()));
+                assertFalse(Arrays.equals(completeOldHand1.toArray(), savedGame.getHands().get(0).getHandtiles().toArray()));
             }
             else{
-                assertFalse(Arrays.equals(oldHand.toArray(), savedGame.getHands().get(1).getHandtiles().toArray()));
+                assertFalse(Arrays.equals(completeOldHand2.toArray(), savedGame.getHands().get(1).getHandtiles().toArray()));
             }
         }
-    }*/
+    }
 }
