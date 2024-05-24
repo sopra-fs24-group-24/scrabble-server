@@ -550,3 +550,9 @@ completed on Tuesday 21.05.2024
 **Create guards for lobby, game and profile [(issue #67)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/67) [(issue #68)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/68) [(issue #69)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/69)** </br>
 
 **Create REST endpoint to get word information [(issue #108)](https://github.com/sopra-fs24-group-24/scrabble-server/issues/108)** </br>
+
+### *Week 7 - Joker* 
+
+**Implement a guard, so that only players with a gameid can access the page [(issue #73)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/73)** </br>
+
+**Correctly remove gameid and lobbyid from sessionstorage upon leaving the endscreen [(issue #72)](https://github.com/sopra-fs24-group-24/scrabble-client/issues/72)** </br>
