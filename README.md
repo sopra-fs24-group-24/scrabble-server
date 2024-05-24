@@ -7,6 +7,10 @@ This Project is part of the module Software Engineering Praktikum (Sopra) at Uni
     - [Node.js](https://nodejs.org/docs/latest/api/)
 
     - [React.js](https://react.dev/)
+ 
+    - [dnd kit](https://dndkit.com/) (drag and drop library)
+ 
+    - [react-toastify](https://fkhadra.github.io/react-toastify/introduction/) (toast notifications library)
 
 - Backend ([Server](https://github.com/sopra-fs24-group-24/scrabble-server))
     - [Springboot](https://docs.spring.io/spring-boot/documentation.html)
